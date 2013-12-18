@@ -1,0 +1,24 @@
+{
+  "name": "WikiNet",
+  "version": "0.1",
+  "description": "Reads your wiki History, build the network map",
+  "permissions": [
+    "history",
+    "tabs"
+
+  ],
+  "page_action": {
+    "default_icon": "net.png",
+    "default_title" : "WikiNet"
+  },
+  "background": {
+    "scripts": ["src/js/background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/site/index.html"],
+      "js": ["src/js/script.js"]
+    }
+  ],
+  "manifest_version": 2
+}
