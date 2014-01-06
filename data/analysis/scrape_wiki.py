@@ -26,9 +26,9 @@ json_data.close()
 historyTitles = []
 
 for item in mHistory:
-	url = mHistory[item][2]
-	count = int(mHistory[item][3])
-	for ii in range(count):
+	url = mHistory[item][2] # The webpage URL
+	count = int(mHistory[item][3]) # The number of times that page was accessed
+	for ii in range(count): # Run this for each time the page was accessed, to get fair weighting.
 		print str(ii) + " of " + str(count)
 		try:
 			# print url.split("wiki/")[1]
@@ -42,14 +42,7 @@ for item in mHistory:
 
 # print historyTitles
 
-	# historyTitles.append(url.match)
-	
-	# historyTitles.append(mHistory[item])
-
-
-
-
-masterPageLinks = {}      # {page1: [list of links page1 contains], ... , pageN: [list of links pageN contains]}
+masterPageLinks = {} # {page1: [list of links page1 contains], ... , pageN: [list of links pageN contains]}
 directPages = {}     # {page1: 4, page2: 13, ... , pageN: 7}
 firsthopPages = {}	 # {page1: 4, page2: 13, ... , pageN: 7}
 secondhopPages = {}	 # {page1: 4, page2: 13, ... , pageN: 7}
@@ -104,11 +97,13 @@ def scrapePage (pageTitle):
 
 # Bokm%C3%A5l
 
+# How many pages are there with only one hit
 countpages = 0
 for page in firsthopPages:
 	if firsthopPages[page] == 1:
 		countpages = countpages + 1
 print str(countpages) + " out of " + str(len(firsthopPages))
+
 
 # Indonesian_killings_of_1965%E2%80%931966
 
@@ -164,20 +159,20 @@ print sorted_x
 
 
 # Clean after direct (first function block)
-pickle.dump( masterPageLinks, open( "masterPageLinks_direct.p", "wb" ) )
-pickle.dump( directPages, open( "directPages.p", "wb" ) )
-pickle.dump( firstHopLinksList, open( "firstHopLinksList.p", "wb" ) )
+# pickle.dump( masterPageLinks, open( "masterPageLinks_direct.p", "wb" ) )
+# pickle.dump( directPages, open( "directPages.p", "wb" ) )
+# pickle.dump( firstHopLinksList, open( "firstHopLinksList.p", "wb" ) )
 
 
-masterPageLinks = pickle.load(open("masterPageLinks.p", "rb"))  
-directPages = pickle.load(open("directPages.p", "rb"))     
-firsthopPages = pickle.load(open("firsthopPages.p", "rb"))	 
+# masterPageLinks = pickle.load(open("masterPageLinks.p", "rb"))  
+# directPages = pickle.load(open("directPages.p", "rb"))     
+# firsthopPages = pickle.load(open("firsthopPages.p", "rb"))	 
 # secondhopPages = pickle.load(open("secondhopPageshalf.p", "rb"))	
 
 firstHopLinksList = pickle.load(open("firstHopLinksList.p", "rb")) 
 # secondHopLinksList = pickle.load(open("secondHopLinksList.p", "rb")) 
 
-pickle.dump( masterPageLinks, open( "masterPageLinks.p", "wb" ) )
+pickle.dump( masterPageLinks, open( "masterPageLinks.p", "wb" ) ) # Add a timestamp to the end
 pickle.dump( firsthopPages, open( "firsthopPages.p", "wb" ) )
 pickle.dump( secondHopLinksList, open( "secondHopLinksList.p", "wb" ) )
 pickle.dump( secondhopPages, open( "secondhopPages.p", "wb" ) )

@@ -2,7 +2,7 @@
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 function checkForValidUrl(tabId, changeInfo, tab) {
-  if (tab.url == "file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/site/index.html") {
+  if (tab.url == "file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/client/index.html") {
     chrome.pageAction.show(tabId); // show the page action
 
     if (tab.url !== undefined && changeInfo.status == "complete") {
@@ -15,7 +15,7 @@ function sendHistory(){
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
       'maxResults': 10000 ,
-      'startTime': 0  // that was accessed less than one week ago.
+      'startTime': 0  
     },
     function(historyItems) {
       console.log(historyItems.length);

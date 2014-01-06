@@ -16,7 +16,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/site/index.html"],
+      "matches": ["file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/client/index.html"],
       "js": ["src/js/script.js"]
     }
   ],
