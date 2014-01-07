@@ -1,0 +1,1333 @@
+Last login: Mon Jan  6 13:44:55 on ttys000
+dhcp-18-85-58-77:~ travis$ ls
+AndroidStudioProjects	Downloads		Pictures
+Applications		Dropbox			Public
+Calibre Library		Library			Workspace
+Desktop			Movies			extraDocs
+Documents		Music			tmp
+dhcp-18-85-58-77:~ travis$ cd /Users/travis/Workspace/acad_MediaLab/proj_wikiNet 
+dhcp-18-85-58-77:proj_wikiNet travis$ ls
+client		extension	public
+data		misc		server
+dhcp-18-85-58-77:proj_wikiNet travis$ cd data/
+dhcp-18-85-58-77:data travis$ ;s
+-bash: syntax error near unexpected token `;'
+dhcp-18-85-58-77:data travis$ ls
+analysis	datasets
+dhcp-18-85-58-77:data travis$ cd analysis
+dhcp-18-85-58-77:analysis travis$ ls
+analyze_scrape.py	scrape_wiki.py
+dhcp-18-85-58-77:analysis travis$ ls
+analyze_scrape.py	scrape_wiki.py
+dhcp-18-85-58-77:analysis travis$ python analyze_scrape.py 
+  File "analyze_scrape.py", line 15
+    for page in directPages
+                          ^
+SyntaxError: invalid syntax
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ python analyze_scrape.py 
+Traceback (most recent call last):
+  File "analyze_scrape.py", line 1, in <module>
+    from lxml import html
+ImportError: No module named lxml
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Epic_film
+Dr._Strangelove
+NoSQL
+Gigantopithecus
+The_Power_of_Now
+Feicheng_Acid_Chemicals
+Thirteen_United_Colonies
+501(c)_organization
+H._Eugene_Stanley
+Armadillo_Aerospace
+Artisan
+Agent_Orange
+Datenschleuder
+Divine_Fits
+Super_Mario_Bros._%28film%29
+Pore%C4%8D
+Niuean_language
+Andrew_Lippman
+Morphic_fields
+The_Veldt_(short_story)
+Krokodil
+Chick_tract
+List_of_astronomical_observatories
+Pectus_excavatum
+Anthropic_principle
+World_Chess_Championship
+Fact
+Billy_Cranston
+Geography_of_Saudi_Arabia
+Web_search_engine
+Jennifer_Love_Hewitt
+Nonuniform_sampling
+Actua
+TARGIT
+Anthony_Kiedis
+Holland
+Kigali
+David_A._Smith_(computer_scientist)
+Zooming_user_interface
+Joint_Chiefs_of_Staff
+Noel_Gallagher
+Ken_Perlin
+Steven_Jay_Blum
+List_of_burn_centers_in_the_United_States
+Universitat_d'Andorra
+Khalid_A._Al-Falih
+Jersey
+Juliane_K%C3%B6pcke
+List_of_Arrested_Development_episodes
+John_C._Inglis
+Padel_tennis
+Beau_Billingslea
+Charles_Kuen_Kao
+Whole_brain_emulation
+Social_sciences
+Kendrick_Lamar
+Motorcycle
+Cantonese
+Jaron_Lanier
+Gang_of_Eight_%28intelligence%29
+The_Cyberiad
+Graham_Hughes
+Java_(programming_language)
+Decoupling_capacitor
+Lenovo
+Slovakia
+ECMAScript
+Ernest_Moniz
+Kenneth_Ham
+Little_Dragon
+Norway
+Re-education_through_labor
+James_Deen
+Calista_Flockhart
+Deus_ex_machina
+Myrmecia
+3,4-Methylenedioxyamphetamine
+The_One_That_Got_Away_(Modern_Family)
+Natural_science
+Royal_house
+Open_Sound_Control
+List_of_countries_by_GDP_(PPP)
+Patrick_Stewart
+Android_Studio
+DoubleClick
+Marginal_distribution
+Neuromancer
+Alan_Kay
+Dava_Newman
+Lists_of_Chinese_companies
+Data_management_system
+Sweetbread
+Mos_Def
+Arab_Socialist_Ba%27ath_Party_%E2%80%93_Iraq_Region
+Mickey_Avalon
+MIT_in_popular_culture
+The_Hard_Case
+Albert-L%C3%A1szl%C3%B3_Barab%C3%A1si
+Liechtenstein
+Spina_bifida
+200_(South_Park)
+Hybrid_systems
+Botfly
+The_Guardian
+Ravensbr%C3%BCck_concentration_camp
+Chiffon_(fabric)
+Taiwan
+Ahmed_bin_Abdul_Aziz
+Portugal
+Gabriel_E._Gomez
+Dina_Katabi
+Neurofibromatosis
+Stanley_Tucci
+Stitch!
+Edurne_Pasaban
+Cultural_Revolution
+Plague_doctor_costume
+Kent_Larson_(architect)
+Enfilade_and_defilade
+Eros
+Third_Saudi_State
+Complexity_theory
+J%25C3%25A1nos_%25C3%2581der&h=277&w=182&sz=1&tbnid=rFCpyd2_jOpVzM:&tbnh=160&tbnw=105&zoom=1&usg=__E5MCZaS9kKJouz1Kx8SA2KDs0G8=&docid=1rQBXI8QhGfdnM&itg=1&sa=X&ei=J41qUsLuCpTpkAfHg4CQAQ&ved=0CLMBEPwdMBA
+Norah_Jones
+Kuwait
+Semantic_Web
+Podblanc
+Non-Aligned_Movement
+Edith_Head
+Lojban
+2000s
+Hindi
+Javanese&q=&esrc=s&ei=8jGmUubcIdLRkQf5tYHQAQ&usg=AFQjCNHG4sHUbT-J0U9B03UkK_snaBQARQ
+GeoCities
+Wales
+John_McAfee
+Wikipedia:About
+Mary_Kay_Bergman
+'Pataphysics
+Spike_Spiegel
+Washington_Navy_Yard
+Turki_of_Najd
+Great_Oxygenation_Event
+Cobalt-60
+Advanced_Systems_Format
+Squid_Labs
+Nick_Montfort
+Andrew_Bird
+Guild_Guitar_Company
+SETI
+Wikipedia:Getting_to_Philosophy
+Alexander_the_Great
+Yale_University
+MIT_Senseable_City_Lab
+Hiriko
+From_Here_to_Now_to_You
+Ray_LaMontagne
+Linux_kernel
+Michele_Miscavige
+Category:Non-profit_organizations_based_in_Europe
+Antwerp
+Nicholas_Negroponte
+Nepal
+Medell%C3%ADn_Cartel
+Casa_d'Areny-Plandolit
+Eisley
+Denmark
+General_Council_of_Andorra
+Javanese_language
+The_Hole_%28Scientology%29
+Bilbao
+Khalil_Gibran_Muhammad
+Glenn_Greenwald
+Hinterkaifeck
+Heber_Jentzsch
+Ask.com
+Zach_Galifianakis
+Taggant
+Mastectomy
+List_of_Co-Princes_of_Andorra
+Danny_Masterson
+Cheese
+Diceros_bicornis_minor
+Toulouse
+Boston_Red_Sox
+Kosovo
+THX_1138
+Wolfgang_Pauli
+University_College_London
+Red_Hot_Chili_Peppers
+Harajuku
+History_of_petroleum
+Souvlaki
+Head_voice
+Marcia_Ball
+Joint_Chiefs_of_Staff_Identification_Badge
+Zed_Shaw
+John_Harbaugh
+Chess
+Stephanie_Gilmore
+Republic_of_Turkey
+Code_refactoring
+John_Maeda
+JavaScript
+Frederic_William_Henry_Myers
+Bosnia_and_Herzegovina
+Leonard_Cohen
+Kryptonite
+Tesla_Model_S
+McAfee
+Great_Smog_of_1952
+Carlo_Ratti
+Epic_(genre)
+Recep_Tayyip_Erdo%C4%9Fan
+Biafra
+Gilded_Age
+Tesfaye_Jifar
+Plasq
+Joe_Haldeman
+Dennis_Ritchie
+Phoenix
+Arecibo,_Puerto_Rico
+Shit_Robot
+Regular_expression
+Philo_Farnsworth
+2010_(film)
+Shaka
+Rock_hyrax
+Anti-tobacco_movement_in_Nazi_Germany
+Actias_luna
+Dustin_Pedroia
+Vespa_GTS_250ie
+Necromancer_(novel)
+Specific_absorption_rate
+Daniel_Poneman
+Partial_differential_equation
+The_Last_Shadow_Puppets
+Eritrea
+Mound_builder_(people)
+Mind_map
+Ben_Cohen_(businessman)
+Deadpool_(video_game)
+Khalid_Sheikh_Mohammed
+Harmony_Company
+Bruce_Iglauer
+David_P._Reed
+Arliss_Howard
+Types_of_motorcycles
+Yesterday_and_Today
+John_D._and_Catherine_T._MacArthur_Foundation
+Syria
+Rennet
+United_States_Department_of_Veterans_Affairs_emblems_for_headstones_and_markers
+Fluffer
+Jonathan_Zittrain
+Nonverbal_communication
+Wii_U_GamePad
+MIT_Media_Lab
+Ugali
+Hamid_Karzai
+Musa%27id_bin_Abdul_Aziz_Al_Saud
+Kinyarwanda
+Jerry_West
+Art
+Complex_system
+Greece
+Positive_psychology
+Arctic_Monkeys
+Esperanto
+12-3_incident
+Aleksandar_Lazarevic
+Pearl_Harbor
+Abu_Musab_al-Zarqawi
+Ghostpoet
+Nick_Toon
+Main_Page
+Fugu
+Alan_V._Oppenheim
+Monaco
+Visible_light_communication
+Cinema_of_Nigeria
+Hunter_S._Thompson
+Rendang
+Sloan_Great_Wall
+Ayman_al-Zawahiri
+Zac_Efron
+Arecibo_Observatory
+Felix_G._Arroyo
+United_Kingdom
+Mizuko_Ito
+Jjimjilbang
+Andrew_B._Lippman
+Second_Sino-Japanese_War
+Emirate
+Alligator_Records
+Guern%C3%A9siais
+Tim_Gunn
+Steven_Chu
+Midge_(Barbie)
+Gonzo_journalism
+Fez_%28video_game%29
+Sino
+Martin_Dempsey
+Nordic_model
+Brussels
+Environmental_portrait
+Arlington,_Massachusetts
+Jacklyn_H._Lucas
+Barcelona_Sants_railway_station
+2010s
+Chiang_Kai-shek
+Whatever_People_Say_I_Am,_That's_What_I'm_Not
+Human_Speechome_Project
+Revolver_(2005_film)
+Shaybah
+Amebelodon
+Repsol_S.A.
+Cliff_Bleszinski
+Complexity
+Freetown_Christiania
+Eiffel_Tower
+Organism
+Taipei
+Henry_Lee_Lucas
+Helicopter_noise_reduction
+Digital_Life
+Blue_Origin
+Geography_of_Asia
+Prc
+DBA
+Mike_Nichols
+Freemium
+The_Atlantic
+Fred_Hollows
+Alfonso_XIII_of_Spain
+Brian_Hallisay
+Wedding_anniversary
+Bashar_al-Assad
+Semantic_network
+Estado_Novo_(Portugal)
+Bruce_Sterling
+Thein_Sein
+South_Park_controversies
+Cheesemaker
+Ciampino_%E2%80%93_G.B._Pastine_International_Airport
+Ashkenazi_Jews
+Cory_Doctorow
+Donald_Glover
+Cryptology
+New_Balance
+Precession
+Kevin_P._Ryan
+Franz_von_Holzhausen
+Frank_Murphy
+Camp_22
+News_Corporation
+Dissolution_of_the_Soviet_Union
+Jimi_Hendrix
+Brandy_Norwood
+Tyler,_The_Creator
+Pauli_equation
+Brandon_Marshall
+Elizabeth_Bear
+Kingdom_of_Great_Britain
+The_Lookout_Air_Raid
+Antoine_Dodson
+Fear,_uncertainty_and_doubt
+First_Opium_War
+Chaos_Computer_Club
+Eye_tracking
+MIT_Museum
+Guy_Ritchie
+Watermelon
+Malagasy_language
+Saul_Griffith
+Lake_Vostok
+Shibuya,_Tokyo
+Motorcycle_safety
+President_of_Iran
+Pine_Gap
+Champion_(role_variant)
+Arthur_C._Clarke
+List_of_winners_of_the_Boston_Marathon
+Shafi_Goldwasser
+Hikaru_Utada
+Peter_Lyman
+Regenerative_brake
+Ordino
+Ron_Rivest
+Saskatoon
+Arthur_D._Levinson
+Remove_before_flight
+Winky_Dink_and_You
+Sallie_Mae
+Transcranial_magnetic_stimulation
+Rainbows_End
+Attack_on_Pearl_Harbor
+Paul_Ekman
+Goldwasser
+Douglas_Engelbart
+Doushantuo_Formation
+Boston
+Kernel_(computing)
+Pyrosome
+Business_Insider
+Puerto_Rico
+OK_Soda
+Pablo_escobar
+Inna
+MongoDB_Inc.
+Carrie_Nye
+The_Postelles
+John_McCarthy_(computer_scientist)
+Complexity_theory_and_organizations
+Fourth_Amendment_to_the_United_States_Constitution
+Major_League_Soccer
+The_Violet_May
+Shepard_Fairey
+Jersey's_population
+ELife
+Hari_Seldon
+Ottoman_Empire
+Standard_Chinese
+Marshall_Applewhite
+David_Yost
+L%C3%A9opold_Eyharts
+Edward_Tufte
+Dan_Auerbach
+Fourier_transform
+Sherlock_Holmes:_A_Game_of_Shadows
+Rome_Airport
+Ontology
+Postal_services_in_Andorra
+Diller_Scofidio_%2B_Renfro
+Second_Battle_of_Fallujah
+OS_X_Mavericks
+Usage_share_of_operating_systems
+RichGirl
+Michael_Posner_(psychologist)
+The_Gernsback_Continuum
+Scott_Forstall
+Kanye_West
+Croquet_Project
+Marie_de%27_Medici
+Indonesian_killings_of_1965%E2%80%931966
+Kaiten
+Mary_Todd_Lincoln
+Napoleon_Beazley
+Daniel_Gilbert_(psychologist)
+S%C3%B3nar
+Belgium
+Antoni_Mart%C3%AD
+Independence_Day_(United_States)
+Rosalind_Picard
+Dutch_language
+Jim_Davis_(business)
+Odd_Future
+Language
+Black_sites
+Hassan_Rouhani
+Jack_T._Chick
+Tangible_media
+Kitesurfing
+Features_of_Skype
+Max_Schireson
+Fundamentalist_Church_of_Jesus_Christ_of_Latter-Day_Saints
+Servomotor
+Limbic_resonance
+The_Velvet_Underground
+AC_power_plugs_and_sockets
+Pareidolia
+Git_(software)
+Gilbert_Saboya_Suny%C3%A9
+James_Stewart_(mathematician)
+Valentich_disappearance
+List_of_Spanish_monarchs
+Earth
+David_Horowitz
+SRI_International
+Marlon_Brando
+Markdown
+Canberra
+The_Baffler
+List_of_NFL_franchise_owners
+MongoDB
+Western_University_of_Health_Sciences
+Qing_Dynasty
+Robert_Kraft
+Takeo_Ishii
+Diplo
+Pep_Guardiola
+Samuel_Adams
+Russian_tricolor
+Macau
+King_Abdullah_University_of_Science_and_Technology
+Orbital_welding
+Pentagram_Design
+Enthought
+Knowledge_representation_and_reasoning
+Polygamy
+boston
+Sexy_prime
+Sir_Georg_Solti
+Myers-Briggs_Type_Indicator
+Multiplane_camera
+Unincorporated_territories_of_the_United_States
+Craig_Cobb
+Parsons_The_New_School_for_Design
+Isaac_Asimov
+Phagophobia
+Dr._Dog
+Lisp_(programming_language)
+Hallucinations_(book)
+Cold_War
+Suzuki_SV650
+First_Sino-Japanese_War
+Donald_Tsang
+Oil
+Lou_Reed
+Macedonia_(ancient_kingdom)
+Arrested_Development_(season_4)
+Saint_IGNUcius
+Larry_Kasanoff
+Green_children_of_Woolpit
+Nicktoons_(United_States)
+Eliot_Horowitz
+chess
+Telepathy
+Genre
+Boston_nicknames
+Jeff_Bridges
+James_Baker
+Eckhart_Tolle
+Rhinoceros&q=&esrc=s&ei=F8mLUZSxGLH94AO72IGIBw&usg=AFQjCNEAo7yvsHSX6rkUEQbGEtl2KyDn3w
+That_%2770s_Show
+Ibn_Saud_of_Saudi_Arabia
+Financial_District,_Boston
+Herbert_A._Simon
+Nasal_congestion
+Master_control
+Uncontacted_peoples
+Russefeiring
+New_Orleans_Pelicans
+Kinetic_user_interface
+Archy
+Sepandar_Kamvar
+Buddhas_of_Bamiyan
+B._J._Fogg
+Clay_Shirky
+Cambridge,_Massachusetts
+Al-Qaeda
+Burma
+John_D._Carmack
+FF_DIN
+Chief_executive_officer
+Douglas_Crockford
+Marcantonio_Flaminio
+List_of_Cowboy_Bebop_episodes
+La_Massana
+Academic_disciplines
+List_of_motorcycle_deaths_in_U.S._by_year
+Kevin_Carter
+Antarctica
+Phoenix_(mythology)
+Tisch_School_of_the_Arts
+Reptar_(band)
+John_Frusciante
+Franz_Ferdinand_(band)
+Deadpool
+List_of_emoticons
+Gravity_(film)
+Burnage
+Dar_es_Salaam
+San_Francisco
+Drag%C3%A9e
+W._Daniel_Hillis
+Frank_Fournier
+Segway_polo
+Brad_Hall
+Qwest
+Gordon_R._Dickson
+Hard_problem_of_consciousness
+Air_gap_(networking)
+Basque_language
+SDMS
+Nancy_Whang
+Apple_Inc.
+Deception_(novel)
+Bokm%C3%A5l
+JJ_DOOM
+Outline_of_Andorra
+Alfred_Worden
+Copenhagen_Metro
+Andora
+Josh_Homme
+Tanzania
+United_States
+Deb_Roy
+Katherine_Anna_Kang
+Forrest_Gump
+Presidio_of_San_Francisco
+Mirai
+Trento
+Alec_Su
+TR35
+Third_Amendment_to_the_United_States_Constitution
+Ichiro_Suzuki
+Skopje
+BT_Managed_Security_Solutions
+Scrum_(software_development)
+denmark
+Steve_Jobs
+List_of_political_magazines
+History_of_the_Massachusetts_Institute_of_Technology
+Svalbard
+Engolasters
+Suzuki_SFV650_Gladius
+Global_Positioning_System
+Norwegian_language
+23andMe
+John_Wilkes
+Space_roar
+Bobby_Fischer
+Aurochs
+Muhammad_Ali
+Hazloul_bin_Abdulaziz_Al_Saud
+Martin_Varsavsky
+Taiwanese_aborigines
+MIT_class_ring
+Liam_Gallagher
+DMS
+Tom_Brady
+Social_conservatism
+Chamillionaire
+Kyary_Pamyu_Pamyu
+Adena_culture
+Alief_(belief)
+Marty_Walsh_(politician)
+Daniel_Suarez
+Biology
+Higgs_boson
+Min_Nan
+Amar_Bose
+Travis_Tritt
+The_Hire
+Chest_voice
+Tzatziki
+Fender_Telecaster
+McLaren_Mercedes
+Lotus_Software
+201_(South_Park)
+Adrian_Lamo
+H_bridge
+Thomas_Jefferson_High_School_for_Science_and_Technology
+Fulbright_Program
+List_of_Modern_Family_episodes
+Airship
+Saudi_Arabia
+Backronym
+History_of_Chinese_Americans
+Segway_PT
+President_of_Syria
+Kven_language
+Ben_Cherington
+Russell_Brand
+Impostor_syndrome
+Mustafa_Kemal_Atat%C3%BCrk
+Warren_Jeffs
+Mali
+Turing_Award
+David_Miscavige
+Mongrel_(web_server)
+Ubik
+Diaspora_(software)
+1964_New_York_World's_Fair
+When_Good_Kids_Go_Bad
+Sparsh_(software)
+Complex_adaptive_system
+Yamaha_Zuma
+Chalcatongo_de_Hidalgo
+Shaft_passer
+Emotion
+Phoenix,_Arizona
+Snatch_(film)
+Mirrorshades
+Flash_(Barry_Allen)
+Academy_Award_for_Technical_Achievement
+Biz_Markie
+Valco
+Human
+Billy_Beane
+Liberace
+Occitan_language
+Bumpy_Ride_(The_Hoosiers_album)
+Ether
+Smart_city
+Monsanto
+Languages_of_Ethiopia
+Blue_field_entoptic_phenomenon
+Dinesh_D'Souza
+Hoosiers
+Converse_(shoe_company)
+Samuel_Bodman
+Taiwanese_language
+Instructables
+Luxembourg
+Andorra
+Macedonians_(ethnic_group)
+Giorgio_Moroder
+Cluster_(spacecraft)
+European_Union
+Jeff_Hanneman
+Park_G%C3%BCell
+Brody_Dalle
+Okhotsk_Plate
+Matt_Helders
+Literature
+Kendall_Square
+A_Scanner_Darkly
+Paul_Rand
+Nederland,_Colorado
+Dyshidrosis
+JSON
+Spumoni
+Ronnie_Lee_Gardner
+Saudi_Aramco
+John_W._Henry
+Mad_Catz
+Ryan_Gosling
+UNICEF
+Ozzy_Osbourne
+Jack_LaLanne
+Universal_Product_Code
+Boston,_Lincolnshire
+index.html?curid=6223658
+Yarnell,_Arizona
+Holmgang?repost
+Blinkbot
+F-number
+Geohash
+Al-Bandari_bint_Abdulaziz
+Guernsey
+Javanese
+Tim_Berners-Lee
+Volunia
+Fast_Company_(magazine)
+Michael_Naimark
+Poe's_law
+Brain%E2%80%93computer_interface
+Ranulph_Fiennes
+List_of_languages_by_number_of_native_speakers
+A_Scanner_Darkly_(film)
+Polo
+John_Muir_Trail
+Color_blindness&docid=2BKRl4L2xwANcM&imgurl=http://upload.wikimedia.org/wikipedia/commons/7/71/Braeburn_GrannySmith_dichromat_sim.jpg&w=327&h=367&ei=I3RIUpfiJJje4AO45IC4Dg&zoom=1
+List_of_heads_of_government_of_Andorra
+24-hour_comic
+Jeff_Buckley
+Rome:_Total_War
+Poliomyelitis
+AM_(Arctic_Monkeys_album)
+Hare
+The_Notebook_(film)
+History_of_the_bikini
+Muffin_top
+Qatar
+Byline
+Macedonian
+GNU
+Gilgamesh
+Craig_Mundie
+TARGIT_Business_Intelligence
+Adam_Goodes
+Neuroblastoma
+Laura_Prepon
+Mamdouh_bin_Abdulaziz
+Vegetable
+Keith_B._Alexander
+Tournavista_District
+Apartheid_in_South_Africa
+Lilo_%26_Stitch
+Hugh_Grant_(manager)
+Abdullah_al-Janabi
+Jack_Johnson_(musician)
+Magnus_Carlsen
+Hong_Kong
+Roc_Nation
+Kingdom_of_Bosnia
+Naked_Came_the_Stranger
+Director_(business)
+E._B._White
+Prime_Minister_of_Hungary
+Venn_diagram
+C_(programming_language)
+Standard_Basque
+Ruth_Simmons
+Moussaka
+Baby_on_Board_(Modern_Family)
+Blue_Cat_Blues
+Basque_people
+House_of_Bourbon
+Science_Foo_Camp
+Makani_Power
+Randy_Schekman
+Norah_Jones&q=&esrc=s&ei=apinUfX-DsqN7QauzIGAAw&usg=AFQjCNGI1-xwHbx2CavnRj0XSWKrzzgccQ
+Dude_Ranch_(Modern_Family)
+Frou_Frou_(band)
+Philology
+Minority_Report_(film)
+Barcelona
+Qi_Lu
+Bruce_Sterling_bibliography
+Spanish_language
+Latvia
+Amharic_language
+Diaspora_(social_network)
+Max_Levchin
+Britt_Daniel
+Shakuntala_Devi
+Big_Sean
+Artificial_neural_network
+Systems_theory
+Latin
+North_Korea
+American_bison
+Information_design
+Northern_Sami_language
+New_York_Yankees
+Gallup,_New_Mexico
+Autism
+List_of_collective_nouns
+List_of_compositions_for_harp
+Louis_XIII_of_France
+Iceland
+Wladimir_Klitschko
+University_of_London
+International_Driving_Permit
+Julia_Louis-Dreyfus
+Keith_White_(II)
+Branches_of_science
+Roc
+Mercator_projection
+Chris_Hadfield
+Vi_Hart
+Representational_state_transfer
+Steve_jobs
+See_You_Next_Fall
+Oculus_Rift
+Imperial_Earth
+James_Collins_(Boston_University)
+Amphetamine
+Pygmy_peoples
+AC/DC
+Jean-Paul_Sartre
+Quetta_Shura
+Atul_Chitnis
+Epic_of_Gilgamesh
+SETI@home
+Dwight_Merriman
+Holomorphic_function
+Scooter_(motorcycle)
+White_van_speaker_scam
+National_Security_Agency
+Aalto_University
+Gabi_Hollows
+Smart_City,_Malta
+Uncle_Sam
+List_of_Robert_A._Heinlein_characters
+Jeanne_Calment
+History_of_technology
+Alexander_Graham_Bell
+Malvina_Reynolds
+Uncle_Sam_Wants_You
+Bonnie_MacBird
+Ducati
+Paul_Williams_(songwriter)
+Lineus_longissimus
+MacArthur_Fellows_Program
+Go.com
+Large_Hadron_Collider
+FIRST
+Bestival
+Library_of_Alexandria
+Sherlock_Holmes_(2009_film)
+Skordalia
+Commune
+John_Muir
+Fieldmarshal_(role_variant)
+Raised_pavement_marker
+Vespa_LX_150
+Louis_XIV
+ACDC
+List_of_concept-_and_mind-mapping_software
+Centipede
+Bicycle_safety
+Coaxial_cable
+Lock,_Stock_and_Two_Smoking_Barrels
+Chamois
+Peter_Hyams
+The_Wild_Thornberrys
+Victor_Hugo
+Homonym
+List_of_Cowboy_Bebop_characters
+GameShark
+The_Hoosiers
+Trireme
+Human_Development_Index
+Human_behavior
+CCCP_(disambiguation)
+Rizla
+Same-sex_marriage_in_Massachusetts
+Lye
+Nieu
+Shane_Victorino
+MTV%27s_Annual_Hottest_MC_List
+Hungarian_language
+Norovirus
+David_Wallace_(physicist)
+Samsung_Galaxy_Gear
+Ilya_Zhitomirskiy
+BT_Group
+Russian_Soviet_Federative_Socialist_Republic
+Pro_bono
+Kaufmann's
+Jean-Lou_Chameau
+Jazztel
+Lift_(force)
+Space_Syntax
+STL_(file_format)
+Les_Corts_(district)
+Kyoto_Prize
+Rwanda
+Wouter_van_Oortmerssen
+Ally_McBeal
+A123_Systems
+Eastern_promises
+Perlin_noise
+Rhinoceros
+Jennifer_Lawrence
+List_of_NFL_on_CBS_commentator_pairings
+Kawasaki_Ninja_250R
+Web_Open_Font_Format
+Same-sex_marriage_in_the_United_States
+RocknRolla
+Cretan_diet
+The_Last_of_Us
+El_Pas_de_la_Casa
+Johnny_Lee_Clary
+Tessellation
+Yonkers_(song)
+Disneyland_(Modern_Family)
+Dick_Cavett
+John_Legere
+Stephen_Elop
+Ontological_argument
+Ch%c5%abgi
+National_Taiwan_University
+Fiumicino_%E2%80%93_Leonardo_da_Vinci_International_Airport
+Danah_boyd
+Nanosys
+Nazi_human_experimentation
+WebOS
+Accelerando_(novel)
+Jean-Claude_Van_Damme
+Judith_Donath
+Duchenne_de_Boulogne
+Australia
+Behavior
+Grammy_Award_records
+Alexander_W._Dreyfoos,_Jr.
+Homophone
+Taiwanese_Hokkien
+Republic_of_Macedonia
+Kate_Crawford
+New_Taipei
+Jacqui_Ainsley
+Media_Lab
+Ed_Markey
+Michael_Hawley
+Carbohydrate
+Oliver_Sacks
+Gerald_Jay_Sussman
+Randal_Pinkett
+Botfly&q=&esrc=s&ei=slmuUeLbHMKy7AbziYFY&usg=AFQjCNF9rFYEMFuRB7Bh-eo2fnddCZ90pw
+Japan
+Chief_technology_officer
+Yasin_al-Qadi
+Twin_towns_and_sister_cities
+Les_Mis%C3%A9rables
+Knowledge
+Ladera_Heights,_California
+Affective_computing
+Alan_Watts
+Lemaitre_(band)
+Arthur_Kornberg
+Turkish_language
+Ernest_Thompson_Seton
+Carnation_Revolution
+Cinque_Terre
+El_Camino_(The_Black_Keys_album)
+List_of_countries_without_armed_forces
+NovaMin
+Castellano
+Marcelo_Caetano
+Tom_Ridge
+Alzheimer's_Association
+Rupert_Murdoch
+Eben_Moglen
+Tony_Fadell
+Patriot_(American_Revolution)
+Gemini_Observatory
+TUIO
+Vulture
+Languages_of_Madagascar
+Nicki_Minaj
+Real-time_computing
+Quincy_Jones
+Intractability_(complexity)
+Wikipedia:Deleted_articles_with_freaky_titles
+Thomas_P._O%27Neill_Jr._Federal_Building
+Martha_Rogers,_Ph.D.
+Ivan_Sutherland
+Robert_A._Heinlein
+Patriots'_Day
+K._Eric_Drexler
+Stealth_helicopter
+Vespa
+Quantum_mechanics
+Ancient_Macedonians
+Sino%E2%80%93French_War
+Whistleblower_Protection_Act
+Timeline_of_the_far_future
+Huddle
+Slavery
+Wilhelm_scream
+Pneumonia
+Wau_Holland
+Zygi_Wilf
+Languages_of_Spain
+Jai_Paul
+Lake_Travis
+Thomas_Frank
+Sport_touring_motorcycle
+Denn%C5%8D_Coil
+Southern_Methodist_University
+Foreign_relations_of_Andorra
+Rabies
+The_Illusion_of_Safety_(The_Hoosiers_album)
+English_language
+Twin
+Pardon_my_French
+%D0%A1%D0%A1%D0%A1%D0%A0
+Snow_Crash
+Shiatsu
+Dark_matter
+Geoffrey_Mutai
+Tommy_Lee_Jones
+2000s_(decade)
+Alan_Silvestri
+Anthology
+Zen
+Hila_Elmalich
+Scientific_data_management_system
+Joan_Enric_Vives_Sic%C3%ADlia
+Comparison_of_Portuguese_and_Spanish
+Lhasa
+Ferdinand_VII_of_Spain
+List_of_South_African_slang_words
+Rydberg_formula
+Pranav_Mistry
+Philip_K._Dick
+Anthony_Kennedy
+Luxembourg_(city)
+Swahili_language
+Ptech
+Omayra_S%C3%A1nchez
+Tibet
+Herb_Boyer
+Suicide_clutch
+Ibn_Saud
+The_Electric_Company
+Aston_Martin_DB5
+Peter_Higgs
+Hashtag
+Extreme_Cheapskates
+Trench_warfare
+Billy_West
+Oromo_language
+Madonna_(entertainer)
+Desomorphine
+Heaven's_Gate_(religious_group)
+Bullshit
+Bus_factor
+DEKA
+Cicada_3301
+New_York
+Homography
+John_Vanbrugh
+The_Pharcyde
+Jesse_Dee
+FreedomBox
+Huns
+Boston_Music_Awards
+Red_Burns
+The_Kooks
+Faroe_Islands
+Schr%C3%B6dinger_equation
+Mobile_phone_tracking
+BSON
+James_Woods
+Copenhagen
+Pedro_L%C3%B3pez_(serial_killer)
+Laetiporus
+William_Binney_(U.S._intelligence_official)
+Muriel_Cooper
+Nicole_Wong
+First_Battle_of_Fallujah
+J._G._Ballard
+Interagency_hotshot_crew
+Tunisia
+Jay-Z
+Nynorsk
+Andreas_Raab
+Lyndon_B._Johnson
+Digital_DNA
+Foodfight!
+Teacher_(role_variant)
+List_of_sexually_active_popes
+Stereolithography
+Bruce_Schneier
+Ergo_Proxy
+Scots_language
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+  File "analyze_scrape.py", line 20
+    print "Beginning Direct Page Analysis"
+    ^
+IndentationError: unexpected indent
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+  File "analyze_scrape.py", line 20
+    print("Beginning Direct Page Analysis")
+    ^
+IndentationError: unexpected indent
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Finished Direct Page Analysis
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Finished Direct Page Analysis
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Traceback (most recent call last):
+  File "analyze_scrape.py", line 25, in <module>
+    print "Total Number of Pages: " + len(directPages)
+TypeError: cannot concatenate 'str' and 'int' objects
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Total Number of Pages: 1132
+The page with the most hits has Andorra hits.
+Top ten results:
+[(u'Andorra', 20), (u'Guy_Ritchie', 12), (u'Saudi_Arabia', 10), (u'Ibn_Saud', 10), (u'Lyndon_B._Johnson', 10), (u'Boston', 9), (u'Joe_Haldeman', 7), (u'Arecibo_Observatory', 7), (u'Motorcycle_safety', 7), (u'Paul_Ekman', 7)]
+Finished Direct Page Analysis
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Total Number of Pages: 1132
+Traceback (most recent call last):
+  File "analyze_scrape.py", line 30, in <module>
+    print "The page with the most hits has " + maxHits + " hits."
+TypeError: cannot concatenate 'str' and 'int' objects
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Total Number of Pages: 1132
+The page with the most hits has 20 hits.
+Top ten results:
+[(u'Andorra', 20), (u'Guy_Ritchie', 12), (u'Saudi_Arabia', 10), (u'Ibn_Saud', 10), (u'Lyndon_B._Johnson', 10), (u'Boston', 9), (u'Joe_Haldeman', 7), (u'Arecibo_Observatory', 7), (u'Motorcycle_safety', 7), (u'Paul_Ekman', 7)]
+Finished Direct Page Analysis
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+Total Number of Pages: 1132
+The page with the most hits has 20 hits.
+Top ten results:
+[(u'Andorra', 20),
+ (u'Guy_Ritchie', 12),
+ (u'Saudi_Arabia', 10),
+ (u'Ibn_Saud', 10),
+ (u'Lyndon_B._Johnson', 10),
+ (u'Boston', 9),
+ (u'Joe_Haldeman', 7),
+ (u'Arecibo_Observatory', 7),
+ (u'Motorcycle_safety', 7),
+ (u'Paul_Ekman', 7)]
+Finished Direct Page Analysis
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+------------------------------
+Total Number of Pages: 1132
+The page with the most hits has 20 hits.
+Top ten results:
+[(u'Andorra', 20),
+ (u'Guy_Ritchie', 12),
+ (u'Saudi_Arabia', 10),
+ (u'Ibn_Saud', 10),
+ (u'Lyndon_B._Johnson', 10),
+ (u'Boston', 9),
+ (u'Joe_Haldeman', 7),
+ (u'Arecibo_Observatory', 7),
+ (u'Motorcycle_safety', 7),
+ (u'Paul_Ekman', 7)]
+Finished Direct Page Analysis
+------------------------------
+Beginning First Hop Page Analysis
+------------------------------
+Total Number of Pages: 104596
+The page with the most hits has 408 hits.
+Top ten results:
+[(u'United_States', 408),
+ (u'', 340),
+ (u'The_New_York_Times', 279),
+ (u'Wikipedia:Persondata', 222),
+ (u'The_Guardian', 158),
+ (u'European_Union', 138),
+ (u'California', 137),
+ (u'World_War_II', 129),
+ (u'New_York_City', 127),
+ (u'Rolling_Stone', 127)]
+Finished First Hop Page Analysis
+------------------------------
+Beginning Second Hop Page Analysis
+------------------------------
+^CTraceback (most recent call last):
+  File "analyze_scrape.py", line 64, in <module>
+    secondhopPages = pickle.load(open("../datasets/secondhopPages.p", "rb"))
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/pickle.py", line 1378, in load
+    return Unpickler(file).load()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/pickle.py", line 858, in load
+    dispatch[key](self)
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/pickle.py", line 980, in load_unicode
+    self.append(unicode(self.readline()[:-1],'raw-unicode-escape'))
+KeyboardInterrupt
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ 
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+------------------------------
+Total Number of Pages: 1132
+The page with the most hits has 20 hits.
+Top ten results:
+[(u'Andorra', 20),
+ (u'Guy_Ritchie', 12),
+ (u'Saudi_Arabia', 10),
+ (u'Ibn_Saud', 10),
+ (u'Lyndon_B._Johnson', 10),
+ (u'Boston', 9),
+ (u'Joe_Haldeman', 7),
+ (u'Arecibo_Observatory', 7),
+ (u'Motorcycle_safety', 7),
+ (u'Paul_Ekman', 7)]
+Finished Direct Page Analysis
+------------------------------
+Beginning First Hop Page Analysis
+------------------------------
+Total Number of Pages: 104596
+The page with the most hits has 408 hits.
+Top ten results:
+[(u'United_States', 408),
+ (u'', 340),
+ (u'The_New_York_Times', 279),
+ (u'Wikipedia:Persondata', 222),
+ (u'The_Guardian', 158),
+ (u'European_Union', 138),
+ (u'California', 137),
+ (u'World_War_II', 129),
+ (u'New_York_City', 127),
+ (u'Rolling_Stone', 127)]
+Finished First Hop Page Analysis
+------------------------------
+Beginning Second Hop Page Analysis
+------------------------------
+Total Number of Pages: 2037659
+The page with the most hits has 123860 hits.
+Top ten results:
+[(u'', 123860),
+ (u'United_States', 62694),
+ (u'The_New_York_Times', 39803),
+ (u'World_War_II', 31067),
+ (u'United_Kingdom', 26451),
+ (u'New_York_City', 25146),
+ (u'Wikipedia:Persondata', 23011),
+ (u'France', 21710),
+ (u'European_Union', 21437),
+ (u'English_language', 20925)]
+Finished Second Hop Page Analysis
+------------------------------
+dhcp-18-85-58-77:analysis travis$ 

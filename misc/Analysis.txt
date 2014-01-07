@@ -1,0 +1,86 @@
+dhcp-18-85-58-77:analysis travis$ python2.7 analyze_scrape.py 
+Beginning Direct Page Analysis
+------------------------------
+Total Number of Pages: 1132
+The page with the most hits has 20 hits.
+Top ten results:
+[(u'Andorra', 20),
+ (u'Guy_Ritchie', 12),
+ (u'Saudi_Arabia', 10),
+ (u'Ibn_Saud', 10),
+ (u'Lyndon_B._Johnson', 10),
+ (u'Boston', 9),
+ (u'Joe_Haldeman', 7),
+ (u'Arecibo_Observatory', 7),
+ (u'Motorcycle_safety', 7),
+ (u'Paul_Ekman', 7)]
+Top ten normalized results:
+[(u'Steve_Jobs', 5.0),
+ (u'Pablo_escobar', 1.0),
+ (u'Steve_jobs', 1.0),
+ (u'Space_Syntax', 1.0),
+ (u'Eastern_promises', 1.0),
+ (u'Media_Lab', 1.0),
+ (u'DEKA', 1.0),
+ (u'Complexity_theory', 0.5454545454545454),
+ (u'Engolasters', 0.4),
+ (u'Martha_Rogers,_Ph.D.', 0.4)]
+Finished Direct Page Analysis
+------------------------------
+Beginning First Hop Page Analysis
+------------------------------
+Total Number of Pages: 104596
+The page with the most hits has 408 hits.
+Top ten results:
+[(u'United_States', 408),
+ (u'', 340),
+ (u'The_New_York_Times', 279),
+ (u'Wikipedia:Persondata', 222),
+ (u'The_Guardian', 158),
+ (u'European_Union', 138),
+ (u'California', 137),
+ (u'World_War_II', 129),
+ (u'New_York_City', 127),
+ (u'Rolling_Stone', 127)]
+Top ten normalized results:
+[(u'Allmusic', 50.0),
+ (u'computer_science', 35.0),
+ (u'artificial_intelligence', 31.0),
+ (u'Eastern_Bloc', 20.0),
+ (u'Steve_Jobs', 17.0),
+ (u'Syrian_civil_war', 16.0),
+ (u'operating_system', 16.0),
+ (u'Computer_Science', 12.0),
+ (u'Arabian_Peninsula', 12.0),
+ (u'Flow_My_Tears,_the_Policeman_Said', 11.0)]
+Finished First Hop Page Analysis
+------------------------------
+Beginning Second Hop Page Analysis
+------------------------------
+Total Number of Pages: 2037659
+The page with the most hits has 123860 hits.
+Top ten results:
+[(u'', 123860),
+ (u'United_States', 62694),
+ (u'The_New_York_Times', 39803),
+ (u'World_War_II', 31067),
+ (u'United_Kingdom', 26451),
+ (u'New_York_City', 25146),
+ (u'Wikipedia:Persondata', 23011),
+ (u'France', 21710),
+ (u'European_Union', 21437),
+ (u'English_language', 20925)]
+Top ten normalized results:
+[(u'Allmusic', 8939.0),
+ (u'Pulitzer_Prize', 4949.0),
+ (u'operating_system', 3240.0),
+ (u'Eastern_Bloc', 2603.0),
+ (u'computer_science', 2601.0),
+ (u'Sun_Yat-sen', 2093.0),
+ (u'Iron_Age', 2059.0),
+ (u'Arabian_Peninsula', 2046.0),
+ (u'commander-in-chief', 1764.0),
+ (u'artificial_intelligence', 1715.0)]
+Finished Second Hop Page Analysis
+------------------------------
+dhcp-18-85-58-77:analysis travis$ 
