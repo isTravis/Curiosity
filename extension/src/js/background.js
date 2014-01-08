@@ -2,7 +2,7 @@
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 function checkForValidUrl(tabId, changeInfo, tab) {
-  if (tab.url == "file://localhost/Users/travis/Workspace/acad_MediaLab/proj_wikiNet/client/index.html") {
+  if (tab.url == "http://blergblerg.meteor.com/") {
     chrome.pageAction.show(tabId); // show the page action
 
     if (tab.url !== undefined && changeInfo.status == "complete") {
