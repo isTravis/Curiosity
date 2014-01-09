@@ -41,6 +41,7 @@ import sys
 # 		directPages_normalized[page] = 0
 # 		# print "Oops. Error"
 
+# pickle.dump( directPages_normalized, open( "../datasets/directPages_normalized.p", "wb" ) )
 # directPages_normalized_sorted = sorted(directPages_normalized.iteritems(), key=operator.itemgetter(1), reverse=True)
 # pickle.dump( directPages_normalized_sorted, open( "../datasets/directPages_normalized_sorted.p", "wb" ) )
 

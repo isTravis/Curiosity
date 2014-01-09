@@ -1,4 +1,79 @@
+#!/usr/bin/python
+'''
+Analyze network and dump it to a D3-able graph.
+'''
+import json
+import pickle
 
+# nodes.append({"name":"Napoleon","group":8})
+# links.append({"source":1,"target":0,"value":1})
+
+def buildFirstHopNetwork(numInMin, sharedMin, pageList):
+	firstHopNetwork = {}
+	count = 0
+	pageListLength = len(pageList)
+	for page in pageList:
+		pageTitle = page
+		numIn = numInlink(page)
+		# if numIn > numInMin:
+		index = count
+		connections = {}
+		for destPage in pageList:
+			sharedLinks = sharedLinkCount(page, destPage)
+			if sharedLinks > sharedMin:
+				connections[destPage] = sharedLinks
+		firstHopNetwork[page] = [index,pageTitle,numIn,connections]
+		print "Building Network: Page " + str(count+1) + " of " + str(pageListLength)
+		count += 1
+	return firstHopNetwork
+	# pickle.dump( firstHopNetwork, open( "../datasets/firstHopNetwork1.p", "wb" ) )
+
+
+def createJSON(network):
+	nodes = []
+	links = []
+	count = 0
+	missedConnections = 0
+	networkLength = len(network)
+	wtfcounter = 0
+	# for page in network:
+	for i in range(networkLength):
+		page = {}
+		for thispage in network:
+			if network[thispage][0] == i:
+				page = thispage
+		if wtfcounter > 5000:
+			break
+		print "Formatting Data: Page " + str(count+1) + " of " + str(networkLength)
+		index = network[page][0]
+		print "Compare: " +str(wtfcounter) + " " + str(index)
+		title = network[page][1]
+		inLinks = network[page][2]
+		# if inLinks > 0:
+		nodes.append({"name":title,"inlinks":inLinks})
+		# nodes.append({"name":title,"inlinks":1})
+		print "network[page][3]: " 
+		print network[page][3]
+		for connection in network[page][3]:
+			connectionTitle = connection
+			print "Connection title: " + connectionTitle
+			try:
+				connectionIndex = network[connectionTitle][0]
+				if connectionIndex != index:
+					connectionStrength = sharedLinkCount(title, connectionTitle)
+					links.append({"source":index,"target":connectionIndex,"value":connectionStrength})
+			except:
+				missedConnections +=1
+		count += 1
+		wtfcounter += 1
+	print "Missed Connections: " + str(missedConnections)
+	outputJSON = {"nodes":nodes,"links":links}
+	# Write .json file out
+	with open('../../public/netDataTest.json', 'w') as outfile:
+	  json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
+
+
+createJSON(mNetwork)
 
 
 def sharedLinkCount (pageTitle1, pageTitle2):
@@ -9,26 +84,8 @@ def sharedLinkCount (pageTitle1, pageTitle2):
 	except:
 		return 0
 
-# times = time.time()
-# numbers = []
-# count = 1
-# for page1 in directPages:
-# 	for page2 in directPages:
-# 		try:
-# 			numlinks = sharedLinkCount(page1, page2)
-# 			numbers.append(numlinks)
-# 		except:
-# 			print "oops"
-# 	print count
-# 	count += 1
-
-# print("Total time was: " + str(time.time()-times) + " seconds")
-
-# numbers_sorted = sorted(sorted.iteritems(), key=operator.itemgetter(1), reverse=True)
-
-
-def numInlinkMethod (pageTitle):
-	times = time.time()
+def numInlink (pageTitle):
+	# times = time.time()
 	inLinks = 0
 	for page in directPages:
 		try:
@@ -51,35 +108,40 @@ def inlinksFromDirect(pageTitle):
 		x = 0
 	return totalInLinks
 
-firstHopNetwork = {}
-count = 1
-for page in directPages:
-	print count
-	count += 1
-	pageTitle = page
-	numIn = numInlinkMethod(page)
-	connections = {}
-	for destPage in directPages:
-		sharedLinks = sharedLinkCount(page, destPage)
-		if sharedLinks > 1:
-			connections[destPage] = sharedLinks
-	firstHopNetwork[page] = [pageTitle,numIn,connections]
-
-
-pickle.dump( firstHopNetwork, open( "../datasets/firstHopNetwork1.p", "wb" ) )
-
-
-firsthopValidation = {}
-count = 1
-for page in firsthopPages:
-	print count
-	count += 1
-	firsthopValidation[page] = str(inlinksFromDirect(page))
-
-firsthopValidation_sorted = sorted(firsthopValidation.iteritems(), key=operator.itemgetter(1), reverse=True)
 
 
 
-# Some structure (or maybe just a function that queries… bluh) that denotes a page. It contains, the page title, url, incoming links, outgoing links, confidence rating, number of links on page, network connections (perhaps you can set a threshold for network connections - you take the top 10 or top 20, and then build your visualization)
+
+
+# Main Code Calls
+# --------------------------
+print "Importing masterPageLinks..."
+masterPageLinks = pickle.load(open("../datasets/masterPageLinks.p", "rb")) 
+print "Importing directPages..."
+directPages = pickle.load(open("../datasets/directPages.p", "rb")) 
+print "Importing directPages_normalized..."
+directPages_normalized = pickle.load(open("../datasets/directPages_normalized.p", "rb")) 
+
+mNetwork = buildFirstHopNetwork(5,15, directPages_normalized)
+createJSON(mNetwork)
+
+
+
+
+# firsthopValidation = {}
+# count = 1
+# for page in firsthopPages:
+# 	print count
+# 	count += 1
+# 	firsthopValidation[page] = str(inlinksFromDirect(page))
+
+# firsthopValidation_sorted = sorted(firsthopValidation.iteritems(), key=operator.itemgetter(1), reverse=True)
+
+
+
+
+
+
+# Some structure (or maybe just a function that queries bluh) that denotes a page. It contains, the page title, url, incoming links, outgoing links, confidence rating, number of links on page, network connections (perhaps you can set a threshold for network connections - you take the top 10 or top 20, and then build your visualization)
 	# -Probably want to pick a small threshold (maybe even just 1), send that to client, and then let the client-side filter
 	# Maybe this structure, built around their direct history, is what you send the client.
