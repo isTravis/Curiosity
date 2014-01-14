@@ -1,16 +1,19 @@
 Template.ddd.rendered = ->
-	width = 1200
-	height = 500
+	w = 1200
+	h = 800
+	r = 6
 	color = d3.scale.category20()
 
 	force = d3.layout.force()
-		.charge(-110)
-		.linkDistance(100)
-		.size([width, height])
+		.charge(-80)
+		.gravity(0.06)
+		.linkDistance(50)
+		.size([w, h ])
 
 	svg = d3.select(".hereD").append("svg")
-		.attr("width", width)
-		.attr("height", height)
+		.attr("width", w)
+		.attr("height", h)
+		.attr("transform", "translate(" + w / 4 + "," + h / 3 + ")")
 
 	d3.json "netDataTest.json", (error, graph) ->
 		force.nodes(graph.nodes).links(graph.links).start()
@@ -36,7 +39,7 @@ Template.ddd.rendered = ->
 			)
 			.on("mouseout", (d) ->
 				nodeSelection = d3.select(this)
-				nodeSelection.select("circle").style(opacity: "0.2")
+				nodeSelection.select("circle").style(opacity: "1.0")
 				nodeSelection.select("text").style(opacity: "0.2")
 				console.log nodeSelection.text()
 			)
@@ -52,7 +55,7 @@ Template.ddd.rendered = ->
 			.style("fill", (d) ->
 				color d.inlinks
 			)
-			.style("opacity", "0.2")
+			.style("opacity", "1.0")
 			.call(force.drag)
 			
 		labels = gnodes.append("text").text((d) ->
@@ -60,8 +63,15 @@ Template.ddd.rendered = ->
 		)
 		.style("opacity", "0.2")
 		.attr("text-anchor", "middle")
+		.attr("class","node-label")
 
 		force.on "tick", ->
+
+			# gnodes.attr("cx", (d) ->
+			# 	d.x = Math.max(r, Math.min(w - r, d.x))
+			# ).attr "cy", (d) ->
+			# 	d.y = Math.max(r, Math.min(h - r, d.y))
+
 			# Update the links
 			link.attr("x1", (d) ->
 			  d.source.x
@@ -76,7 +86,10 @@ Template.ddd.rendered = ->
 
 			# Translate the groups
 			gnodes.attr "transform", (d) ->
-			  "translate(" + [d.x, d.y] + ")"
+			  "translate(" + [Math.max(r, Math.min(w - r, d.x)), d.y = Math.max(r, Math.min(h - r, d.y))] + ")"
+
+			
+
 
 
 
@@ -85,7 +98,7 @@ Template.ddd.rendered = ->
 		# When you click, then you can draw all it's connections
 
 
-		
+
 		# maxRadius = 50
 		# padding = 1.5
 		# clusterPadding = 6

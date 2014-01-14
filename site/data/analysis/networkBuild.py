@@ -15,16 +15,21 @@ def buildFirstHopNetwork(numInMin, sharedMin, pageList):
 	for page in pageList:
 		pageTitle = page
 		numIn = numInlink(page)
-		# if numIn > numInMin:
-		index = count
-		connections = {}
-		for destPage in pageList:
-			sharedLinks = sharedLinkCount(page, destPage)
-			if sharedLinks > sharedMin:
-				connections[destPage] = sharedLinks
-		firstHopNetwork[page] = [index,pageTitle,numIn,connections]
-		print "Building Network: Page " + str(count+1) + " of " + str(pageListLength)
-		count += 1
+		if numIn > numInMin:
+			if numIn < 15:
+				index = count
+				connections = {}
+				for destPage in pageList:
+					sharedLinks = sharedLinkCount(page, destPage)
+					if sharedLinks > sharedMin:
+						connections[destPage] = sharedLinks
+				print connections
+				if len(connections) > 1:
+					print "inside"
+					firstHopNetwork[page] = [index,pageTitle,numIn,connections]
+					count += 1
+				print "Building Network: Page " + str(count+1) + " of " + str(pageListLength)
+				# count += 1
 	return firstHopNetwork
 	# pickle.dump( firstHopNetwork, open( "../datasets/firstHopNetwork1.p", "wb" ) )
 
@@ -72,7 +77,7 @@ def createJSON(network):
 	with open('../../public/netDataTest.json', 'w') as outfile:
 	  json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
 
-
+mNetwork = buildFirstHopNetwork(2,10, directPages)
 createJSON(mNetwork)
 
 
@@ -122,7 +127,7 @@ directPages = pickle.load(open("../datasets/directPages.p", "rb"))
 print "Importing directPages_normalized..."
 directPages_normalized = pickle.load(open("../datasets/directPages_normalized.p", "rb")) 
 
-mNetwork = buildFirstHopNetwork(5,15, directPages_normalized)
+mNetwork = buildFirstHopNetwork(2,10, directPages)
 createJSON(mNetwork)
 
 
