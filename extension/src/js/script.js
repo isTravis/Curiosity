@@ -1,13 +1,15 @@
-var wikihistory
+var wikihistory;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.greeting == "hello")
+
       sendResponse({response: "recieved"});
 
     // console.log (request.payload[0].url);
     wikihistory = request.payload;
-
+    window.postMessage({ type: "FROM_PAGE", text: wikihistory }, "*");
+    
     var div = document.getElementById('here');
     console.log (wikihistory);
     div.innerHTML = div.innerHTML + "{"
@@ -25,3 +27,7 @@ chrome.runtime.onMessage.addListener(
     div.innerHTML = div.innerHTML + "}"
 	// div.innerHTML = div.innerHTML + wikihistory
   });
+
+function checkit(){
+    Meteor.call('printVal', 'Hi')
+}

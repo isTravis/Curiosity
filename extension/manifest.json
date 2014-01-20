@@ -4,7 +4,8 @@
   "description": "Reads your wiki History, build the network map",
   "permissions": [
     "history",
-    "tabs"
+    "tabs",
+    "storage"
 
   ],
   "page_action": {
@@ -16,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://blergblerg.meteor.com/"],
+      "matches": ["http://localhost:3000/"],
       "js": ["src/js/script.js"]
     }
   ],

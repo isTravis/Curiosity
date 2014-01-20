@@ -47,11 +47,8 @@ Template.ddd.rendered = ->
 		node = gnodes.append("circle")
 			.attr("class", "node")
 			.attr("class", "node").attr("r", (d) ->
-				if d.inlinks > 50
-					10
-				else
-					d.inlinks
-			  )
+				d.inlinks
+			)
 			.style("fill", (d) ->
 				color d.inlinks
 			)
@@ -66,11 +63,13 @@ Template.ddd.rendered = ->
 		.attr("class","node-label")
 
 		force.on "tick", ->
+			q = d3.geom.quadtree(graph.nodes)
+			# console.log q
+			i = 0
+			n = graph.nodes.length
+			# console.log graph.nodes[i]
+			q.visit collide(graph.nodes[i])  while ++i < n
 
-			# gnodes.attr("cx", (d) ->
-			# 	d.x = Math.max(r, Math.min(w - r, d.x))
-			# ).attr "cy", (d) ->
-			# 	d.y = Math.max(r, Math.min(h - r, d.y))
 
 			# Update the links
 			link.attr("x1", (d) ->
@@ -81,18 +80,54 @@ Template.ddd.rendered = ->
 			  d.target.x
 			).attr "y2", (d) ->
 			  d.target.y
-			
 			# node.each(collide(.5))
+
+			# console.log svg.selectAll(".gnode")
+			# svg.selectAll(".gnode").attr("cx", (d) ->
+			#     d.source.x
+			#   ).attr "cy", (d) ->
+			#     d.y
 
 			# Translate the groups
 			gnodes.attr "transform", (d) ->
 			  "translate(" + [Math.max(r, Math.min(w - r, d.x)), d.y = Math.max(r, Math.min(h - r, d.y))] + ")"
 
 			
+		collide = (node) ->
+			rr = node.inlinks + 16
+			# console.log rr
+			nx1 = node.x - rr
+			nx2 = node.x + rr
+			ny1 = node.y - rr
+			ny2 = node.y + rr
+			(quad, x1, y1, x2, y2) ->
+			  if quad.point and (quad.point isnt node)
+			    x = node.x - quad.point.x
+			    y = node.y - quad.point.y
+			    l = Math.sqrt(x * x + y * y)
+			    rr = node.radius + quad.point.radius
+			    if l < rr
+			      l = (l - rr) / l * .5
+			      node.x -= x *= l
+			      node.y -= y *= l
+			      quad.point.x += x
+			      quad.point.y += y
+			  x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
 
+window.addEventListener "message", ((event) ->
+  
+  # We only accept messages from ourselves
+  return  unless event.source is window
+  if event.data.type and (event.data.type is "FROM_PAGE")
+    console.log "Content script received: " + event.data.text
+    Meteor.call "printVal", event.data.text
 
+# port.postMessage(event.data.text);
+), false
 
+@callMeteor = ()->
+	Meteor.call('printVal', 'Hi')
 		# How about no links, but a spectrum of colors, based on link connection. Not simply 6 colors, 
 		# but a wide spectrum that communicate connections. Too many links for them to actually show value.
 		# When you click, then you can draw all it's connections
