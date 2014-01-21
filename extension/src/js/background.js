@@ -34,7 +34,7 @@ function checkAndSendHistory(){
   });
 
   if(hasLocal){
-    var startTime = 5; // XXX set to be the last value in the local history
+    var startTime = 0; // XXX set to be the last value in the local history
   }else{
     var startTime = 0;
   }
@@ -45,31 +45,31 @@ function checkAndSendHistory(){
 }
 
 
-// function saveChanges() {
-//   // Get a value saved in a form.
-//   // Save it using the Chrome extension storage API.
-//   chrome.storage.sync.set({'value': 'tboneee'}, function() {
-//     // Notify that we saved.
-//     console.log('Settings saved');
-//   });
 
-//   chrome.storage.sync.get('value', function(d) {
-//     // Notify that we saved.
-//     console.log("I got: ");
-//     console.log(d);
-//   });
-// }
-
-
+var urls = [];
+var singles = 0;
+var notsingles = 0;
 
 function sendNewHistory(startTime){
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 10 ,
+      'maxResults': 10000 ,
       'startTime': startTime
     },
     function(historyItems) {
-      console.log(historyItems.length);
+      console.log(historyItems);
+
+      // historyItems.forEach(function(e) {
+      //   // console.log(e.url);
+      //   urls.push(e.url);
+      //   if(e.visitCount != 1){
+      //     notsingles += 1;
+      //   }else{
+      //     singles +=1;
+      //   }
+      //   // chrome.history.getVisits({'url':'http://en.wikipedia.org/wiki/Moog_synthesizer'}, function(d){console.log(d);})
+      // });
+
 
       // Send a message to the content_script with all of the history items
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -79,10 +79,35 @@ function sendNewHistory(startTime){
       });
 
     });
+
 }
+// var brackets = 0;
+// var notbrackets = 0;
+// xx.forEach(function(e) {
+//         // console.log("-------");
+//         // console.log(e);
+//         // xx.push(e.url);
+//         chrome.history.getVisits({'url':e}, function(d){
+//           if(d.length == 0){
+//             brackets += 1;
+//           }else{
+//             notbrackets += 1;
+//           }
+//           // console.log(d);
+//         })
+//       });
 
-
-
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+    if (request.greeting == "wtf"){
+      console.log(request.payload);
+      chrome.storage.local.set({'localHistory': request.payload});
+      sendResponse({farewell: "goodbye"});
+    }
+  });
 
 
 

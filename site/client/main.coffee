@@ -114,20 +114,31 @@ Template.ddd.rendered = ->
 			      quad.point.y += y
 			  x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
+# Template.wikiData.created = ->
+# 	Session.set "updated", false
 
 window.addEventListener "message", ((event) ->
-  
   # We only accept messages from ourselves
   return  unless event.source is window
   if event.data.type and (event.data.type is "FROM_PAGE")
-    console.log "Content script received: " + event.data.text
     Meteor.call "printVal", event.data.text
-
-# port.postMessage(event.data.text);
+    Session.set "updated", true
 ), false
 
-@callMeteor = ()->
-	Meteor.call('printVal', 'Hi')
+Template.wikiData.wikiData = ->
+	xx = WikiData.find().fetch()
+	console.log "xx count is" + xx
+	postToExt(xx)
+	# Session.set "updated", false
+	return xx
+
+
+@postToExt = (xx) ->
+	window.postMessage
+	  type: "FROM_Server"
+	  text: xx
+	, "*"
+
 		# How about no links, but a spectrum of colors, based on link connection. Not simply 6 colors, 
 		# but a wide spectrum that communicate connections. Too many links for them to actually show value.
 		# When you click, then you can draw all it's connections

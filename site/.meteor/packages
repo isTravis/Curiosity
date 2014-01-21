@@ -10,3 +10,5 @@ coffeescript
 less
 ejson
 d3
+http
+npm
