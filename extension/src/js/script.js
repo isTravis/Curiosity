@@ -7,24 +7,31 @@ chrome.runtime.onMessage.addListener(
         window.postMessage({ type: "FROM_PAGE", text: wikihistory }, "*");
         sendResponse({response: "recieved"});
 
-    // console.log (request.payload[0].url);
+    // if (request.greeting == "network"){
+    //     network = request.payload;
+    //     var div = document.getElementById('here');
+    //     console.log("got it to here");
+    //     div.innerHTML = div.innerHTML + network;
+    //     sendResponse({response: "gotNetwork"});
+    // }
+ //    console.log (request.payload[0].url);
     
 
-    // var div = document.getElementById('here');
-    // console.log (wikihistory);
-    // div.innerHTML = div.innerHTML + "{"
-    // for (var i = 0; i<wikihistory.length; i++){
-    // 	div.innerHTML = div.innerHTML + "\"" + i + "\"" + ":["
-    // 	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].id + "\","
-    // 	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].lastVisitTime + "\","
-    // 	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].url + "\","
-    // 	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].visitCount + "\""
-    // 	div.innerHTML = div.innerHTML + "],"
+ //    var div = document.getElementById('here');
+ //    console.log (wikihistory);
+ //    div.innerHTML = div.innerHTML + "{"
+ //    for (var i = 0; i<wikihistory.length; i++){
+ //    	div.innerHTML = div.innerHTML + "\"" + i + "\"" + ":["
+ //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].id + "\","
+ //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].lastVisitTime + "\","
+ //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].url + "\","
+ //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].visitCount + "\""
+ //    	div.innerHTML = div.innerHTML + "],"
 
-    // 	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url + "<br>";	
-    // 	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url.match(/[^/]+$/) + "<br>";	
-    // }
-    // div.innerHTML = div.innerHTML + "}"
+ //    	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url + "<br>";	
+ //    	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url.match(/[^/]+$/) + "<br>";	
+ //    }
+ //    div.innerHTML = div.innerHTML + "}"
 	// div.innerHTML = div.innerHTML + wikihistory
   });
 
@@ -38,13 +45,52 @@ window.addEventListener("message", function(event) {
   if (event.data.type && (event.data.type == "FROM_Server")) {
     myData = event.data.text
     console.log("Received from Server: " + event.data.text);
+
+    var div = document.getElementById('here');
+    div.innerHTML = div.innerHTML + event.data.text;
+
     chrome.runtime.sendMessage({greeting: "wtf", payload: myData}, function(response) {
       console.log(response.farewell);
     });
   }
 }, false);
 
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
 
+
+//     // console.log (request.payload[0].url);
+    
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
+//     if (request.greeting == "network"){
+//         network = request.payload;
+//         var div = document.getElementById('here');
+//         console.log("got it to here");
+//         div.innerHTML = div.innerHTML + network;
+//         sendResponse({response: "gotNetwork"});
+//     }
+
+//   });
+
+
+//     // var div = document.getElementById('here');
+//     // console.log (wikihistory);
+//     // div.innerHTML = div.innerHTML + "{"
+//     // for (var i = 0; i<wikihistory.length; i++){
+//     //  div.innerHTML = div.innerHTML + "\"" + i + "\"" + ":["
+//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].id + "\","
+//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].lastVisitTime + "\","
+//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].url + "\","
+//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].visitCount + "\""
+//     //  div.innerHTML = div.innerHTML + "],"
+
+//     //  // div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url + "<br>";  
+//     //  // div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url.match(/[^/]+$/) + "<br>";  
+//     // }
+//     // div.innerHTML = div.innerHTML + "}"
+//     // div.innerHTML = div.innerHTML + wikihistory
+//   });
 // var urls = [a,b,c,d],
 
 // var unvisitedUrls = [],

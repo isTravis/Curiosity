@@ -31,14 +31,15 @@ function checkAndSendHistory(){
       hasLocal  = true;
       console.log("Local History Available");
     }
+    if(hasLocal == true){
+      var startTime = 0; // XXX set to be the last value in the local history
+    }else{
+      var startTime = 0;
+    }
+    sendNewHistory(startTime);
   });
 
-  if(hasLocal){
-    var startTime = 0; // XXX set to be the last value in the local history
-  }else{
-    var startTime = 0;
-  }
-  sendNewHistory(startTime);
+  
 
 
 
@@ -53,11 +54,11 @@ var notsingles = 0;
 function sendNewHistory(startTime){
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 10000 ,
+      'maxResults': 70 ,
       'startTime': startTime
     },
     function(historyItems) {
-      console.log(historyItems);
+      console.log("SentHistory");
 
       // historyItems.forEach(function(e) {
       //   // console.log(e.url);
@@ -103,14 +104,25 @@ chrome.runtime.onMessage.addListener(
                 "from a content script:" + sender.tab.url :
                 "from the extension");
     if (request.greeting == "wtf"){
+      console.log("Got new from server");
       console.log(request.payload);
       chrome.storage.local.set({'localHistory': request.payload});
+      console.log("Set new localHistory");
       sendResponse({farewell: "goodbye"});
+      // sendNetwork("cat");
     }
   });
 
 
+function sendNetwork(network){
+      console.log("sending...");
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {greeting: "network", payload: network}, function(response) {
+          console.log(response);
+        });
+      });
 
+}
 // chrome.storate.local.getBytesInUse(function(d)
 //   chrome.storage.local.getBytesInUse( function(d) {
 //     // Notify that we saved.

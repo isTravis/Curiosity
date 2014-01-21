@@ -126,11 +126,13 @@ window.addEventListener "message", ((event) ->
 ), false
 
 Template.wikiData.wikiData = ->
-	xx = WikiData.find().fetch()
-	console.log "xx count is" + xx
-	postToExt(xx)
-	# Session.set "updated", false
-	return xx
+	if Session.get "updated"
+		xx = WikiData.findOne({accountID:'travis'})
+		if xx
+			console.log xx['titles']
+			Session.set "updated", false
+			postToExt(xx['titles'])
+		return xx
 
 
 @postToExt = (xx) ->
