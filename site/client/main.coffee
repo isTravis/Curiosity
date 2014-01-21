@@ -114,14 +114,12 @@ Template.ddd.rendered = ->
 			      quad.point.y += y
 			  x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
-# Template.wikiData.created = ->
-# 	Session.set "updated", false
 
 window.addEventListener "message", ((event) ->
   # We only accept messages from ourselves
   return  unless event.source is window
   if event.data.type and (event.data.type is "FROM_PAGE")
-    Meteor.call "printVal", event.data.text
+    Meteor.call "inputHistory", event.data.text
     Session.set "updated", true
 ), false
 
@@ -145,33 +143,6 @@ Template.wikiData.wikiData = ->
 		# but a wide spectrum that communicate connections. Too many links for them to actually show value.
 		# When you click, then you can draw all it's connections
 
-
-
-		# maxRadius = 50
-		# padding = 1.5
-		# clusterPadding = 6
-
-		# collide = (alpha) ->
-		#   quadtree = d3.geom.quadtree(gnodes)
-		#   (d) ->
-		#     r = d.radius + maxRadius + Math.max(padding, clusterPadding)
-		#     nx1 = d.x - r
-		#     nx2 = d.x + r
-		#     ny1 = d.y - r
-		#     ny2 = d.y + r
-		#     quadtree.visit (quad, x1, y1, x2, y2) ->
-		#       if quad.point and (quad.point isnt d)
-		#         x = d.x - quad.point.x
-		#         y = d.y - quad.point.y
-		#         l = Math.sqrt(x * x + y * y)
-		#         r = d.radius + quad.point.radius + ((if d.cluster is quad.point.cluster then padding else clusterPadding))
-		#         if l < r
-		#           l = (l - r) / l * alpha
-		#           d.x -= x *= l
-		#           d.y -= y *= l
-		#           quad.point.x += x
-		#           quad.point.y += y
-		#       x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
 		# http://bl.ocks.org/mbostock/1748247
 

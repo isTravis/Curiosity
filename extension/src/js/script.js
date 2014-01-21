@@ -6,33 +6,9 @@ chrome.runtime.onMessage.addListener(
         wikihistory = request.payload;
         window.postMessage({ type: "FROM_PAGE", text: wikihistory }, "*");
         sendResponse({response: "recieved"});
-
-    // if (request.greeting == "network"){
-    //     network = request.payload;
-    //     var div = document.getElementById('here');
-    //     console.log("got it to here");
-    //     div.innerHTML = div.innerHTML + network;
-    //     sendResponse({response: "gotNetwork"});
-    // }
- //    console.log (request.payload[0].url);
     
-
- //    var div = document.getElementById('here');
- //    console.log (wikihistory);
- //    div.innerHTML = div.innerHTML + "{"
- //    for (var i = 0; i<wikihistory.length; i++){
- //    	div.innerHTML = div.innerHTML + "\"" + i + "\"" + ":["
- //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].id + "\","
- //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].lastVisitTime + "\","
- //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].url + "\","
- //    	div.innerHTML = div.innerHTML + "\"" + wikihistory[i].visitCount + "\""
- //    	div.innerHTML = div.innerHTML + "],"
-
- //    	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url + "<br>";	
- //    	// div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url.match(/[^/]+$/) + "<br>";	
- //    }
- //    div.innerHTML = div.innerHTML + "}"
-	// div.innerHTML = div.innerHTML + wikihistory
+    // var div = document.getElementById('here');
+    // div.innerHTML = div.innerHTML + wikihistory;
   });
 
 
@@ -54,87 +30,3 @@ window.addEventListener("message", function(event) {
     });
   }
 }, false);
-
-// chrome.runtime.onMessage.addListener(
-//   function(request, sender, sendResponse) {
-
-
-//     // console.log (request.payload[0].url);
-    
-// chrome.runtime.onMessage.addListener(
-//   function(request, sender, sendResponse) {
-//     if (request.greeting == "network"){
-//         network = request.payload;
-//         var div = document.getElementById('here');
-//         console.log("got it to here");
-//         div.innerHTML = div.innerHTML + network;
-//         sendResponse({response: "gotNetwork"});
-//     }
-
-//   });
-
-
-//     // var div = document.getElementById('here');
-//     // console.log (wikihistory);
-//     // div.innerHTML = div.innerHTML + "{"
-//     // for (var i = 0; i<wikihistory.length; i++){
-//     //  div.innerHTML = div.innerHTML + "\"" + i + "\"" + ":["
-//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].id + "\","
-//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].lastVisitTime + "\","
-//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].url + "\","
-//     //  div.innerHTML = div.innerHTML + "\"" + wikihistory[i].visitCount + "\""
-//     //  div.innerHTML = div.innerHTML + "],"
-
-//     //  // div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url + "<br>";  
-//     //  // div.innerHTML = div.innerHTML + i + ": " + wikihistory[i].url.match(/[^/]+$/) + "<br>";  
-//     // }
-//     // div.innerHTML = div.innerHTML + "}"
-//     // div.innerHTML = div.innerHTML + wikihistory
-//   });
-// var urls = [a,b,c,d],
-
-// var unvisitedUrls = [],
-//     count = urls.length,
-//     done = false;
-
-// var checkUrl = function(d) {
-//   var url = d;
-
-
-//   return function(visitItems) {
-//     console.log(visitItems);
-//     if (done) return;
-//     count--;
-
-//     if (visitItems && visitItems.length > 0) {
-//         unvisitedUrls.push(url);
-//     }
-//     else {
-//         urls.splice(urls.indexOf(url));  // remove the visited url
-//     }
-
-//     if(unvisitedUrls.indexOf(urls[0]) > -1 || count === 0) {
-//         done = true;
-//         // done checking urls, urls[0] is the winner
-//     }
-
-//   }
-// }
-
-
-// urls.forEach(function(d) { chrome.history.getVisits({'url':d}, checkUrl(d)); });
-
-
-// chrome.history.search({'text': '','maxResults': N ,'startTime': 0},function(historyItems) {
-//       console.log(historyItems);
-//     });
-
-
-//       // Send a message to the content_script with all of the history items
-//       // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-//       //   chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello", payload: historyItems}, function(response) {
-//       //     console.log(response);
-//       //   });
-//       // });
-
-//     });

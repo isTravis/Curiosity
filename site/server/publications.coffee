@@ -4,12 +4,12 @@ Meteor.publish "wikiDataPub", () ->
 
 
 
-Meteor.methods printVal: (value) ->
-	# console.log value
+Meteor.methods inputHistory: (value) ->
+
 	visitHistory = []
 	visitedTitles = []
 	userID = 'travis'
-	console.log value
+
 	# For each history item in value
 	_.forEach value, (e) ->
 		if testURL(e.url) # If the url is valid, according to testURL
@@ -20,18 +20,17 @@ Meteor.methods printVal: (value) ->
 
 	    	visitedTitles.push(thisTitle)
 	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
-    		
-	    	# console.log {url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount}
+
     
     
-	console.log "Here2"
 	scrapeHistory(visitedTitles)
 	networkData = 0
-	# console.log myresult
 	# networkData = buildNetwork(visitHistory)
 
+	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
+	# Since update gets set to true, it just winds up reading the old wikiData 
+	# Need to have the function check if the server is done. Can we set session variables from server?
 	if WikiData.findOne({accountID:userID})
-		console.log "Here"
 		WikiData.update(
 			accountID: userID
 		,
@@ -40,11 +39,6 @@ Meteor.methods printVal: (value) ->
 				history: visitHistory
 				networkData: networkData
 		)
-		# WikiData.update(
-	    #     accountID: userID
-	    #     titles: visitedTitles
-	    #     history: visitHistory
-	    # )
 	else
 	   WikiData.insert(
 	        accountID: userID
@@ -54,25 +48,13 @@ Meteor.methods printVal: (value) ->
 	    )
 
 
-# @testTitle = (title) ->
-# # Test if the title is acceptable, 
-# 	if 
-
-# 		str = "Hello world!"
-
-# #look for "Hello"
-# isFile = /File:/g
-# isCategory = /Category:/g
-
-# result = patt.test(str)
-# document.write "Returned value: " + result
 
 @buildNetwork = (visitHistory) ->
+	# Need to build out. This will be the renderable network
+	# will include links as well as time stamps and the such
 
 @goGetTitle = (url) ->
-	# Parse url,
-	# Get Page api
-	# 
+	# Use when the history search result returns a title of ''
 	urlTitle = url.split("wiki/")[1].split("#")[0]
 	apiURL = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urlTitle + '&redirects&prop=revisions'
 	result = Meteor.http.get(apiURL)
@@ -88,9 +70,9 @@ Meteor.methods printVal: (value) ->
 		return ''
 
 
-
 @testURL = (url) ->
-# Test if url is redirect, if it is, return the proper url
+	# Test to make sure the url is what we're looking for. Checks a number of different aspects
+
 	isWiki = /wikipedia.org\/wiki\//g # Gets rid of api calls and such
 	if isWiki.test(url)
 		# url = 'http://en.wikipedia.org/wiki/Samsung_Galaxy_Tab#Cat'
@@ -119,25 +101,21 @@ Meteor.methods printVal: (value) ->
 	else
 		return false
 
+
 linkSet = []
-# require = __meteor_bootstrap__.require; //to use npm require must be exposed.
+
 @scrapeLinks = (pageID,url) ->
 	result = Meteor.http.get(url)
-	# $ = cheerio.load(result.content)
-	# CurrentTime = $.root()
-	# mything = JSON.parse(result)
 	
 	if result.data.hasOwnProperty('query-continue')
 		# console.log result.data['query-continue']['links']['gplcontinue']
 		continueURL ='http://en.wikipedia.org/w/api.php?format=json&action=query&pageids=' + pageID + '&redirects&generator=links&gpllimit=max&gplcontinue='+result.data['query-continue']['links']['gplcontinue']
-		console.log "Continuing with " + continueURL
+		# console.log "Continuing with " + continueURL
 
 		linkSet.concat(scrapeLinks(pageID, continueURL))
-		# console.log linkSet
 
 	for link of result.data['query']['pages']
-		# console.log link
-		# console.log result.data['query']['pages'][link]['title']
+
 		if link > 0 # Bad pages get thrown as -1
 			isFile = /File:/g
 			isCategory = /Category:/g
@@ -147,20 +125,14 @@ linkSet = []
 			isWikipedia = /Wikipedia:/g
 			isPortal = /Portal:/g
 			isUser = /User:/g
+			isAPI = /api.php/g
+			isTalk = /Talk:/g
 			pageTitle = result.data['query']['pages'][link]['title']
-			if(!isFile.test(pageTitle) and !isCategory.test(pageTitle) and !isTemplate.test(pageTitle) and !isHelp.test(pageTitle) and !isWikipedia.test(pageTitle) and !isPortal.test(pageTitle) and !isTemplateTalk.test(pageTitle) and !isUser.test(pageTitle))
+			if(!isFile.test(pageTitle) and !isCategory.test(pageTitle) and !isTemplate.test(pageTitle) and !isHelp.test(pageTitle) and !isWikipedia.test(pageTitle) and !isPortal.test(pageTitle) and !isTemplateTalk.test(pageTitle) and !isUser.test(pageTitle) and !isAPI.test(pageTitle) and !isTalk.test(pageTitle))
 				linkSet.push(pageTitle)
-	
-
-	
 	
 	return linkSet
 
-
-
-# Write a function to get id given page name
-# create collections that store name > id
-# create collection that stores id > links 
 
 @getPageID = (pageTitle) ->
 	if PageIDs.findOne({title: pageTitle}) # If we have the pageID already, return that.
@@ -187,51 +159,36 @@ linkSet = []
 	else
 		return 'noPageFound'
 
-# Meteor.methods getTime: () ->
+
 @scrapeHistory = (pageTitles) ->
-	console.log "Here3"
-	console.log pageTitles
-	# cheerio = Meteor.require('cheerio')
 	counter = 1
 	length = pageTitles.length
 	for title in pageTitles
 		linkSet = []
 		pageID = getPageID(title)
 		if !Links.findOne({pageID: pageID})# If we have the pageID already, return that.
-			# allLinks = []
-			
-			# getPageID('Boston')
-			# console.log getPageTitle('24437894')
-
-
-			# title = "Cat"
 			urltitle = title.replace(/\ /g, "_")
-
-			# Get page id, and use that
 			url ='http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urltitle + '&redirects'
 			result = Meteor.http.get(url)
-			
-			# for page of result.data['query']['pages']
-			# 	pageID = page
-			# 	if(!PageIDs.findOne({title: title})) # If this is a new pageID, add it to the collection
-			# 		PageIDs.insert(
-			# 	        title: title
-			# 	        pageID: pageID
-			# 	    )   
 
 			# url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + title + '&prop=revisions&rvprop=content&redirects'
 			url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&pageids=' + pageID + '&redirects&generator=links&gpllimit=max'
 
 			scrapeLinks(pageID, url) # will update linkSet
-			# console.log linkSet
 
 			Links.insert(
 				pageID: pageID
 				links: linkSet
 			)
+			console.log "linkset length : " + linkSet.length
 			console.log "new"
 		console.log counter + " of " + length
 		counter += 1
+
+
+
+
+
 
 
 

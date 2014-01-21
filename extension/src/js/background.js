@@ -1,3 +1,9 @@
+// Extension checks for existing history
+// Extension gets history (starting from date in local if available)
+// Extension sends history to client
+// Client Meteor.calls
+// Meteor returns new history item, which replaces the stored local
+
 // Listen for any changes to the URL of any tab.
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
@@ -7,19 +13,10 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 
     if (tab.url !== undefined && changeInfo.status == "complete") {
       checkAndSendHistory();
-      // sendHistory();
-      // saveChanges();
     }
   }
 };
 
-
-// Extension checks for existing history
-// Extension gets history (starting from date in local if available)
-// Extension sends history to client
-// Client Meteor.calls
-// Meteor returns new history item, which replaces the stored local
-// 
 
 function checkAndSendHistory(){
   // Check for a locally stored history and if it exists, save it.
@@ -38,18 +35,7 @@ function checkAndSendHistory(){
     }
     sendNewHistory(startTime);
   });
-
-  
-
-
-
 }
-
-
-
-var urls = [];
-var singles = 0;
-var notsingles = 0;
 
 function sendNewHistory(startTime){
   chrome.history.search({
@@ -59,19 +45,6 @@ function sendNewHistory(startTime){
     },
     function(historyItems) {
       console.log("SentHistory");
-
-      // historyItems.forEach(function(e) {
-      //   // console.log(e.url);
-      //   urls.push(e.url);
-      //   if(e.visitCount != 1){
-      //     notsingles += 1;
-      //   }else{
-      //     singles +=1;
-      //   }
-      //   // chrome.history.getVisits({'url':'http://en.wikipedia.org/wiki/Moog_synthesizer'}, function(d){console.log(d);})
-      // });
-
-
       // Send a message to the content_script with all of the history items
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello", payload: historyItems}, function(response) {
@@ -109,20 +82,11 @@ chrome.runtime.onMessage.addListener(
       chrome.storage.local.set({'localHistory': request.payload});
       console.log("Set new localHistory");
       sendResponse({farewell: "goodbye"});
-      // sendNetwork("cat");
     }
   });
 
 
-function sendNetwork(network){
-      console.log("sending...");
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {greeting: "network", payload: network}, function(response) {
-          console.log(response);
-        });
-      });
 
-}
 // chrome.storate.local.getBytesInUse(function(d)
 //   chrome.storage.local.getBytesInUse( function(d) {
 //     // Notify that we saved.
