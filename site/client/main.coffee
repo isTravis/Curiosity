@@ -129,7 +129,8 @@ Template.wikiData.wikiData = ->
 		if xx
 			console.log xx['titles']
 			Session.set "updated", false
-			postToExt(xx['titles'])
+			# postToExt(xx['titles'])
+			postToExt(xx)
 		return xx
 
 

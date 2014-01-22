@@ -22,10 +22,17 @@ Meteor.methods inputHistory: (value) ->
 	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
 
     
-    
-	scrapeHistory(visitedTitles)
-	networkData = 0
-	# networkData = buildNetwork(visitHistory)
+    # startTime = new Date().getTime()
+    # console.log startTime
+
+	scrapedHistory = scrapeHistory(visitedTitles)
+	# networkData = 0
+	# result = 
+	# console.log result
+	# networkData = buildNetwork(visitHistory,visitedTitles)
+	
+	# endTime = new Date().getTime()
+	# console.log "Total time = " + (endTime-startTime)/1000 + " seconds"
 
 	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
 	# Since update gets set to true, it just winds up reading the old wikiData 
@@ -49,9 +56,7 @@ Meteor.methods inputHistory: (value) ->
 
 
 
-@buildNetwork = (visitHistory) ->
-	# Need to build out. This will be the renderable network
-	# will include links as well as time stamps and the such
+
 
 @goGetTitle = (url) ->
 	# Use when the history search result returns a title of ''
@@ -62,7 +67,7 @@ Meteor.methods inputHistory: (value) ->
 	for page of result.data['query']['pages']
 		pageID = page
 		# console.log pageID
-	if pageID != -1
+	if pageID != '-1'
 		# And now add to collection
 		title = result.data['query']['pages'][pageID]['title']
 		return title
@@ -94,8 +99,9 @@ Meteor.methods inputHistory: (value) ->
 		isUser = /User:/g
 		isAPI = /api.php/g
 		isTalk = /Talk:/g
+		isSpecial = /Special:/g
 		
-		if(isTalk.test(parsedURL) or isAPI.test(parsedURL) or isFile.test(parsedURL) or isCategory.test(parsedURL) or isTemplate.test(parsedURL) or isHelp.test(parsedURL) or isWikipedia.test(parsedURL) or isPortal.test(parsedURL) or isTemplateTalk.test(parsedURL) or isUser.test(parsedURL))
+		if(isSpecial.test(parsedURL) or isTalk.test(parsedURL) or isAPI.test(parsedURL) or isFile.test(parsedURL) or isCategory.test(parsedURL) or isTemplate.test(parsedURL) or isHelp.test(parsedURL) or isWikipedia.test(parsedURL) or isPortal.test(parsedURL) or isTemplateTalk.test(parsedURL) or isUser.test(parsedURL))
 			return false
 		return true
 	else
@@ -127,8 +133,9 @@ linkSet = []
 			isUser = /User:/g
 			isAPI = /api.php/g
 			isTalk = /Talk:/g
+			isSpecial = /Special:/g
 			pageTitle = result.data['query']['pages'][link]['title']
-			if(!isFile.test(pageTitle) and !isCategory.test(pageTitle) and !isTemplate.test(pageTitle) and !isHelp.test(pageTitle) and !isWikipedia.test(pageTitle) and !isPortal.test(pageTitle) and !isTemplateTalk.test(pageTitle) and !isUser.test(pageTitle) and !isAPI.test(pageTitle) and !isTalk.test(pageTitle))
+			if(!isSpecial.test(pageTitle) and !isFile.test(pageTitle) and !isCategory.test(pageTitle) and !isTemplate.test(pageTitle) and !isHelp.test(pageTitle) and !isWikipedia.test(pageTitle) and !isPortal.test(pageTitle) and !isTemplateTalk.test(pageTitle) and !isUser.test(pageTitle) and !isAPI.test(pageTitle) and !isTalk.test(pageTitle))
 				linkSet.push(pageTitle)
 	
 	return linkSet
@@ -145,7 +152,7 @@ linkSet = []
 		for page of result.data['query']['pages']
 			pageID = page
 			# console.log pageID
-			if pageID != -1
+			if pageID != '-1'
 				# And now add to collection
 				PageIDs.insert(
 			        title: pageTitle
@@ -163,27 +170,130 @@ linkSet = []
 @scrapeHistory = (pageTitles) ->
 	counter = 1
 	length = pageTitles.length
+	
+	scrapedHistory = {}
+
 	for title in pageTitles
 		linkSet = []
 		pageID = getPageID(title)
-		if !Links.findOne({pageID: pageID})# If we have the pageID already, return that.
-			urltitle = title.replace(/\ /g, "_")
-			url ='http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urltitle + '&redirects'
-			result = Meteor.http.get(url)
 
-			# url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + title + '&prop=revisions&rvprop=content&redirects'
-			url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&pageids=' + pageID + '&redirects&generator=links&gpllimit=max'
+		if pageID != '-1'
+			console.log counter + " of " + length
+			console.log title
+			counter += 1
 
-			scrapeLinks(pageID, url) # will update linkSet
+			if !Links.findOne({pageID: pageID})# If we have the pageID already, return that.
+				# urltitle = title.replace(/\ /g, "_")
+				# url ='http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urltitle + '&redirects'
+				# result = Meteor.http.get(url)
 
-			Links.insert(
-				pageID: pageID
-				links: linkSet
-			)
-			console.log "linkset length : " + linkSet.length
-			console.log "new"
-		console.log counter + " of " + length
-		counter += 1
+				# url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + title + '&prop=revisions&rvprop=content&redirects'
+				url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&pageids=' + pageID + '&redirects&generator=links&gpllimit=max'
+
+				scrapeLinks(pageID, url) # will update linkSet
+
+				Links.insert(
+					pageID: pageID
+					links: linkSet
+				)
+				console.log "new"
+
+			scrapedHistory[pageID] = linkSet
+	return scrapedHistory
+
+	
+
+
+
+
+# Build Network - and functions for building the network
+#################################################
+
+@buildNetwork = (visitHistory, visitedTitles) ->
+	console.log "Building Network..."
+	# Need to build out. This will be the renderable network
+	# will include links as well as time stamps and the such
+	# visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
+	numInMin = 5
+	sharedMin = 1
+
+	firstHopNetwork = {}
+	count = 0
+	pageListLength = visitHistory.length	
+	for visit in visitHistory
+		pageTitle = visit['title']
+		pageID = getPageID(pageTitle)
+		if pageID != '-1'
+			numIn = numInLink(pageID, visitedTitles)
+			console.log 'PageTitle ' + pageTitle + ' | pageID ' + pageID + ' | numIn ' + numIn
+			if numIn > numInMin
+				index = count
+				connections = {}
+				console.log "sharedpage"
+				for destPageIndex of visitedTitles
+					destPage = visitedTitles[destPageIndex]
+					sharedLinks = sharedLinkCount(getPageID(pageTitle), getPageID(destPage))
+					if sharedLinks > sharedMin
+						connections[getPageID(destPage)] = sharedLinks
+						# console.log "Shared Links " + sharedLinks
+				if Object.keys(connections).length > 1
+					# firstHopNetwork[pageID] = [index,pageTitle,numIn,connections]
+					firstHopNetwork[pageTitle] = [index,pageID,pageTitle,numIn,connections]
+					count += 1
+
+ 
+
+
+	# console.log firstHopNetwork
+			# print "Building Network: Page " + str(count+1) + " of " + str(pageListLength)
+			# count += 1
+	console.log "Done With Network..."
+	return firstHopNetwork
+
+
+
+
+
+@sharedLinkCount = (pageID1, pageID2) ->
+
+	try
+		links1 = Links.findOne({pageID:pageID1}).links
+		links2 = Links.findOne({pageID:pageID2}).links
+		# console.log links1
+		# console.log links2
+		sharedLinks = []
+		for i of links1
+			if links2.indexOf(links1[i]) > -1
+				sharedLinks.push links1[i]  
+		# console.log "Number of shared Links: " +sharedLinks.length
+		return sharedLinks.length
+	catch err
+		return 0
+	
+
+@numInLink = (pageID,visitedTitles) ->
+	console.log "HereNumInLInk"
+	pageTitle = getPageTitle(pageID)
+	inLinks = 0
+	mmlinks = Links.findOne({pageID:getPageID('Boston')}).links
+	for i of visitedTitles
+		page = visitedTitles[i]
+		try
+			# console.log page
+			# console.log Links.findOne({pageID:getPageID(page)})
+			if mmlinks.indexOf(pageTitle) > -1
+				inLinks += 1
+		catch err
+			console.log page
+			console.log Links.findOne({pageID:getPageID(page)})
+			console.log err
+	return inLinks
+
+
+
+
+
+
 
 
 

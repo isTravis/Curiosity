@@ -40,7 +40,7 @@ function checkAndSendHistory(){
 function sendNewHistory(startTime){
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 70 ,
+      'maxResults': 500 ,
       'startTime': startTime
     },
     function(historyItems) {
@@ -88,13 +88,13 @@ chrome.runtime.onMessage.addListener(
 
 
 // chrome.storate.local.getBytesInUse(function(d)
-//   chrome.storage.local.getBytesInUse( function(d) {
-//     // Notify that we saved.
-//     console.log("I got: ");
-//     console.log(d);
-//   });
+  // chrome.storage.local.getBytesInUse( function(d) {
+  //   // Notify that we saved.
+  //   console.log("I got: ");
+  //   console.log(d);
+  // });
 
-  //   chrome.storage.sync.get('value', function(d) {
+  //   chrome.storage.local.get('value', function(d) {
   //   // Notify that we saved.
   //   console.log("I got: ");
   //   console.log(d);

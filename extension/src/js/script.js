@@ -22,8 +22,8 @@ window.addEventListener("message", function(event) {
     myData = event.data.text
     console.log("Received from Server: " + event.data.text);
 
-    var div = document.getElementById('here');
-    div.innerHTML = div.innerHTML + event.data.text;
+    // var div = document.getElementById('here');
+    // div.innerHTML = div.innerHTML + event.data.text;
 
     chrome.runtime.sendMessage({greeting: "wtf", payload: myData}, function(response) {
       console.log(response.farewell);
