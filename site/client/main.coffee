@@ -119,19 +119,22 @@ window.addEventListener "message", ((event) ->
   # We only accept messages from ourselves
   return  unless event.source is window
   if event.data.type and (event.data.type is "FROM_PAGE")
-    Meteor.call "inputHistory", event.data.text
-    Session.set "updated", true
+    console.log "message gotten"
+    # Meteor.call "inputHistory", event.data.text
+    Session.set "updated", event.data.text
 ), false
 
 Template.wikiData.wikiData = ->
-	if Session.get "updated"
-		xx = WikiData.findOne({accountID:'travis'})
-		if xx
-			console.log xx['titles']
-			Session.set "updated", false
+	console.log "inUpdatedWiki"
+	# if Session.get "updated"
+	# console.log "updated was true"
+	xx = WikiData.findOne({accountID:'travis'})
+	if xx
+		# Session.set "updated", false
 			# postToExt(xx['titles'])
-			postToExt(xx)
-		return xx
+		postToExt(xx['networkData'])
+
+	return WikiData.findOne({accountID:'travis'})
 
 
 @postToExt = (xx) ->

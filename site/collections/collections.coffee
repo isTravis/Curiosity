@@ -2,4 +2,5 @@
 @WikiData = new Meteor.Collection "wikidata"
 @PageIDs = new Meteor.Collection "pageids"
 @Links = new Meteor.Collection "links"
+# @isReady = new Meteor.Collection "links"
 

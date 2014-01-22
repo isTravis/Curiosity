@@ -11,5 +11,5 @@
 # An overview of deps.autorun is documented here: http://docs.meteor.com/#reactivity
 Deps.autorun ->
     # maxNumShown = Session.get "maxNumShown" # Get the session variable
-    # updated = Session.get "updated"
-    wikiDataSub = Meteor.subscribe "wikiDataPub"
+    updated = Session.get "updated"
+    wikiDataSub = Meteor.subscribe "wikiDataPub", updated
