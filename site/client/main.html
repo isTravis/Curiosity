@@ -1,24 +1,18 @@
 <head>
   <title>Curiosity</title>
-  <meta charset="utf-8">
 </head>
 
 <body>
 	<h1 class="main-title">Curiosity</h1>
-	<div id="here"></div>
-	{{>ddd}}
-	{{>wikiData}}
+	<div id="here">{{>wikiData}}</div>
+  {{#constant}}
+    <div class="hereD"></div>
+  {{/constant}}
+
+	
 </body>
 
 
 <template name="wikiData">
 	{{wikiData}}
-</template>
-
-<template name="ddd">
-<div class="timeline-wrapper">
-    {{#constant}}
-    <div class="hereD"></div>
-    {{/constant}}
-  </div>
 </template>

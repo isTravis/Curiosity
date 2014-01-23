@@ -1,11 +1,21 @@
-Meteor.publish "wikiDataPub", (updated) ->
+# Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
+#     console.log "just Updated"
+#     # console.log "updated " + updated
+#     # if updated 
+#     console.log "Beginning new"
+#     beginEverything(historyValues, receivedHistoryTime)
+#     console.log "finished updated"
+#     return WikiData.find()
+
+
+Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
     console.log "just Updated"
     # console.log "updated " + updated
-    if updated 
-    	console.log "Beginning new"
-	    beginEverything(updated)
-	    console.log "finished updated"
-	    return WikiData.find()
+    # if updated 
+    console.log "Beginning new"
+    beginEverything(historyValues, receivedHistoryTime)
+    console.log "finished updated"
+    return WikiData.find()
 
 
 
@@ -17,14 +27,14 @@ Meteor.publish "wikiDataPub", (updated) ->
 	# 		$set:
 	# 			toSend: 'false'
 	# 	)
-@beginEverything = (value) ->
+@beginEverything = (historyValues, receivedHistoryTime) ->
 
 	visitHistory = []
 	visitedTitles = []
 	userID = 'travis'
 
 	# For each history item in value
-	_.forEach value, (e) ->
+	_.forEach historyValues, (e) ->
 		if testURL(e.url) # If the url is valid, according to testURL
 	    	if e.title == ''
 	    		thisTitle = goGetTitle(e.url)
@@ -38,7 +48,7 @@ Meteor.publish "wikiDataPub", (updated) ->
 
 
 	scrapedHistory = scrapeHistory(visitedTitles)
-	networkData = buildNetwork(scrapedHistory)
+	# networkData = buildNetwork(scrapedHistory)
 	# networkData = 0
 
 
@@ -52,14 +62,20 @@ Meteor.publish "wikiDataPub", (updated) ->
 			$set:
 				titles: visitedTitles
 				history: visitHistory
-				networkData: networkData
+				scrapedHistory: scrapedHistory[0]
+				scrapedIDs: scrapedHistory[1]
+				# networkData: networkData
+				receivedHistoryTime: receivedHistoryTime
 		)
 	else
 	   WikiData.insert(
 	        accountID: userID
 	        titles: visitedTitles
 	        history: visitHistory
-	        networkData: networkData
+	        scrapedHistory: scrapedHistory[0]
+	        scrapedIDs: scrapedHistory[1]
+	        # networkData: networkData
+	        receivedHistoryTime: receivedHistoryTime
 	    )
 
 
@@ -178,10 +194,12 @@ linkSet = []
 	length = pageTitles.length
 	
 	scrapedHistory = {}
+	scrapedIDs = {}
 
 	for title in pageTitles
 		linkSet = []
 		pageID = getPageID(title)
+		scrapedIDs[pageID] = title
 
 		if pageID != '-1'
 			# console.log counter + " of " + length
@@ -209,120 +227,120 @@ linkSet = []
 				scrapedHistory[pageID] = Links.findOne({pageID: pageID}).links
 			
 	# console.log scrapedHistory
-	return scrapedHistory
+	return [scrapedHistory, scrapedIDs]
 
 	
 
 
 
 
-# Build Network - and functions for building the network
-#################################################
+# # Build Network - and functions for building the network
+# #################################################
 
-# @buildNetwork = (visitHistory, visitedTitles) ->
-@buildNetwork = (scrapedHistory) ->
-	console.log "Building Network..."
-	# Need to build out. This will be the renderable network
-	# will include links as well as time stamps and the such
-	# visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
-	numInMin = .02
-	sharedMin = 1
+# # @buildNetwork = (visitHistory, visitedTitles) ->
+# @buildNetwork = (scrapedHistory) ->
+# 	console.log "Building Network..."
+# 	# Need to build out. This will be the renderable network
+# 	# will include links as well as time stamps and the such
+# 	# visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
+# 	numInMin = .02
+# 	sharedMin = 1
 
-	firstHopNetwork = {}
-	count = 0
-	pageListLength = Object.keys(scrapedHistory).length
-	# console.log pageListLength
-	numInTitles = {}
-	totalOriginalTime=0;
-	totalNewTime = 0;
+# 	firstHopNetwork = {}
+# 	count = 0
+# 	pageListLength = Object.keys(scrapedHistory).length
+# 	# console.log pageListLength
+# 	numInTitles = {}
+# 	totalOriginalTime=0;
+# 	totalNewTime = 0;
 
-	# Get and built numIn counts
-	for visit of scrapedHistory
-		pageID = visit
-		if pageID != '-1'
-			numIn = numInLink(pageID, scrapedHistory)
-			numInNormal = numIn/scrapedHistory[pageID].length
-			# console.log getPageTitle(pageID)
-			# console.log numInNormal
-			if numInNormal > numInMin
-				numInTitles[pageID] = numIn
+# 	# Get and built numIn counts
+# 	for visit of scrapedHistory
+# 		pageID = visit
+# 		if pageID != '-1'
+# 			numIn = numInLink(pageID, scrapedHistory)
+# 			numInNormal = numIn/scrapedHistory[pageID].length
+# 			# console.log getPageTitle(pageID)
+# 			# console.log numInNormal
+# 			if numInNormal > numInMin
+# 				numInTitles[pageID] = numIn
 
-	# Get and build connections		
-	for page of numInTitles
-		pageID = page
-		pageTitle = getPageTitle(pageID) 
-		numIn = numInTitles[pageID]
-		# console.log 'PageTitle ' + pageTitle + ' | pageID ' + pageID + ' | numIn ' + numIn
+# 	# Get and build connections		
+# 	for page of numInTitles
+# 		pageID = page
+# 		pageTitle = getPageTitle(pageID) 
+# 		numIn = numInTitles[pageID]
+# 		# console.log 'PageTitle ' + pageTitle + ' | pageID ' + pageID + ' | numIn ' + numIn
 
-		index = count
-		connections = {}
+# 		index = count
+# 		connections = {}
 
-		# startTime = new Date().getTime()
-		for destPage of numInTitles
-			if parseInt(destPage) != parseInt(pageID)
-				sharedLinks= sharedLinkCount(scrapedHistory[pageID], scrapedHistory[destPage])
-				if sharedLinks > sharedMin
-					connections[destPage] = sharedLinks
-		# endTime = new Date().getTime()
-		# totalNewTime += (endTime-startTime)/1000
+# 		# startTime = new Date().getTime()
+# 		for destPage of numInTitles
+# 			if parseInt(destPage) != parseInt(pageID)
+# 				sharedLinks= sharedLinkCount(scrapedHistory[pageID], scrapedHistory[destPage])
+# 				if sharedLinks > sharedMin
+# 					connections[destPage] = sharedLinks
+# 		# endTime = new Date().getTime()
+# 		# totalNewTime += (endTime-startTime)/1000
 
 
 
-		if Object.keys(connections).length > 0
+# 		if Object.keys(connections).length > 0
 			
-			# firstHopNetwork[pageID] = [index,pageTitle,numIn,connections]
-			firstHopNetwork[pageID] = [index,pageID,pageTitle,numIn,connections]
-			count += 1
+# 			# firstHopNetwork[pageID] = [index,pageTitle,numIn,connections]
+# 			firstHopNetwork[pageID] = [index,pageID,pageTitle,numIn,connections]
+# 			count += 1
 
  
 
 
-	# console.log firstHopNetwork
-	# console.log "New: " + totalNewTime + " seconds"
-	console.log "Done With Network..."
-	return firstHopNetwork
+# 	# console.log firstHopNetwork
+# 	# console.log "New: " + totalNewTime + " seconds"
+# 	console.log "Done With Network..."
+# 	return firstHopNetwork
 
 
 
-@sharedLinkCount = (linkList1, linkList2) ->
-  linkList1.sort()
-  linkList2.sort()
-  ai = bi = 0
-  result = []
-  while ai < linkList1.length and bi < linkList2.length
-    # console.log a[ai]
-    # console.log b[bi]
-    if linkList1[ai] < linkList2[bi]
-      ai++
-    else if linkList1[ai] > linkList2[bi]
-      bi++
-    # they're equal 
-    else
-      result.push ai
-      ai++
-      bi++
-  return result.length
+# @sharedLinkCount = (linkList1, linkList2) ->
+#   linkList1.sort()
+#   linkList2.sort()
+#   ai = bi = 0
+#   result = []
+#   while ai < linkList1.length and bi < linkList2.length
+#     # console.log a[ai]
+#     # console.log b[bi]
+#     if linkList1[ai] < linkList2[bi]
+#       ai++
+#     else if linkList1[ai] > linkList2[bi]
+#       bi++
+#     # they're equal 
+#     else
+#       result.push ai
+#       ai++
+#       bi++
+#   return result.length
 
 
 	
 
-@numInLink = (pageID,scrapedHistory) ->
-	# console.log "HereNumInLInk"
-	pageTitle = getPageTitle(pageID)
-	inLinks = 0
-	for i of scrapedHistory
-		histID = i
-		histLinks = scrapedHistory[i]
-		try
-			# console.log page
-			# console.log Links.findOne({pageID:getPageID(page)})
-			if histLinks.indexOf(pageTitle) > -1
-				inLinks += 1
-		catch err
-			console.log histID
-			# console.log Links.findOne({pageID:getPageID(page)})
-			# console.log err
-	return inLinks
+# @numInLink = (pageID,scrapedHistory) ->
+# 	# console.log "HereNumInLInk"
+# 	pageTitle = getPageTitle(pageID)
+# 	inLinks = 0
+# 	for i of scrapedHistory
+# 		histID = i
+# 		histLinks = scrapedHistory[i]
+# 		try
+# 			# console.log page
+# 			# console.log Links.findOne({pageID:getPageID(page)})
+# 			if histLinks.indexOf(pageTitle) > -1
+# 				inLinks += 1
+# 		catch err
+# 			console.log histID
+# 			# console.log Links.findOne({pageID:getPageID(page)})
+# 			# console.log err
+# 	return inLinks
 
 
 
