@@ -156,60 +156,107 @@
 
 
 
-
-
-@renderD4 = (renderData) ->
+@generateClusters = (renderData) ->
 	if renderData
+		console.log "renderdata " + renderData
+		clusterData = []
+		for item of renderData['nodes']
+			console.log renderData['nodes'][item]
+			title = renderData['nodes'][item]['name']
+			inlinks = renderData['nodes'][item]['inlinks']
+			# console.log inlinks
+			if inlinks < 45
+				clusterData.push({cluster:1, radius:inlinks, title: title})
+		return clusterData
+
+
+@renderD4 = (clusterData) ->
+	if clusterData
 		width = 960
-		height = 500
+		height = 800
 		padding = 1.5
 		clusterPadding = 6
-		maxRadius = 12
-		n = 200
-		m = 20
+		maxRadius = 45
+		n = 4
+		m = 1
 		color = d3.scale.category20().domain(d3.range(m))
 		clusters = new Array(m)
 
-
-		nodes = d3.range(n).map(->
-		  i = Math.floor(Math.random() * m)
-		  r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius
+		
+		data = [{cluster: 0.0, radius: 5.0},{cluster: 0.0, radius: 5.0},{cluster: 1.0, radius: 5.0},{cluster: 0.0, radius: 5.0},{cluster: 0.0, radius: 3.0}]
+		counter = 0
+		# console.log clusterData
+		nodes = d3.range(clusterData.length).map(->
+		  console.log clusterData[counter]
+		  i = clusterData[counter]['cluster']
+		  r = clusterData[counter]['radius']
+		  if r > 50
+		  	r = 50
+		  # console.log r
 		  d =
 		    cluster: i
 		    radius: r
+		    title: clusterData[counter]['title']
+		    id: 'id'
 
+		  # console.log d
 		  clusters[i] = d  if not clusters[i] or (r > clusters[i].radius)
+		  counter += 1
 		  d
 		)
 
+		# console.log clusters
+		# console.log nodes
+		# clusters2 = clusters
+		# nodes2 = nodes
+		# nodes = [{cluster: 0.0, radius: 5.0},{cluster: 1.0, radius: 5.0},{cluster: 0.0, radius: 5.0},{cluster: 0.0, radius: 3.0}]
+		# clusters = [{cluster: 0.0, radius: 5.0},{cluster: 1.0, radius: 5.0}]
+		# console.log clusters
+		# console.log nodes
 
-		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0).charge(0).start()
+		# nodes = nodes2
+		# clusters = clusters2
+
+		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0.2).charge(0).start()
 		svg = d3.select(".hereD").append("svg").attr("width", width).attr("height", height)
 		
 		gnodes = svg.selectAll('g.gnode')
-		  .data(nodes)
-		  .enter()
-		  .append('g')
-		  .classed('gnode', true)
+			.data(nodes)
+			.enter()
+			.append('g')
+			.classed('gnode', true)
+			.on("mouseover", (d) ->
+				nodeSelection = d3.select(this)
+				# nodeSelection.select("circle").style(opacity: "1.0")
+				nodeSelection.select("text").style(opacity: "1.0")
+				# console.log nodeSelection.text()
+			)
+			.on("mouseout", (d) ->
+				nodeSelection = d3.select(this)
+				# nodeSelection.select("circle").style(opacity: "1.0")
+				nodeSelection.select("text").style(opacity: "0.0")
+				# console.log nodeSelection.text()
+			)
 
 		circle = gnodes.append("circle").attr("r", (d) ->
 		  d.radius
 		).style("fill", (d) ->
 		  color d.cluster
-		).call(force.drag)
+		)
 
 		labels = gnodes.append("text")
-		  .text((d) ->  "puh" )
+		  .text((d) ->  d.title )
+		  .attr("text-anchor", "middle")
+		  .style("opacity", "0.0")
+		  .attr("class","node-label")
 
 		# separation between same-color circles
 		# separation between different-color circles
 		# total number of circles
 		# number of distinct clusters
 
-		console.log "here"
-		# The largest node for each cluster.
+
 		force.on "tick", -> 
-			console.log "here1"
 			circle
 				.each(cluster(10 *.01))
 				.each(collide(.5))
@@ -273,4 +320,5 @@
 		          quad.point.y += y
 		      x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
-# 
+		
+

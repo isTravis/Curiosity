@@ -34,7 +34,11 @@ Template.wikiData.wikiData = ->
 				# for n of networkData
 				# 	console.log n
 				renderData = createJSON(networkData)
-				renderD4(renderData) # Function is located in renderD3.coffee
+				# clusterData = generateClusters(renderData)
+				# Session.set "clusterData", clusterData
+				# renderD4(clusterData) # Function is located in renderD3.coffee
+				renderD3(renderData)
+
 
 				postToExt(renderData)
 			
