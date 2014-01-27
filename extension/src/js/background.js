@@ -37,13 +37,204 @@ function checkAndSendHistory(){
   });
 }
 
+
+
+// function buildTypedUrlList(divName) {
+//   // chrome.history.search({
+//   //     'text': '',              // Return every history item....
+//   //     'startTime': oneWeekAgo  // that was accessed less than one week ago.
+//   //   },
+//     function(historyItems) {
+//       // For each history item, get details on all visits.
+//       for (var i = 0; i < historyItems.length; ++i) {
+//         var url = historyItems[i].url;
+//         var processVisitsWithUrl = function(url) {
+//           // We need the url of the visited item to process the visit.
+//           // Use a closure to bind the  url into the callback's args.
+//           return function(visitItems) {
+//             processVisits(url, visitItems);
+//           };
+//         };
+//         chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
+//         numRequestsOutstanding++;
+//       }
+//       if (!numRequestsOutstanding) {
+//         onAllVisitsProcessed();
+//       }
+//     };
+
+
+
+//   // Maps URLs to a count of the number of times the user typed that URL into
+//   // the omnibox.
+//   var urlToCount = {};
+
+//   // Callback for chrome.history.getVisits().  Counts the number of
+//   // times a user visited a URL by typing the address.
+//   var processVisits = function(url, visitItems) {
+//     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+//       // Ignore items unless the user typed the URL.
+//       if (visitItems[i].transition != 'typed') {
+//         continue;
+//       }
+
+//       if (!urlToCount[url]) {
+//         urlToCount[url] = 0;
+//       }
+
+//       urlToCount[url]++;
+//     }
+
+//     // If this is the final outstanding call to processVisits(),
+//     // then we have the final results.  Use them to build the list
+//     // of URLs to show in the popup.
+//     if (!--numRequestsOutstanding) {
+//       onAllVisitsProcessed();
+//     }
+//   };
+
+//   // This function is called when we have the final list of URls to display.
+//   var onAllVisitsProcessed = function() {
+//     // Get the top scorring urls.
+//     urlArray = [];
+//     for (var url in urlToCount) {
+//       urlArray.push(url);
+//     }
+
+//     // Sort the URLs by the number of times the user typed them.
+//     urlArray.sort(function(a, b) {
+//       return urlToCount[b] - urlToCount[a];
+//     });
+
+//     buildPopupDom(divName, urlArray.slice(0, 10));
+//   };
+// }
+
+
 function sendNewHistory(startTime){
+  var numRequestsOutstanding = 0;
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 1200 ,
+      'maxResults': 100,
       'startTime': startTime
     },
     function(historyItems) {
+      // For each history item, get details on all visits.
+    //   console.log(historyItems.length);
+    //   for (var i = 0; i < historyItems.length; ++i) {
+    //     var url = historyItems[i].url;
+
+    //     var processVisitsWithUrl = function(url) {
+    //       // We need the url of the visited item to process the visit.
+    //       // Use a closure to bind the  url into the callback's args.
+    //       return function(visitItems) {
+    //         processVisits(url, visitItems);
+    //       };
+    //     };
+    //     chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
+    //     numRequestsOutstanding++;
+    //     // console.log(numRequestsOutstanding);
+    //   }
+    //   if (!numRequestsOutstanding) {
+    //     onAllVisitsProcessed();
+    //   }
+    // });
+
+    // var properHistory = {};
+
+    // var processVisits = function(url, visitItems) {
+    //   if(visitItems.length >0){
+    //       console.log("here");
+    //     }
+    //   for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+    //     // Ignore items unless the user typed the URL.
+        
+    //     // if (visitItems[i].transition != 'typed') {
+    //     //   continue;
+    //     // }
+
+    //     if (!properHistory[url]) {
+    //       properHistory[url] = {url:url,title:'blah',visits:[]};
+    //     }
+
+    //     properHistory[url]['visits'].push(visitItems[i].visitTime);
+    //   }
+
+    //   // If this is the final outstanding call to processVisits(),
+    //   // then we have the final results.  Use them to build the list
+    //   // of URLs to show in the popup.
+    //   if (!--numRequestsOutstanding) {
+    //     onAllVisitsProcessed();
+    //   }
+    // };
+
+    // // This function is called when we have the final list of URls to display.
+    // var onAllVisitsProcessed = function() {
+    //   console.log(properHistory);
+    //   // Get the top scorring urls.
+    //   // urlArray = [];
+    //   // for (var url in prop) {
+    //   //   urlArray.push(url);
+    //   // }
+
+    //   // // Sort the URLs by the number of times the user typed them.
+    //   // urlArray.sort(function(a, b) {
+    //   //   return urlToCount[b] - urlToCount[a];
+    //   // });
+
+    //   // buildPopupDom(divName, urlArray.slice(0, 10));
+    // };
+
+
+
+
+    // function(historyItems) {
+    //   var histories = [];
+    //   var visits = [];
+    //   var historycount = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    //   var visitcount = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    //   var go = 1;
+    //   // console.log(historyItems);
+    //   var historiesProcessed = 0;
+    //         // for(var ii = 0; ii < historyItems.length; ii++)
+    //         // {
+    //         var ii = 0;
+    //         while (go == 1){
+    //             historycount[historyItems[ii].visitCount] += 1;
+    //             histories.push(historyItems[ii]);
+    //             var urll = historyItems[ii].url
+    //             console.log(urll);
+    //             chrome.history.getVisits({url: historyItems[ii].url}, function(visitItems)
+    //             { 
+
+                    
+    //                 console.log(visitItems.length);
+    //                 // console.log(visitcount[parseInt(visitItems.length)]);
+    //                 visitcount[parseInt(visitItems.length)] += 1;
+    //                 // console.log('----------------');
+    //                 for(var i = 0; i < visitItems.length; i++)
+    //                 {
+    //                     visits.push(visitItems[i]);
+    //                 }
+    //                 historiesProcessed++;
+
+    //                 if(historiesProcessed === historyItems.length)
+    //                 {
+    //                     // console.log(visits);
+    //                     go = 0;
+    //                 }
+    //                 ii += 1;
+
+    //             });
+    //             // while( go == 1){console.log('shit');}
+    //         }
+    //         // console.log(histories.length + ' histories');
+    //         console.log(histories);
+    //         console.log(visits);
+
+
+
+
       console.log("SentHistory");
       // Send a message to the content_script with all of the history items
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {

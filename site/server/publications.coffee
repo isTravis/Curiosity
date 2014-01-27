@@ -45,13 +45,46 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
 
     
+    # console.log "Herehere"
+	visitedIDs = []
+	_.forEach visitedTitles, (title) ->
+		visitedIDs.push(getPageID(title))
+	# console.log "Herehere2"
+	# console.log visitedIDs
+
+
+
 
 
 	scrapedHistory = scrapeHistory(visitedTitles)
 	# networkData = buildNetwork(scrapedHistory)
 	# networkData = 0
+	myEdges = {}
+	_.forEach visitedIDs, (id1) ->
+		console.log id1
+		srcedges = Edges.findOne({src:id1}) 
+		_.forEach visitedIDs, (id2) ->
+			# console.log id1
+			# if id1 != id2
+				# if myEdges[id1]
+				# 	myEdges[id1][id2] = createEdge(id1,id2)
+				# else
+					# myEdges[id1]= {id2: createEdge(id1,id2)}
+				# if myEdges[id1]
+				# 	myEdges[id1][id2] = srcedges[id2]
+				# else
+				# 	myEdges[id1]= {id2: srcedges[id2]}
+					
+	
 
+	# compare = (a, b) ->
+	#   return -1  if a.last_nom < b.last_nom
+	#   return 1  if a.last_nom > b.last_nom
+	#   0
+	# objs.sort compare
 
+	console.log myEdges
+	console.log "done"
 	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
 	# Since update gets set to true, it just winds up reading the old wikiData 
 	# Need to have the function check if the server is done. Can we set session variables from server?
@@ -62,9 +95,10 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 			$set:
 				titles: visitedTitles
 				history: visitHistory
-				scrapedHistory: scrapedHistory[0]
-				scrapedIDs: scrapedHistory[1]
+				# scrapedHistory: scrapedHistory[0]
+				# scrapedIDs: scrapedHistory[1]
 				# networkData: networkData
+				edges:myEdges
 				receivedHistoryTime: receivedHistoryTime
 		)
 	else
@@ -72,9 +106,10 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	        accountID: userID
 	        titles: visitedTitles
 	        history: visitHistory
-	        scrapedHistory: scrapedHistory[0]
-	        scrapedIDs: scrapedHistory[1]
+	        # scrapedHistory: scrapedHistory[0]
+	        # scrapedIDs: scrapedHistory[1]
 	        # networkData: networkData
+	        edges:myEdges
 	        receivedHistoryTime: receivedHistoryTime
 	    )
 
@@ -236,8 +271,27 @@ linkSet = []
 	# console.log scrapedHistory
 	return [scrapedHistory, scrapedIDs]
 
-	
 
+@createEdge = (pageID1, pageID2) ->
+	# console.log "Edge of " + pageID1 + " " +pageID2
+	strength = 0
+	# dir1 = Edges.findOne({src:pageID1, dest:pageID2}) 
+	# dir1 = Edges.findOne({src:pageID1})[pageID2]
+	
+	# if !dir1
+	# 	dir2 = Edges.findOne({src:pageID2, dest:pageID1}) 		
+	# 	if dir2
+	# 		strength = dir2.strength
+	# 	else
+	# 		linkList1 = Links.findOne({pageID: pageID1}).links
+	# 		linkList2 = Links.findOne({pageID: pageID2}).links
+	# 		# console.log linkList1
+	# 		# console.log linkList2
+	# 		strength = sharedLinkCount(linkList1, linkList2)
+	# 		Edges.insert({src:pageID1, dest:pageID2,strength:strength})
+	# else
+	# 	strength = dir1.strength
+	return strength
 
 
 
@@ -309,24 +363,24 @@ linkSet = []
 
 
 
-# @sharedLinkCount = (linkList1, linkList2) ->
-#   linkList1.sort()
-#   linkList2.sort()
-#   ai = bi = 0
-#   result = []
-#   while ai < linkList1.length and bi < linkList2.length
-#     # console.log a[ai]
-#     # console.log b[bi]
-#     if linkList1[ai] < linkList2[bi]
-#       ai++
-#     else if linkList1[ai] > linkList2[bi]
-#       bi++
-#     # they're equal 
-#     else
-#       result.push ai
-#       ai++
-#       bi++
-#   return result.length
+@sharedLinkCount = (linkList1, linkList2) ->
+  linkList1.sort()
+  linkList2.sort()
+  ai = bi = 0
+  result = []
+  while ai < linkList1.length and bi < linkList2.length
+    # console.log a[ai]
+    # console.log b[bi]
+    if linkList1[ai] < linkList2[bi]
+      ai++
+    else if linkList1[ai] > linkList2[bi]
+      bi++
+    # they're equal 
+    else
+      result.push ai
+      ai++
+      bi++
+  return result.length
 
 
 	
