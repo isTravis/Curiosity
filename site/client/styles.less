@@ -1,3 +1,89 @@
+@header-bg: #272F32;
+@header-font: #FFF;
+@highlight: #FF3D2E;
+@main-bg: #DAEAEF;
+@main-font: #9DBDC6;
+
+@header-bg: #374140;
+@header-font: #ddd;
+@highlight: #F1433F;
+@main-bg: #3D4C53;
+@main-font: #ddd;
+
+@nav-width: 520px;
+
+h1,h2,h3,h4,h5,div{
+	margin:0;
+	padding:0;
+}
+
+body{
+	font-family:Arial, sans-serif;
+}
+
+.header{
+	background-color: @header-bg;
+	height: 100px;
+	// position: relative;
+	
+	.title{
+		width: @nav-width;
+		display: block;
+		margin: 0 auto;
+		// padding-right: 25px;
+		h1{
+			color: @header-font;
+			text-align: center;
+		}
+	}
+	
+
+
+	.nav{
+		width: @nav-width;
+		display: block;
+		margin: 0 auto;
+		h2{
+			width:100px;
+			font-size:20px;
+			text-align: center;
+			color: @highlight;
+			float:left;
+			padding-left: 15px;
+			padding-right: 15px;
+
+		}
+	}
+}
+
+
+
+.main{
+	background-color: @main-bg;
+	color: @main-font;
+	.welcome{
+
+	}
+
+	.data{
+		.settings{
+			width: 100px;
+			height:400px;
+			float: right;
+			position: absolute;
+			right:0px;
+			padding-right: 5px;
+			.fa-cog{
+				color: @main-font;
+				font-size: 25px;
+				position: absolute;
+				top:5px;
+				right: 5px;
+			}	
+		}
+		
+	}
+}
 .node {
   stroke: #fff;
   stroke-width: 1.5px;
@@ -11,8 +97,18 @@
 .node-label{
 	font-size: 1em;
 	pointer-events: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
-#here{
+.hidden{
 	display: none;
+}
+
+.wikimap svg{
+	// background-color: #222;
 }

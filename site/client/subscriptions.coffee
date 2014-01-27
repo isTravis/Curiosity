@@ -14,3 +14,5 @@ Deps.autorun ->
     receivedHistoryTime = Session.get "receivedHistoryTime"
     historyValues = Session.get "historyValues"
     wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime
+
+   

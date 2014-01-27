@@ -222,9 +222,16 @@ linkSet = []
 				)
 				console.log "new"
 
-				scrapedHistory[pageID] = linkSet
+				# console.log linkSet.length
+				if linkSet.length < 200
+					scrapedHistory[pageID] = linkSet
 			else
-				scrapedHistory[pageID] = Links.findOne({pageID: pageID}).links
+				linksethere = Links.findOne({pageID: pageID}).links
+				# console.log linksethere.length
+				if linksethere.length < 800
+					scrapedHistory[pageID] = linksethere
+				else
+					console.log title
 			
 	# console.log scrapedHistory
 	return [scrapedHistory, scrapedIDs]

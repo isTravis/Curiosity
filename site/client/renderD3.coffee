@@ -11,7 +11,7 @@
 			.linkDistance(50)
 			.size([w, h ])
 
-		svg = d3.select(".hereD").append("svg")
+		svg = d3.select(".wikimap").append("svg")
 			.attr("width", w)
 			.attr("height", h)
 			.attr("transform", "translate(" + w / 4 + "," + h / 3 + ")")
@@ -161,23 +161,25 @@
 		console.log "renderdata " + renderData
 		clusterData = []
 		for item of renderData['nodes']
-			console.log renderData['nodes'][item]
+			# console.log renderData['nodes'][item]
 			title = renderData['nodes'][item]['name']
 			inlinks = renderData['nodes'][item]['inlinks']
 			# console.log inlinks
-			if inlinks < 45
-				clusterData.push({cluster:1, radius:inlinks, title: title})
+			# if inlinks < 45
+			clusterData.push({cluster:1, radius:inlinks, title: title})
 		return clusterData
 
 
 @renderD4 = (clusterData) ->
 	if clusterData
-		width = 960
-		height = 800
+		docHeight = $(document).height()
+		docWidth = $(document).width()
+		width = docWidth
+		height = docHeight-100
 		padding = 1.5
 		clusterPadding = 6
 		maxRadius = 45
-		n = 4
+		n = 25
 		m = 1
 		color = d3.scale.category20().domain(d3.range(m))
 		clusters = new Array(m)
@@ -187,7 +189,7 @@
 		counter = 0
 		# console.log clusterData
 		nodes = d3.range(clusterData.length).map(->
-		  console.log clusterData[counter]
+		  # console.log clusterData[counter]
 		  i = clusterData[counter]['cluster']
 		  r = clusterData[counter]['radius']
 		  if r > 50
@@ -198,6 +200,8 @@
 		    radius: r
 		    title: clusterData[counter]['title']
 		    id: 'id'
+		    x: Math.cos(i / m * 2 * Math.PI) * 200 + width / 2 + Math.random()
+		    y: Math.sin(i / m * 2 * Math.PI) * 200 + height / 2 + Math.random()
 
 		  # console.log d
 		  clusters[i] = d  if not clusters[i] or (r > clusters[i].radius)
@@ -218,7 +222,7 @@
 		# clusters = clusters2
 
 		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0.2).charge(0).start()
-		svg = d3.select(".hereD").append("svg").attr("width", width).attr("height", height)
+		svg = d3.select(".wikimap").append("svg").attr("width", width).attr("height", height)
 		
 		gnodes = svg.selectAll('g.gnode')
 			.data(nodes)
@@ -237,6 +241,14 @@
 				nodeSelection.select("text").style(opacity: "0.0")
 				# console.log nodeSelection.text()
 			)
+
+		gnodes.transition().duration(750).delay((d, i) ->
+		  i * 5
+		).attrTween "r", (d) ->
+		  i = d3.interpolate(0, d.radius)
+		  (t) ->
+		    d.radius = i(t)
+
 
 		circle = gnodes.append("circle").attr("r", (d) ->
 		  d.radius
@@ -321,4 +333,38 @@
 		      x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
 		
+# @renderTimeline = () ->
+# 	type = (d) ->
+# 		d.frequency = +d.frequency
+# 		d
+		
+# 	margin =
+# 		top: 	20
+# 		right: 20
+# 		bottom: 30
+# 		left: 40
+
+# 	width = 960 - margin.left - margin.right
+# 	height = 500 - margin.top - margin.bottom
+# 	x = d3.scale.ordinal().rangeRoundBands([0, width], .1)
+# 	y = d3.scale.linear().range([height, 0])
+# 	xAxis = d3.svg.axis().scale(x).orient("bottom")
+# 	yAxis = d3.svg.axis().scale(y).orient("left").ticks(10, "%")
+# 	svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+# 	d3.tsv "data.tsv", type, (error, data) ->
+# 		x.domain data.map((d) ->
+# 		  d.letter
+# 		)
+# 		y.domain [0, d3.max(data, (d) ->
+# 		  d.frequency
+# 		)]
+# 		svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call xAxis
+# 		svg.append("g").attr("class", "y axis").call(yAxis).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", ".71em").style("text-anchor", "end").text "Frequency"
+# 		svg.selectAll(".bar").data(data).enter().append("rect").attr("class", "bar").attr("x", (d) ->
+# 		  x d.letter
+# 		).attr("width", x.rangeBand()).attr("y", (d) ->
+# 		  y d.frequency
+# 		).attr "height", (d) ->
+# 		  height - y(d.frequency)
+
 

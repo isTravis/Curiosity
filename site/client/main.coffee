@@ -3,6 +3,7 @@ window.addEventListener "message", ((event) ->
   return  unless event.source is window
   if event.data.type and (event.data.type is "FROM_PAGE")
     console.log "message gotten"
+    Session.set "status", "Parsing Wikipedia History"
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
     Session.set "historyValues", event.data.text
@@ -11,9 +12,18 @@ window.addEventListener "message", ((event) ->
     # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
 ), false
 
+
+
 Template.wikiData.created = ->
 	Session.set "receivedHistoryTime", 0
 	Session.set "renderNetwork", {}
+	Session.set "status", "Reading Wikipedia History"
+
+	
+	# Session.set "status", "here" # page updates automatically!
+
+# Template.status.status = ->
+# 	return Session.get "status"
 
 Template.wikiData.wikiData = ->
 	# console.log "inUpdatedWiki"
@@ -25,7 +35,9 @@ Template.wikiData.wikiData = ->
 		# console.log "wikipub history rtime " + xx['receivedHistoryTime']
 		if xx['receivedHistoryTime'] == (Session.get "receivedHistoryTime")
 			if xx['scrapedHistory']
+
 				Session.set "scrapedIDs", xx['scrapedIDs']
+				Session.set "status", "okkk"
 				networkData = buildNetwork(xx['scrapedHistory'])
 
 				# console.log Object.keys(networkData).length
@@ -34,10 +46,10 @@ Template.wikiData.wikiData = ->
 				# for n of networkData
 				# 	console.log n
 				renderData = createJSON(networkData)
-				# clusterData = generateClusters(renderData)
+				clusterData = generateClusters(renderData)
 				# Session.set "clusterData", clusterData
 				# renderD4(clusterData) # Function is located in renderD3.coffee
-				renderD3(renderData)
+				renderD4(clusterData)
 
 
 				postToExt(renderData)
@@ -82,16 +94,21 @@ Template.wikiData.wikiData = ->
 
 	firstHopNetwork = {}
 	count = 0
+	statuscount = 0
 	pageListLength = Object.keys(scrapedHistory).length
 	# console.log "scrape length" + Object.keys(scrapedHistory).length
 	# console.log pageListLength
 	numInTitles = {}
 	totalOriginalTime=0;
 	totalNewTime = 0;
-
+	Session.set "status", "Building Network Nodes: Page "
 	# Get and built numIn counts
 	for visit of scrapedHistory
 		# console.log visit
+		# div = document.getElementById('here');
+		# div.innerHTML = div.innerHTML + statuscount;
+		console.log "Building Network Nodes: Page " + (statuscount+1) + " of " + pageListLength
+		Session.set "status", "Building Network Nodes: Page " + statuscount+1 + " of " + pageListLength
 		pageID = visit
 		if pageID != '-1'
 			numIn = numInLink(pageID, scrapedHistory)
@@ -100,10 +117,15 @@ Template.wikiData.wikiData = ->
 			# console.log numInNormal
 			if numInNormal > numInMin
 				numInTitles[pageID] = numIn
+		statuscount += 1
 
+	console.log "Done with numin"
 	# console.log "numintitles " + Object.keys(numInTitles).length
 	# Get and build connections		
+	statuscount = 0
+
 	for page of numInTitles
+		Session.set "status", "Building Network Links: Page " + statuscount+1 + " of " + pageListLength
 		pageID = page
 		pageTitle = getPageTitle(pageID) 
 		numIn = numInTitles[pageID]
@@ -129,7 +151,12 @@ Template.wikiData.wikiData = ->
 			firstHopNetwork[pageID] = [index,pageID,pageTitle,numIn,connections]
 			count += 1
 
- 
+		statuscount += 1
+
+	console.log firstHopNetwork
+	for i of firstHopNetwork
+		# console.log firstHopNetwork[i]
+		console.log firstHopNetwork[i][2] + " | " + firstHopNetwork[i][3] + " | " + Object.keys(firstHopNetwork[i][4]).length
 
 
 	# console.log firstHopNetwork
@@ -202,7 +229,7 @@ Template.wikiData.wikiData = ->
 
 	networkLength = Object.keys(network).length
 	# wtfcounter = 0
-
+	Session.set "status", "Formatting Network"
 	if networkLength
 		for i in [0..networkLength-1]
 			# console.log i
