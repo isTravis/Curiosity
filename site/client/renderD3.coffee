@@ -1,7 +1,7 @@
-@renderD3 = (renderData) ->
+@renderD3 = (renderData,pageHistory) ->
 	if renderData
-		w = 1200
-		h = 800
+		w = $(document).width()
+		h = $(document).height()
 		r = 6
 		color = d3.scale.category20()
 
@@ -10,7 +10,7 @@
 			.gravity(0.06)
 			.linkDistance(50)
 			.size([w, h ])
-
+		$(".wikimap").empty()
 		svg = d3.select(".wikimap").append("svg")
 			.attr("width", w)
 			.attr("height", h)
@@ -46,15 +46,47 @@
 		# mygraph = Session.get "networkData"
 		# mygraph ="netDataTest.json"
 		# mygraph =  JSON.stringify(testingxx)
-		mnodes = renderData['nodes']
-		mlinks = renderData['links']
-		console.log mnodes
+
+
+		nodeMap = []
+		renderData['nodes'].forEach (x) ->
+			# console.log "derg" + pageHistory[x.id]
+			title =  pageHistory[x.id].title
+			nodeMap.push({id:x.id, value:x.attr, title:title})
+
+		# _.forEach renderData['links'], (link) ->
+		# 	console.log link.source
+		# 	console.log link.source.id
+
+
+		mlinks = []
+
+		renderData['links'].forEach((x) ->
+			sourceID = x.source.id
+			targetID = x.target.id
+			srcIndex = nodeMap.map((y) ->  y.id).indexOf(sourceID)
+			targetIndex = nodeMap.map((y) ->  y.id).indexOf(targetID)
+			# console.log srcIndex
+			# source: nodeMap[x.source.id]
+			# target: nodeMap[x.target.id]
+			# value: 0
+			mlinks.push({source:srcIndex,target:targetIndex,value:0})
+		)
+
+		console.log nodeMap
+		console.log mlinks
+
+		mnodes = nodeMap
+		# mlinks = renderData['links']
+		# console.log mnodes
 		# mygraph = "netData.json"
 		# d3.json "netDataTest.json", (error, graph) ->
 		# console.log "mygraph" + mygraph
 		# if mygraph
 			# d3.json mygraph, (error, graph) ->
+		console.log "d2here"
 		force.nodes(mnodes).links(mlinks).start()
+		console.log "d4here"
 		link = svg.selectAll(".link")
 			.data(mlinks)
 			.enter()
@@ -63,7 +95,7 @@
 			.style("stroke-width", (d) ->
 				1
 			)
-
+		console.log "d3here"
 		gnodes = svg.selectAll("g.gnode")
 			.data(mnodes)
 			.enter()
@@ -85,28 +117,30 @@
 		node = gnodes.append("circle")
 			.attr("class", "node")
 			.attr("class", "node").attr("r", (d) ->
-				d.inlinks
+				d.value/100
 			)
 			.style("fill", (d) ->
-				color d.inlinks
+				color d.value
 			)
 			.style("opacity", "1.0")
 			.call(force.drag)
 			
 		labels = gnodes.append("text").text((d) ->
-			d.name
+			# console.log "herrr" + pageHistory
+			# console.log pageHistory[d.id]
+			d.title
 		)
 		.style("opacity", "0.2")
 		.attr("text-anchor", "middle")
 		.attr("class","node-label")
 
 		force.on "tick", ->
-			q = d3.geom.quadtree(mnodes)
-			# console.log q
-			i = 0
-			n = mnodes.length
+			# q = d3.geom.quadtree(mnodes)
+			# # console.log q
+			# i = 0
+			# n = mnodes.length
 			# console.log graph.nodes[i]
-			q.visit collide(mnodes[i])  while ++i < n
+			# q.visit collide(mnodes[i])  while ++i < n
 
 
 			# Update the links
@@ -131,26 +165,26 @@
 			  "translate(" + [Math.max(r, Math.min(w - r, d.x)), d.y = Math.max(r, Math.min(h - r, d.y))] + ")"
 
 			
-		collide = (node) ->
-			rr = node.inlinks + 16
-			# console.log rr
-			nx1 = node.x - rr
-			nx2 = node.x + rr
-			ny1 = node.y - rr
-			ny2 = node.y + rr
-			(quad, x1, y1, x2, y2) ->
-			  if quad.point and (quad.point isnt node)
-			    x = node.x - quad.point.x
-			    y = node.y - quad.point.y
-			    l = Math.sqrt(x * x + y * y)
-			    rr = node.radius + quad.point.radius
-			    if l < rr
-			      l = (l - rr) / l * .5
-			      node.x -= x *= l
-			      node.y -= y *= l
-			      quad.point.x += x
-			      quad.point.y += y
-			  x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
+		# collide = (node) ->
+		# 	rr = node.inlinks + 16
+		# 	# console.log rr
+		# 	nx1 = node.x - rr
+		# 	nx2 = node.x + rr
+		# 	ny1 = node.y - rr
+		# 	ny2 = node.y + rr
+		# 	(quad, x1, y1, x2, y2) ->
+		# 	  if quad.point and (quad.point isnt node)
+		# 	    x = node.x - quad.point.x
+		# 	    y = node.y - quad.point.y
+		# 	    l = Math.sqrt(x * x + y * y)
+		# 	    rr = node.radius + quad.point.radius
+		# 	    if l < rr
+		# 	      l = (l - rr) / l * .5
+		# 	      node.x -= x *= l
+		# 	      node.y -= y *= l
+		# 	      quad.point.x += x
+		# 	      quad.point.y += y
+		# 	  x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
 
 
@@ -368,3 +402,93 @@
 # 		  height - y(d.frequency)
 
 
+@buildGraph = (edges) ->
+	selectEdges = reduceEdges(edges)
+	nodes = []
+	links = []
+
+	console.log "selectEdges " + selectEdges.length 
+
+	_.forEach selectEdges, (edge) ->
+		src = edge.src
+		dest = edge.dest
+		strength = edge.strength
+		# console.log strength
+		srcIndex = nodes.map((x) ->  x.id).indexOf(src)
+
+
+		if srcIndex < 0
+			nodes.push({id:src,links:[],skip:false,attr:strength})
+		else
+			# console.log nodes[srcIndex].attr
+			# console.log "add:" 
+			# console.log nodes[srcIndex].attr + strength
+			nodeStrength = nodes[srcIndex].attr + strength
+			nodeLinks = nodes[srcIndex].links
+			nodes[srcIndex] = {id:src,links:nodeLinks,skip:false,attr:nodeStrength}
+
+		destIndex = nodes.map((x) ->  x.id).indexOf(dest)
+		if destIndex < 0
+			nodes.push({id:dest,links:[],skip:false,attr:strength})
+		else
+			nodeStrength = nodes[destIndex].attr + strength
+			nodeLinks = nodes[destIndex].links
+			nodes[destIndex] = {id:dest,links:nodeLinks,skip:false,attr:nodeStrength}
+
+		# console.log "here"
+		srcIndex = nodes.map((x) ->  x.id).indexOf(src)
+		# console.log srcIndex
+		destIndex = nodes.map((x) ->  x.id).indexOf(dest)
+		nodes[srcIndex].links.push({source:nodes[srcIndex],target:nodes[destIndex],skip:false})
+		# console.log "here2"
+		# nodes[destIndex].links.push({src:nodes[srcIndex],dest:nodes[destIndex]})
+		# IS the link supposed to exist in both the src and dest links[]?
+
+		links.push({source:nodes[srcIndex],target:nodes[destIndex],skip:false})
+
+	graph = {nodes: nodes, links: links}
+
+	return graph
+	# export interface INode {
+ #    id: string;
+ #    links: ILink[];
+ #    attr?: any;
+ #    skip: bool;
+ #  }
+
+ #  export interface ILink {
+ #    source: INode;
+ #    target: INode;
+ #    attr?: any;
+ #    skip: bool;
+ #  }
+
+ #  export interface IGraph {
+ #    nodes: INode[];
+ #    links: ILink[];
+ #  }
+
+
+@reduceEdges = (edges) ->
+	# Ween down the full edges list 
+
+	numNodes = 200
+	nodes = []
+	# Sort edges by strength value
+	edges.sort (a, b) ->
+		b.strength - a.strength
+
+	edgecounter = 0
+	_.forEach edges, (e) ->
+		if nodes.length < 200
+			if nodes.indexOf(e.src) < 0
+				# console.log "here"
+				nodes.push(e.src)
+			if nodes.indexOf(e.dest) < 0
+				nodes.push(e.dest)
+			edgecounter += 1
+
+	console.log "nodeslength " + nodes.length
+	return edges.slice(0,edgecounter)
+
+	

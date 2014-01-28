@@ -115,7 +115,7 @@ function sendNewHistory(startTime){
   var numRequestsOutstanding = 0;
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 1000,
+      'maxResults': 100,
       'startTime': startTime
     },
     function(historyItems) {

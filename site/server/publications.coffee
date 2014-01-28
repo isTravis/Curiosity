@@ -37,11 +37,15 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	startTime = new Date().getTime()
 	console.log "Starting Title Building"
 	# For each history item in value
+	countyy = 0
 	_.forEach historyValues, (e) ->
+		console.log countyy
+		countyy += 1
 		if testURL(e.url) # If the url is valid, according to testURL
 	    	if e.title == ''
 	    		thisTitle = goGetTitle(e.url)
 	    	else
+	    		console.log "sall good"
 	    		thisTitle = e.title.split(" - Wiki")[0]
 
 	    	visitedTitles.push(thisTitle)
@@ -98,10 +102,24 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	# networkData = buildNetwork(scrapedHistory)
 	# networkData = 0
 	startTime = new Date().getTime()
+	countx = 1
+	lengthlength = visitedIDs.length
 	console.log "Beginning Build Edges"
+	
 	_.forEach visitedIDs, (id1) ->
+		console.log countx + " of " + lengthlength
+
+		edgesObject = Edges.findOne({src:id1})
+		if !edgesObject
+			console.log "here"
+			Edges.insert(
+				src: id1
+			)
+			edgesObject = Edges.findOne({src:id1})
+		countx += 1
 		_.forEach visitedIDs, (id2) ->
-			createEdge(id1,id2)
+			createEdge(id1,id2,edgesObject)
+
 
 	endTime = new Date().getTime()
 	totalNewTime = (endTime-startTime)/1000
@@ -110,7 +128,14 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 
 
 	startTime = new Date().getTime()
+
+
 	console.log "Beginning Collect My Edges"
+
+	count1 = 0
+	count5 = 0
+	count2 = 0
+	count10 = 0
 	myEdges = []
 	_.forEach visitedIDs, (id1) ->
 		# console.log id1
@@ -119,7 +144,23 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 			# console.log src_edges
 			strengthVal = src_edges[id2]
 			if strengthVal > 0
-				myEdges.push({src:id1, dest:id2, strength:strengthVal})
+				if strengthVal > 10
+					count10++
+					myEdges.push({src:id1, dest:id2, strength:strengthVal})
+				else if strengthVal > 5
+					count5++
+					myEdges.push({src:id1, dest:id2, strength:strengthVal})
+				else if strengthVal > 2
+					count2++
+				else if strengthVal > 1
+					count1++
+
+				
+	console.log "Edges length " + myEdges.length
+	console.log "count1 " + count1
+	console.log "count2 " + count2
+	console.log "count5 " + count5
+	console.log "count10 " + count10
 			# console.log id1
 			# if id1 != id2
 				# if myEdges[id1]
@@ -151,6 +192,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	# Since update gets set to true, it just winds up reading the old wikiData 
 	# Need to have the function check if the server is done. Can we set session variables from server?
 	if WikiData.findOne({accountID:userID})
+		console.log "got it4"
 		WikiData.update(
 			accountID: userID
 		,
@@ -161,11 +203,13 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 				# scrapedIDs: scrapedHistory[1]
 				# # networkData: networkData
 				# edges:myEdges
-				# receivedHistoryTime: receivedHistoryTime
+				receivedHistoryTime: receivedHistoryTime
 				pageHistory: pageHistory
 				edges: myEdges
 		)
+		console.log "got it3"
 	else
+		console.log "got it"
 		WikiData.insert(
 			accountID: userID
 			# titles: visitedTitles
@@ -174,10 +218,11 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 			# scrapedIDs: scrapedHistory[1]
 			# # networkData: networkData
 			# edges:myEdges
-			# receivedHistoryTime: receivedHistoryTime
+			receivedHistoryTime: receivedHistoryTime
 			pageHistory: pageHistory
 			edges: myEdges
-	    )
+		)
+		console.log "got it2"
 
 
 
@@ -321,7 +366,7 @@ linkSet = []
 					pageID: pageID
 					links: linkSet
 				)
-				# console.log "new"
+				console.log "new"
 
 				# console.log linkSet.length
 				if linkSet.length < 200000
@@ -339,12 +384,12 @@ linkSet = []
 	return [scrapedHistory, scrapedIDs]
 
 
-@createEdge = (pageID1, pageID2) ->
+@createEdge = (pageID1, pageID2,edgesObject) ->
 	# console.log "Edge of " + pageID1 + " " +pageID2
 	# strength = 0
 	# dir1 = Edges.findOne({src:pageID1, dest:pageID2}) 
 	# dir1 = Edges.findOne({src:pageID1})[pageID2]
-	edgesObject = Edges.findOne({src:pageID1})
+	# edgesObject = Edges.findOne({src:pageID1})
 	
 
 	if edgesObject
@@ -352,8 +397,9 @@ linkSet = []
 		# console.log pageID2
 		dir1 = edgesObject[pageID2]
 		if dir1 > -1
+			
 			return dir1
-		# console.log dir1
+		
 	edgesObject2 = Edges.findOne({src:pageID2})
 	if edgesObject2
 		dir2 = edgesObject2[pageID1]
@@ -376,8 +422,8 @@ linkSet = []
 			return strength
 		else
 			# console.log "wtf2"
-			console.log pageID1
-			console.log pageID2
+			# console.log pageID1
+			# console.log pageID2
 			linkList1 = Links.findOne({pageID: pageID1}).links
 			linkList2 = Links.findOne({pageID: pageID2}).links
 			strength = sharedLinkCount(linkList1, linkList2)

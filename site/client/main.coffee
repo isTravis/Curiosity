@@ -34,25 +34,30 @@ Template.wikiData.wikiData = ->
 	if xx
 		# console.log "wikipub history rtime " + xx['receivedHistoryTime']
 		if xx['receivedHistoryTime'] == (Session.get "receivedHistoryTime")
-			if xx['scrapedHistory']
+			if xx['edges']
 
 				Session.set "scrapedIDs", xx['scrapedIDs']
 				Session.set "status", "okkk"
-				networkData = buildNetwork(xx['scrapedHistory'])
+				# console.log xx['edges']
+				# networkData = buildNetwork(xx['scrapedHistory'])
 
 				# console.log Object.keys(networkData).length
-				Session.set "networkData", networkData
+				# Session.set "networkData", networkData
 
 				# for n of networkData
 				# 	console.log n
-				renderData = createJSON(networkData)
-				clusterData = generateClusters(renderData)
+				# renderData = createJSON(networkData)
+				# clusterData = generateClusters(renderData)
 				# Session.set "clusterData", clusterData
 				# renderD4(clusterData) # Function is located in renderD3.coffee
-				renderD4(clusterData)
+				# renderD4(clusterData)
 
+				yy = buildGraph(xx['edges'])
+				console.log yy
+				console.log xx['pageHistory']
+				renderD3(yy,xx['pageHistory'])
 
-				postToExt(renderData)
+				postToExt(xx['edges'])
 			
 
 		# Session.set "updated", false
