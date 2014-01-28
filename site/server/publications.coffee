@@ -33,6 +33,9 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	visitedTitles = []
 	userID = 'travis'
 
+	
+	startTime = new Date().getTime()
+	console.log "Starting Title Building"
 	# For each history item in value
 	_.forEach historyValues, (e) ->
 		if testURL(e.url) # If the url is valid, according to testURL
@@ -44,26 +47,79 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	    	visitedTitles.push(thisTitle)
 	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
 
-    
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Title Building" + " | " + totalNewTime 
+	console.log "Total Titles: " + visitedTitles.length
+	
+
+
+
+	startTime = new Date().getTime()
+	console.log "Beginning Scrape History"
+	scrapeHistory(visitedTitles)
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Scrape History" + " | " + totalNewTime 
+
+	startTime = new Date().getTime()
+	console.log "Beginning Build PageHistory"
+	pageHistory = {}
+	_.forEach visitHistory, (e) ->
+		pageID = getPageID(e.title)
+		pageHistory[pageID] = {url:e.url.split("#")[0], title:e.title, visitTime:e.visitTime, visitCount:e.visitCount}
+
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Build PageHistory" + " | " + totalNewTime 
+
+    # pageHistory = {id: {title, times, visitcount, url}}
+
     # console.log "Herehere"
+
+	startTime = new Date().getTime()
+	console.log "Beginning Collect IDs"
 	visitedIDs = []
 	_.forEach visitedTitles, (title) ->
 		visitedIDs.push(getPageID(title))
 	# console.log "Herehere2"
 	# console.log visitedIDs
+	
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Collect IDs" + " | " + totalNewTime 
 
 
 
-
-
-	scrapedHistory = scrapeHistory(visitedTitles)
+	
+	# scrapedHistory = scrapeHistory(visitedTitles)
 	# networkData = buildNetwork(scrapedHistory)
 	# networkData = 0
-	myEdges = {}
+	startTime = new Date().getTime()
+	console.log "Beginning Build Edges"
 	_.forEach visitedIDs, (id1) ->
-		console.log id1
-		srcedges = Edges.findOne({src:id1}) 
 		_.forEach visitedIDs, (id2) ->
+			createEdge(id1,id2)
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Build Edges" + " | " + totalNewTime 
+
+
+
+	startTime = new Date().getTime()
+	console.log "Beginning Collect My Edges"
+	myEdges = []
+	_.forEach visitedIDs, (id1) ->
+		# console.log id1
+		src_edges = Edges.findOne({src:id1}) 
+		_.forEach visitedIDs, (id2) ->
+			# console.log src_edges
+			strengthVal = src_edges[id2]
+			if strengthVal > 0
+				myEdges.push({src:id1, dest:id2, strength:strengthVal})
 			# console.log id1
 			# if id1 != id2
 				# if myEdges[id1]
@@ -74,8 +130,10 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 				# 	myEdges[id1][id2] = srcedges[id2]
 				# else
 				# 	myEdges[id1]= {id2: srcedges[id2]}
-					
 	
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000	
+	console.log "Finished Collect My Edges" + " | " + totalNewTime 
 
 	# compare = (a, b) ->
 	#   return -1  if a.last_nom < b.last_nom
@@ -83,8 +141,12 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	#   0
 	# objs.sort compare
 
-	console.log myEdges
+	# console.log myEdges
 	console.log "done"
+
+	# pageHistory = {id: {title, times, visitcount, url}}
+	# edges = [{src, dest, strength},...]
+
 	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
 	# Since update gets set to true, it just winds up reading the old wikiData 
 	# Need to have the function check if the server is done. Can we set session variables from server?
@@ -93,24 +155,28 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 			accountID: userID
 		,
 			$set:
-				titles: visitedTitles
-				history: visitHistory
+				# titles: visitedTitles
+				# history: visitHistory
 				# scrapedHistory: scrapedHistory[0]
 				# scrapedIDs: scrapedHistory[1]
-				# networkData: networkData
-				edges:myEdges
-				receivedHistoryTime: receivedHistoryTime
+				# # networkData: networkData
+				# edges:myEdges
+				# receivedHistoryTime: receivedHistoryTime
+				pageHistory: pageHistory
+				edges: myEdges
 		)
 	else
-	   WikiData.insert(
-	        accountID: userID
-	        titles: visitedTitles
-	        history: visitHistory
-	        # scrapedHistory: scrapedHistory[0]
-	        # scrapedIDs: scrapedHistory[1]
-	        # networkData: networkData
-	        edges:myEdges
-	        receivedHistoryTime: receivedHistoryTime
+		WikiData.insert(
+			accountID: userID
+			# titles: visitedTitles
+			# history: visitHistory
+			# scrapedHistory: scrapedHistory[0]
+			# scrapedIDs: scrapedHistory[1]
+			# # networkData: networkData
+			# edges:myEdges
+			# receivedHistoryTime: receivedHistoryTime
+			pageHistory: pageHistory
+			edges: myEdges
 	    )
 
 
@@ -255,18 +321,19 @@ linkSet = []
 					pageID: pageID
 					links: linkSet
 				)
-				console.log "new"
+				# console.log "new"
 
 				# console.log linkSet.length
-				if linkSet.length < 200
+				if linkSet.length < 200000
 					scrapedHistory[pageID] = linkSet
 			else
 				linksethere = Links.findOne({pageID: pageID}).links
 				# console.log linksethere.length
-				if linksethere.length < 800
+				if linksethere.length < 200000
 					scrapedHistory[pageID] = linksethere
 				else
-					console.log title
+					# console.log title
+					ppp=0
 			
 	# console.log scrapedHistory
 	return [scrapedHistory, scrapedIDs]
@@ -274,24 +341,146 @@ linkSet = []
 
 @createEdge = (pageID1, pageID2) ->
 	# console.log "Edge of " + pageID1 + " " +pageID2
-	strength = 0
+	# strength = 0
 	# dir1 = Edges.findOne({src:pageID1, dest:pageID2}) 
 	# dir1 = Edges.findOne({src:pageID1})[pageID2]
+	edgesObject = Edges.findOne({src:pageID1})
 	
-	# if !dir1
-	# 	dir2 = Edges.findOne({src:pageID2, dest:pageID1}) 		
-	# 	if dir2
-	# 		strength = dir2.strength
-	# 	else
-	# 		linkList1 = Links.findOne({pageID: pageID1}).links
-	# 		linkList2 = Links.findOne({pageID: pageID2}).links
-	# 		# console.log linkList1
-	# 		# console.log linkList2
-	# 		strength = sharedLinkCount(linkList1, linkList2)
-	# 		Edges.insert({src:pageID1, dest:pageID2,strength:strength})
+
+	if edgesObject
+		# console.log "okay, I'm here"
+		# console.log pageID2
+		dir1 = edgesObject[pageID2]
+		if dir1 > -1
+			return dir1
+		# console.log dir1
+	edgesObject2 = Edges.findOne({src:pageID2})
+	if edgesObject2
+		dir2 = edgesObject2[pageID1]
+
+	# console.log edgesObject
+	if edgesObject
+		
+		if dir2 > -1
+			# console.log "wtf1"
+			strength = dir2
+			dummy = {}
+			dummy[pageID2] = strength
+			# console.log "write1"
+			Edges.update(
+				src: pageID1
+			,
+				$set:
+					dummy
+			)
+			return strength
+		else
+			# console.log "wtf2"
+			console.log pageID1
+			console.log pageID2
+			linkList1 = Links.findOne({pageID: pageID1}).links
+			linkList2 = Links.findOne({pageID: pageID2}).links
+			strength = sharedLinkCount(linkList1, linkList2)
+			dummy = {}
+			dummy[pageID2] = strength
+			# console.log "write2"
+			Edges.update(
+				src: pageID1
+			,
+				$set:
+					dummy
+			)
+			return strength
+
+	else
+
+		if dir2
+			# console.log "wtf3"
+			strength = dir2
+			dummy = {}
+			dummy[pageID2] = strength
+			# console.log "hereee" + dummy
+			# console.log "write3"
+			Edges.insert(
+				src: pageID1
+			)
+			Edges.update(
+				src: pageID1
+			,
+				$set:
+					dummy
+			)
+			return strength
+		else
+			# console.log "wtf4"
+			linkList1 = Links.findOne({pageID: pageID1}).links
+			linkList2 = Links.findOne({pageID: pageID2}).links
+			strength = sharedLinkCount(linkList1, linkList2)
+			dummy = {}
+			dummy[pageID2] = strength
+			# console.log "write4"
+			# console.log "hereee2 " + dummy[pageID2]
+			Edges.insert(
+				src: pageID1
+			)
+			Edges.update(
+				src: pageID1
+			,
+				$set:
+					dummy
+			)
+			return strength
+
+
+
+	# if edgesObject
+	# 	dir1 = edgesObject[pageID2]
+	
+	# 	if !dir1
+	# 		# dir2 = Edges.findOne({src:pageID2, dest:pageID1}) 
+			
+	# 		if edgesObject2
+	# 			dir2 = edgesObject2[pageID1]		
+	# 			if dir2
+	# 				strength = dir2
+	# 		else
+	# 			linkList1 = Links.findOne({pageID: pageID1}).links
+	# 			linkList2 = Links.findOne({pageID: pageID2}).links
+	# 	# 		# console.log linkList1
+	# 	# 		# console.log linkList2
+	# 			strength = sharedLinkCount(linkList1, linkList2)
+	# 	console.log dummy
+	# 	Edges.update(
+	# 		src: pageID1
+	# 	,
+	# 		$set:
+	# 			dummy
+	# 	)
+
+
+	# dummy = {}
+	# dummy[pageID2] = strength
+	# if edgesObject
+	# 	console.log dummy
+	# 	Edges.update(
+	# 		src: pageID1
+	# 	,
+	# 		$set:
+	# 			dummy
+	# 	)
 	# else
-	# 	strength = dir1.strength
-	return strength
+	# 	console.log "here"
+	# 	console.log dummy
+		# Edges.insert(
+		# 	src: pageID1
+		# 	dummy
+		# )
+
+
+	# 		# Edges.insert({src:pageID1, dest:pageID2,strength:strength})
+	# # else
+	# # 	strength = dir1.strength
+	# return strength
 
 
 
@@ -343,7 +532,7 @@ linkSet = []
 # 				if sharedLinks > sharedMin
 # 					connections[destPage] = sharedLinks
 # 		# endTime = new Date().getTime()
-# 		# totalNewTime += (endTime-startTime)/1000
+# 		# totalNewTime = (endTime-startTime)/1000
 
 
 
