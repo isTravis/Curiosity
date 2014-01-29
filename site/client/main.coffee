@@ -51,11 +51,16 @@ Template.wikiData.wikiData = ->
 				# Session.set "clusterData", clusterData
 				# renderD4(clusterData) # Function is located in renderD3.coffee
 				# renderD4(clusterData)
-
+				startTime = new Date().getTime()
 				yy = buildGraph(xx['edges'])
-				console.log yy
-				console.log xx['pageHistory']
+				# console.log yy
+				# console.log xx['pageHistory']
+				
 				renderD3(yy,xx['pageHistory'])
+
+				endTime = new Date().getTime()
+				totalNewTime = (endTime-startTime)/1000
+				console.log "Client Side" + " | " + totalNewTime 
 
 				postToExt(xx['edges'])
 			

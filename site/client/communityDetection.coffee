@@ -1,7 +1,7 @@
 # The following code was initially developed for use in the Immersion project: immersion.media.mit.edu
 # Code author: Daniel Smilkov
 
-communityDetection = (graph) ->
+@communityDetection = (graph) ->
   nodesMap = {}
   for i of graph.nodes
     continue  if graph.nodes[i].skip
@@ -30,9 +30,11 @@ communityDetection = (graph) ->
     communities[id] =
       score: nodesMap[id].degree / (2.0 * m)
       nodes: [id]
+  console.log communities
   for a of linksMap
     for b of linksMap[a]
       linksMap[a][b] = 1.0 / (2 * m) - (nodesMap[a].degree * nodesMap[b].degree) / (4.0 * m * m)
+  console.log linksMap
   iter = 0
   while iter < 1000
     deltaQ = -1
@@ -63,11 +65,12 @@ communityDetection = (graph) ->
     delete communities[maxa]
 
     delete linksMap[maxa]
-
+    # console.log communities
     Q += deltaQ
     iter++
   tmp = []
   for cid of communities
+    console.log "im here?"
     tmp.push [cid, communities[cid].nodes.length]
   tmp.sort (a, b) ->
     b[1] - a[1]
@@ -78,3 +81,4 @@ communityDetection = (graph) ->
     for i of communities[cid].nodes
       nodesMap[communities[cid].nodes[i]].node.attr.color = colorid
     colorid++  if communities[cid].nodes.length > 1
+  

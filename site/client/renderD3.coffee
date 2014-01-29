@@ -42,7 +42,7 @@
 		    name: "Pug"
 		  ]
 
-		console.log "renderupger " + renderData
+		# console.log "renderupger " + renderData
 		# mygraph = Session.get "networkData"
 		# mygraph ="netDataTest.json"
 		# mygraph =  JSON.stringify(testingxx)
@@ -73,8 +73,8 @@
 			mlinks.push({source:srcIndex,target:targetIndex,value:0})
 		)
 
-		console.log nodeMap
-		console.log mlinks
+		# console.log nodeMap
+		# console.log mlinks
 
 		mnodes = nodeMap
 		# mlinks = renderData['links']
@@ -84,9 +84,9 @@
 		# console.log "mygraph" + mygraph
 		# if mygraph
 			# d3.json mygraph, (error, graph) ->
-		console.log "d2here"
+		# console.log "d2here"
 		force.nodes(mnodes).links(mlinks).start()
-		console.log "d4here"
+		# console.log "d4here"
 		link = svg.selectAll(".link")
 			.data(mlinks)
 			.enter()
@@ -95,7 +95,7 @@
 			.style("stroke-width", (d) ->
 				1
 			)
-		console.log "d3here"
+		# console.log "d3here"
 		gnodes = svg.selectAll("g.gnode")
 			.data(mnodes)
 			.enter()
@@ -448,6 +448,7 @@
 
 	graph = {nodes: nodes, links: links}
 
+	communityDetection(graph)
 	return graph
 	# export interface INode {
  #    id: string;
@@ -480,7 +481,7 @@
 
 	edgecounter = 0
 	_.forEach edges, (e) ->
-		if nodes.length < 200
+		if nodes.length < numNodes
 			if nodes.indexOf(e.src) < 0
 				# console.log "here"
 				nodes.push(e.src)
