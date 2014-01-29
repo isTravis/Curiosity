@@ -2,6 +2,7 @@
   <title>Curiosity</title>
 </head>
 
+<!-- <template name="main"> -->
 <body>
 	<section class="header">
 		<div class="title">
@@ -21,9 +22,7 @@
 		<section class="welcome"></section>
 
 		<section class="data">
-			<div class="settings">
-				<i class="fa fa-cog" data-placement="right" data-toggle="tooltip" data-animation="true" title="Settings"></i>
-			</div>
+			{{>settings}}
 			
 			<section class="map">
 				{{#constant}}
@@ -47,7 +46,7 @@
 
 	
 </body>
-
+<!-- </template> -->
 
 <template name="wikiData">
 	{{wikiData}}
@@ -58,3 +57,28 @@
 </template>
 
 
+<template name="settings">
+	<div class="settings">
+		<i class="fa fa-cog" data-placement="right" data-toggle="tooltip" data-animation="true" title="Settings"></i>
+		<div class="controls hidden">
+		
+			<div class="control node-slider">
+				Node Slider
+				<input type="range" min="50" max="500" value="250" step="50" class="nodeRange">
+			</div>
+
+			<div class="control strength-slider">
+				Strength slider
+				<input type="range" min="1" max="10" value="10" step="1" class="strengthRange">
+			</div>
+
+			<div class="control submit">
+				Submit
+				
+			</div>
+			
+			
+
+		</div>
+	</div>
+</template>

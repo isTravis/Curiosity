@@ -18,13 +18,42 @@ window.addEventListener "message", ((event) ->
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
     Session.set "edges", event.data.text
-    console.log event.data.text
+    draw(250)
+    # console.log event.data.text
     # console.log "event.data.text " + event.data.text
     Session.set "receivedHistoryTime", new Date().getTime()
     # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
   
 ), false
 
+
+
+Template.settings.events = 
+    "mouseenter .fa-cog": (d) ->
+        srcE = if d.srcElement then d.srcElement else d.target
+        console.log srcE.parentNode
+        # srcE = srcE.parentNode
+        $(srcE.parentNode).children(".controls").removeClass("hidden")
+
+    
+    "mouseleave div.controls": (d) ->
+        srcE = if d.srcElement then d.srcElement else d.target
+        console.log srcE.parentNode
+        console.log srcE
+        # srcE = srcE.parentNode
+        $(".controls").addClass("hidden")
+
+
+
+
+    "click .submit": (d)->
+    	console.log "wat"
+    	srcE = if d.srcElement then d.srcElement else d.target
+    	nodeVal = $(".nodeRange").attr("value")
+    	strengthVal = $(".strengthRange").attr("value")
+    	console.log nodeVal
+    	draw(nodeVal)
+		# nodeVal = $(".nodeRange").attr("value") 
 
 
 Template.wikiData.created = ->
@@ -65,11 +94,13 @@ Template.wikiData.wikiData = ->
 				# renderD4(clusterData) # Function is located in renderD3.coffee
 				# renderD4(clusterData)
 				startTime = new Date().getTime()
-				yy = buildGraph(xx['edges'])
-				# console.log yy
-				# console.log xx['pageHistory']
+				Session.set "edges", xx['edges']
+				# yy = buildGraph(xx['edges'])
+				# # console.log yy
+				# # console.log xx['pageHistory']
 
-				renderD3(yy,xx['pageHistory'])
+				# renderD3(yy,xx['pageHistory'])
+				draw(250)
 
 				endTime = new Date().getTime()
 				totalNewTime = (endTime-startTime)/1000
@@ -77,13 +108,13 @@ Template.wikiData.wikiData = ->
 
 				postToExt(xx['edges'])
 	
-	localEdges = Session.get "edges"
-	if localEdges
-		xx = WikiData.findOne({accountID:'travis'})
-		yy = buildGraph(localEdges)
-		console.log "pagehistory"
-		console.log xx
-		renderD3(yy,xx['pageHistory'])
+	# localEdges = Session.get "edges"
+	# if localEdges
+	# 	xx = WikiData.findOne({accountID:'travis'})
+	# 	yy = buildGraph(localEdges)
+	# 	console.log "pagehistory"
+	# 	console.log xx
+	# 	renderD3(yy,xx['pageHistory'])
 		# postToExt([])
 		# Session.set "updated", false
 			# postToExt(xx['titles'])
@@ -105,7 +136,17 @@ Template.wikiData.wikiData = ->
 
 		# http://bl.ocks.org/mbostock/1748247
 
+@draw = (numNodes) ->
+	localEdges = Session.get "edges"
+	xx = WikiData.findOne({accountID:'travis'})
+	yy = buildGraph(localEdges,numNodes)
 
+	# renderD3(yy,xx['pageHistory'])
+
+	clusters = communityDetection(yy)
+
+	# clusterData = generateClusters(yy)
+	renderD4(clusters,xx['pageHistory'])
 
 
 

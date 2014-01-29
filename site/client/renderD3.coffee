@@ -197,20 +197,20 @@
 		clusterData = []
 		for item of renderData['nodes']
 			# console.log renderData['nodes'][item]
-			title = renderData['nodes'][item]['name']
-			inlinks = renderData['nodes'][item]['inlinks']
+			title = renderData['nodes'][item]['id']
+			inlinks = renderData['nodes'][item]['attr']/100
 			# console.log inlinks
 			# if inlinks < 45
 			clusterData.push({cluster:1, radius:inlinks, title: title})
 		return clusterData
 
 
-@renderD4 = (clusterData) ->
+@renderD4 = (clusterData,pageHistory) ->
 	if clusterData
 		docHeight = $(document).height()
 		docWidth = $(document).width()
 		width = docWidth
-		height = docHeight-100
+		height = docHeight-110
 		padding = 1.5
 		clusterPadding = 6
 		maxRadius = 45
@@ -226,7 +226,7 @@
 		nodes = d3.range(clusterData.length).map(->
 		  # console.log clusterData[counter]
 		  i = clusterData[counter]['cluster']
-		  r = clusterData[counter]['radius']
+		  r = Math.pow(clusterData[counter]['radius'],1/3)*2
 		  if r > 50
 		  	r = 50
 		  # console.log r
@@ -257,6 +257,8 @@
 		# clusters = clusters2
 
 		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0.2).charge(0).start()
+
+		$(".wikimap").empty()
 		svg = d3.select(".wikimap").append("svg").attr("width", width).attr("height", height)
 		
 		gnodes = svg.selectAll('g.gnode')
@@ -273,7 +275,7 @@
 			.on("mouseout", (d) ->
 				nodeSelection = d3.select(this)
 				# nodeSelection.select("circle").style(opacity: "1.0")
-				nodeSelection.select("text").style(opacity: "0.0")
+				nodeSelection.select("text").style(opacity: "0.2")
 				# console.log nodeSelection.text()
 			)
 
@@ -292,10 +294,11 @@
 		)
 
 		labels = gnodes.append("text")
-		  .text((d) ->  d.title )
+		  .text((d) ->  pageHistory[d.title].title )
 		  .attr("text-anchor", "middle")
-		  .style("opacity", "0.0")
+		  .style("opacity", "0.2")
 		  .attr("class","node-label")
+		  .style("font-size","10px")
 
 		# separation between same-color circles
 		# separation between different-color circles
@@ -403,8 +406,8 @@
 # 		  height - y(d.frequency)
 
 
-@buildGraph = (edges) ->
-	selectEdges = reduceEdges(edges)
+@buildGraph = (edges,numNodes) ->
+	selectEdges = reduceEdges(edges,numNodes)
 	nodes = []
 	links = []
 
@@ -449,7 +452,7 @@
 
 	graph = {nodes: nodes, links: links}
 
-	communityDetection(graph)
+	
 	return graph
 	# export interface INode {
  #    id: string;
@@ -471,10 +474,10 @@
  #  }
 
 
-@reduceEdges = (edges) ->
+@reduceEdges = (edges,numNodes) ->
 	# Ween down the full edges list 
 
-	numNodes = 200
+	# numNodes = 500
 	nodes = []
 	# Sort edges by strength value
 	edges.sort (a, b) ->

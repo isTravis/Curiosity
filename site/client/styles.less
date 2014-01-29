@@ -19,6 +19,7 @@ h1,h2,h3,h4,h5,div{
 
 body{
 	font-family:Arial, sans-serif;
+	background-color: @main-bg;
 }
 
 .header{
@@ -67,19 +68,31 @@ body{
 
 	.data{
 		.settings{
-			width: 100px;
+			width: 300px;
 			height:400px;
 			float: right;
 			position: absolute;
 			right:0px;
-			padding-right: 5px;
+			// padding-right: 5px;
 			.fa-cog{
 				color: @main-font;
 				font-size: 25px;
 				position: absolute;
 				top:5px;
 				right: 5px;
-			}	
+			}
+			.controls{
+				background-color: rgba(255,255,255,0.6);
+				color: #222;
+				width: 300px;
+				height: 400px;
+				padding-top: 30px;
+				.control{
+					height: 100px;
+					margin: 10px;
+					margin-top:0px;
+				}
+			}
 		}
 		
 	}
