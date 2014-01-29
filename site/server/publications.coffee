@@ -1,13 +1,3 @@
-# Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
-#     console.log "just Updated"
-#     # console.log "updated " + updated
-#     # if updated 
-#     console.log "Beginning new"
-#     beginEverything(historyValues, receivedHistoryTime)
-#     console.log "finished updated"
-#     return WikiData.find()
-
-
 Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
     console.log "just Updated"
     # console.log "updated " + updated
@@ -19,210 +9,91 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 
 
 
-# Meteor.methods inputHistory: (value) ->
-	# if WikiData.findOne({accountID:userID})
-	# 	WikiData.update(
-	# 		accountID: userID
-	# 	,
-	# 		$set:
-	# 			toSend: 'false'
-	# 	)
 @beginEverything = (historyValues, receivedHistoryTime) ->
 
 	visitHistory = []
 	visitedTitles = []
 	userID = 'travis'
 
-	
-	startTime = new Date().getTime()
-	console.log "Starting Title Building"
-	# For each history item in value
-	countyy = 0
-	_.forEach historyValues, (e) ->
-		console.log countyy
-		countyy += 1
-		if testURL(e.url) # If the url is valid, according to testURL
-	    	if e.title == ''
-	    		thisTitle = goGetTitle(e.url)
-	    	else
-	    		console.log "sall good"
-	    		thisTitle = e.title.split(" - Wiki")[0]
+	haveEverything = 1
 
-	    	visitedTitles.push(thisTitle)
-	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
+	if haveEverything
+		startTime = new Date().getTime()
+		console.log "Starting Title Building"
+		# For each history item in value
+		# countyy = 0
+		pageHistory = {}
+		visitedIDs = []
+		startTime = new Date().getTime()	
+		_.forEach historyValues, (e) ->
+			# console.log countyy
+			# console.log e
+			# countyy++
+			title = e.title.split(" - Wiki")[0]
+			url = e.url.split("://")[1].split("#")[0]
+			visitCount = e.visitCount
+			visitTime = e.lastVisitTime
+			if testURL(e.url) #
+				# console.log 
+				pageObject = PageIDs.findOne({url:url})
 
+				if pageObject
+					# console.log pageObject
+					pageID = pageObject['pageID']
+					#great we have everything, no scraping or anything, just compile from the known and go
+					if title == ''
+						title = pageObject['title']
 
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000
-	console.log "Finished Title Building" + " | " + totalNewTime 
-	console.log "Total Titles: " + visitedTitles.length
-	
+					pageHistory[pageID] = {url:url, title:title, visitTime:visitTime, visitCount:visitCount}
+					visitedIDs.push(pageID)
 
+				else
+					console.log "No Page: " + url
+					# Could just be a redirect, check by title instead, maybe? e.title
+					# add it to the queue of things we need to scrape - but don't do it now.
 
-
-	startTime = new Date().getTime()
-	console.log "Beginning Scrape History"
-	scrapeHistory(visitedTitles)
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000
-	console.log "Finished Scrape History" + " | " + totalNewTime 
-
-	startTime = new Date().getTime()
-	console.log "Beginning Build PageHistory"
-	pageHistory = {}
-	_.forEach visitHistory, (e) ->
-		pageID = getPageID(e.title)
-		pageHistory[pageID] = {url:e.url.split("#")[0], title:e.title, visitTime:e.visitTime, visitCount:e.visitCount}
-
-
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000
-	console.log "Finished Build PageHistory" + " | " + totalNewTime 
-
-    # pageHistory = {id: {title, times, visitcount, url}}
-
-    # console.log "Herehere"
-
-	startTime = new Date().getTime()
-	console.log "Beginning Collect IDs"
-	visitedIDs = []
-	_.forEach visitedTitles, (title) ->
-		visitedIDs.push(getPageID(title))
-	# console.log "Herehere2"
-	# console.log visitedIDs
-	
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000
-	console.log "Finished Collect IDs" + " | " + totalNewTime 
-
-
-
-	
-	# scrapedHistory = scrapeHistory(visitedTitles)
-	# networkData = buildNetwork(scrapedHistory)
-	# networkData = 0
-	startTime = new Date().getTime()
-	countx = 1
-	lengthlength = visitedIDs.length
-	console.log "Beginning Build Edges"
-	
-	_.forEach visitedIDs, (id1) ->
-		console.log countx + " of " + lengthlength
-
-		edgesObject = Edges.findOne({src:id1})
-		if !edgesObject
-			console.log "here"
-			Edges.insert(
-				src: id1
-			)
-			edgesObject = Edges.findOne({src:id1})
-		countx += 1
-		_.forEach visitedIDs, (id2) ->
-			createEdge(id1,id2,edgesObject)
-
-
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000
-	console.log "Finished Build Edges" + " | " + totalNewTime 
-
-
-
-	startTime = new Date().getTime()
-
-
-	console.log "Beginning Collect My Edges"
-
-	count1 = 0
-	count5 = 0
-	count2 = 0
-	count10 = 0
-	myEdges = []
-	_.forEach visitedIDs, (id1) ->
-		# console.log id1
-		src_edges = Edges.findOne({src:id1}) 
-		_.forEach visitedIDs, (id2) ->
-			# console.log src_edges
-			strengthVal = src_edges[id2]
-			if strengthVal > 0
-				if strengthVal > 10
-					count10++
+		myEdges = []
+		minStrength = 10
+		_.forEach visitedIDs, (id1) ->
+			src_edges = Edges.findOne({src:id1}) 
+			_.forEach visitedIDs, (id2) ->
+				strengthVal = src_edges[id2]
+				if strengthVal > minStrength
 					myEdges.push({src:id1, dest:id2, strength:strengthVal})
-				else if strengthVal > 5
-					count5++
-					myEdges.push({src:id1, dest:id2, strength:strengthVal})
-				else if strengthVal > 2
-					count2++
-				else if strengthVal > 1
-					count1++
 
-				
-	console.log "Edges length " + myEdges.length
-	console.log "count1 " + count1
-	console.log "count2 " + count2
-	console.log "count5 " + count5
-	console.log "count10 " + count10
-			# console.log id1
-			# if id1 != id2
-				# if myEdges[id1]
-				# 	myEdges[id1][id2] = createEdge(id1,id2)
-				# else
-					# myEdges[id1]= {id2: createEdge(id1,id2)}
-				# if myEdges[id1]
-				# 	myEdges[id1][id2] = srcedges[id2]
-				# else
-				# 	myEdges[id1]= {id2: srcedges[id2]}
-	
-	endTime = new Date().getTime()
-	totalNewTime = (endTime-startTime)/1000	
-	console.log "Finished Collect My Edges" + " | " + totalNewTime 
 
-	# compare = (a, b) ->
-	#   return -1  if a.last_nom < b.last_nom
-	#   return 1  if a.last_nom > b.last_nom
-	#   0
-	# objs.sort compare
+		endTime = new Date().getTime()
+		totalNewTime = (endTime-startTime)/1000
+		console.log "Finished Total Building" + " | " + totalNewTime
 
-	# console.log myEdges
-	console.log "done"
+		if _.isEmpty(pageHistory) == false
+			console.log "got a pagehistory"
+			console.log pageHistory
+			if WikiData.findOne({accountID:userID})
+				WikiData.update(
+					accountID: userID
+				,
+					$set:
+						receivedHistoryTime: receivedHistoryTime
+						pageHistory: pageHistory
+						edges: myEdges
+				)
+			else
+				WikiData.insert(
+					accountID: userID
+					receivedHistoryTime: receivedHistoryTime
+					pageHistory: pageHistory
+					edges: myEdges
+				)
+	else 
+		dontHaveThings(historyValues, receivedHistoryTime)		
 
-	# pageHistory = {id: {title, times, visitcount, url}}
-	# edges = [{src, dest, strength},...]
 
-	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
-	# Since update gets set to true, it just winds up reading the old wikiData 
-	# Need to have the function check if the server is done. Can we set session variables from server?
-	if WikiData.findOne({accountID:userID})
-		console.log "got it4"
-		WikiData.update(
-			accountID: userID
-		,
-			$set:
-				# titles: visitedTitles
-				# history: visitHistory
-				# scrapedHistory: scrapedHistory[0]
-				# scrapedIDs: scrapedHistory[1]
-				# # networkData: networkData
-				# edges:myEdges
-				receivedHistoryTime: receivedHistoryTime
-				pageHistory: pageHistory
-				edges: myEdges
-		)
-		console.log "got it3"
-	else
-		console.log "got it"
-		WikiData.insert(
-			accountID: userID
-			# titles: visitedTitles
-			# history: visitHistory
-			# scrapedHistory: scrapedHistory[0]
-			# scrapedIDs: scrapedHistory[1]
-			# # networkData: networkData
-			# edges:myEdges
-			receivedHistoryTime: receivedHistoryTime
-			pageHistory: pageHistory
-			edges: myEdges
-		)
-		console.log "got it2"
+
+
+
+
+
 
 
 
@@ -250,6 +121,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 	if isWiki.test(url)
 		# url = 'http://en.wikipedia.org/wiki/Samsung_Galaxy_Tab#Cat'
 		urlHead = url.split("://")[1].split("wiki/")[0]
+		# urlHead = url.split("wiki/")[0]
 		
 		if urlHead != 'en.wikipedia.org/' and urlHead !='en.m.wikipedia.org/'
 			return false;
@@ -650,6 +522,230 @@ linkSet = []
 
 
 
+
+@dontHaveThings = (historyValues, receivedHistoryTime)	->
+	visitHistory = []
+	visitedTitles = []
+	userID = 'travis'
+	
+	startTime = new Date().getTime()
+	console.log "Starting Title Building"
+	# For each history item in value
+	countyy = 0
+	_.forEach historyValues, (e) ->
+		# console.log countyy
+		countyy += 1
+		if testURL(e.url) # If the url is valid, according to testURL
+
+	    	if e.title == ''
+	    		thisTitle = goGetTitle(e.url)
+	    		# baseURL = e.url.split("://")[1].split("#")[0]
+	    		# console.log baseURL
+	    		# thisTitle = PageIDs.findOne({url:baseURL})
+	    		# console.log thisTitle
+	    	else
+	    		# console.log "sall good"
+	    		thisTitle = e.title.split(" - Wiki")[0]
+
+	    	visitedTitles.push(thisTitle)
+	    	visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
+
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Title Building" + " | " + totalNewTime 
+	console.log "Total Titles: " + visitedTitles.length
+	
+
+
+
+	startTime = new Date().getTime()
+	console.log "Beginning Scrape History"
+	scrapeHistory(visitedTitles)
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Scrape History" + " | " + totalNewTime 
+
+	startTime = new Date().getTime()
+	console.log "Beginning Build PageHistory"
+	pageHistory = {}
+	_.forEach visitHistory, (e) ->
+		pageID = getPageID(e.title)
+		PageIDs.update(
+	        pageID: pageID
+	    ,
+	    	$set:
+	    		url:e.url.split("://")[1].split("#")[0]
+	    ) 
+	    if e.title == 'Mother sauce'
+		    console.log PageIDs.findOne({pageID: pageID})
+
+		# PageIDs.update(
+		# 	accountID: userID
+		# ,
+		# 	$set:
+		# 		# titles: visitedTitles
+		# 		# history: visitHistory
+		# 		# scrapedHistory: scrapedHistory[0]
+		# 		# scrapedIDs: scrapedHistory[1]
+		# 		# # networkData: networkData
+		# 		# edges:myEdges
+		# 		receivedHistoryTime: receivedHistoryTime
+		# 		pageHistory: pageHistory
+		# 		edges: myEdges
+		# )
+
+		pageHistory[pageID] = {url:e.url.split("#")[0], title:e.title, visitTime:e.visitTime, visitCount:e.visitCount}
+
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Build PageHistory" + " | " + totalNewTime 
+
+    # pageHistory = {id: {title, times, visitcount, url}}
+
+    # console.log "Herehere"
+
+	startTime = new Date().getTime()
+	console.log "Beginning Collect IDs"
+	visitedIDs = []
+	_.forEach visitedTitles, (title) ->
+		visitedIDs.push(getPageID(title))
+	# console.log "Herehere2"
+	# console.log visitedIDs
+	
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Collect IDs" + " | " + totalNewTime 
+
+
+
+	
+	# scrapedHistory = scrapeHistory(visitedTitles)
+	# networkData = buildNetwork(scrapedHistory)
+	# networkData = 0
+	startTime = new Date().getTime()
+	countx = 1
+	lengthlength = visitedIDs.length
+	console.log "Beginning Build Edges"
+	
+	_.forEach visitedIDs, (id1) ->
+		# console.log countx + " of " + lengthlength
+
+		edgesObject = Edges.findOne({src:id1})
+		if !edgesObject
+			# console.log "here"
+			Edges.insert(
+				src: id1
+			)
+			edgesObject = Edges.findOne({src:id1})
+		countx += 1
+		_.forEach visitedIDs, (id2) ->
+			createEdge(id1,id2,edgesObject)
+
+
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000
+	console.log "Finished Build Edges" + " | " + totalNewTime 
+
+
+
+	startTime = new Date().getTime()
+
+
+	console.log "Beginning Collect My Edges"
+
+	count1 = 0
+	count5 = 0
+	count2 = 0
+	count10 = 0
+	myEdges = []
+	_.forEach visitedIDs, (id1) ->
+		# console.log id1
+		src_edges = Edges.findOne({src:id1}) 
+		_.forEach visitedIDs, (id2) ->
+			# console.log src_edges
+			strengthVal = src_edges[id2]
+			if strengthVal > 0
+				if strengthVal > 10
+					count10++
+					myEdges.push({src:id1, dest:id2, strength:strengthVal})
+				else if strengthVal > 5
+					count5++
+					myEdges.push({src:id1, dest:id2, strength:strengthVal})
+				else if strengthVal > 2
+					count2++
+				else if strengthVal > 1
+					count1++
+
+				
+	# console.log "Edges length " + myEdges.length
+	# console.log "count1 " + count1
+	# console.log "count2 " + count2
+	# console.log "count5 " + count5
+	# console.log "count10 " + count10
+			# console.log id1
+			# if id1 != id2
+				# if myEdges[id1]
+				# 	myEdges[id1][id2] = createEdge(id1,id2)
+				# else
+					# myEdges[id1]= {id2: createEdge(id1,id2)}
+				# if myEdges[id1]
+				# 	myEdges[id1][id2] = srcedges[id2]
+				# else
+				# 	myEdges[id1]= {id2: srcedges[id2]}
+	
+	endTime = new Date().getTime()
+	totalNewTime = (endTime-startTime)/1000	
+	console.log "Finished Collect My Edges" + " | " + totalNewTime 
+
+	# compare = (a, b) ->
+	#   return -1  if a.last_nom < b.last_nom
+	#   return 1  if a.last_nom > b.last_nom
+	#   0
+	# objs.sort compare
+
+	# console.log myEdges
+	console.log "done"
+
+	# pageHistory = {id: {title, times, visitcount, url}}
+	# edges = [{src, dest, strength},...]
+
+	# Strange, the message seems to get sent back to the extension before all the links are scraped. 
+	# Since update gets set to true, it just winds up reading the old wikiData 
+	# Need to have the function check if the server is done. Can we set session variables from server?
+	if WikiData.findOne({accountID:userID})
+		# console.log "got it4"
+		WikiData.update(
+			accountID: userID
+		,
+			$set:
+				# titles: visitedTitles
+				# history: visitHistory
+				# scrapedHistory: scrapedHistory[0]
+				# scrapedIDs: scrapedHistory[1]
+				# # networkData: networkData
+				# edges:myEdges
+				receivedHistoryTime: receivedHistoryTime
+				pageHistory: pageHistory
+				edges: myEdges
+		)
+		# console.log "got it3"
+	else
+		# console.log "got it"
+		WikiData.insert(
+			accountID: userID
+			# titles: visitedTitles
+			# history: visitHistory
+			# scrapedHistory: scrapedHistory[0]
+			# scrapedIDs: scrapedHistory[1]
+			# # networkData: networkData
+			# edges:myEdges
+			receivedHistoryTime: receivedHistoryTime
+			pageHistory: pageHistory
+			edges: myEdges
+		)
+		# console.log "got it2"
 
 
 

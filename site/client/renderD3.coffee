@@ -2,6 +2,7 @@
 	if renderData
 		w = $(document).width()
 		h = $(document).height()
+		h = h-100
 		r = 6
 		color = d3.scale.category20()
 

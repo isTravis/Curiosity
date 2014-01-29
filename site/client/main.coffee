@@ -1,8 +1,9 @@
 window.addEventListener "message", ((event) ->
   # We only accept messages from ourselves
   return  unless event.source is window
-  if event.data.type and (event.data.type is "FROM_PAGE")
-    console.log "message gotten"
+  if (event.data.type and (event.data.type is "FROM_PAGE_WIKI"))
+    console.log "gotWikimessage"
+    # console.log "message gotten"
     Session.set "status", "Parsing Wikipedia History"
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
@@ -10,6 +11,18 @@ window.addEventListener "message", ((event) ->
     # console.log "event.data.text " + event.data.text
     Session.set "receivedHistoryTime", new Date().getTime()
     # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
+  else if (event.data.type and (event.data.type is "FROM_PAGE_EDGES"))
+    # console.log "hereere"
+    console.log "Gotedgemessage"
+    Session.set "status", "Parsing Edges History"
+    # Meteor.call "inputHistory", event.data.text
+    Session.set "updated", event.data.text
+    Session.set "edges", event.data.text
+    console.log event.data.text
+    # console.log "event.data.text " + event.data.text
+    Session.set "receivedHistoryTime", new Date().getTime()
+    # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
+  
 ), false
 
 
@@ -55,7 +68,7 @@ Template.wikiData.wikiData = ->
 				yy = buildGraph(xx['edges'])
 				# console.log yy
 				# console.log xx['pageHistory']
-				
+
 				renderD3(yy,xx['pageHistory'])
 
 				endTime = new Date().getTime()
@@ -63,8 +76,15 @@ Template.wikiData.wikiData = ->
 				console.log "Client Side" + " | " + totalNewTime 
 
 				postToExt(xx['edges'])
-			
-
+	
+	localEdges = Session.get "edges"
+	if localEdges
+		xx = WikiData.findOne({accountID:'travis'})
+		yy = buildGraph(localEdges)
+		console.log "pagehistory"
+		console.log xx
+		renderD3(yy,xx['pageHistory'])
+		# postToExt([])
 		# Session.set "updated", false
 			# postToExt(xx['titles'])
 		# postToExt(xx['networkData'])
