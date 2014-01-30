@@ -205,8 +205,9 @@
 		return clusterData
 
 
-@renderD4 = (clusterData,pageHistory) ->
+@renderD4 = (clusterData,scrapedIDs) ->
 	if clusterData
+		console.log "scrapedid is " + scrapedIDs
 		docHeight = $(document).height()
 		docWidth = $(document).width()
 		width = docWidth
@@ -294,7 +295,7 @@
 		)
 
 		labels = gnodes.append("text")
-		  .text((d) ->  pageHistory[d.title].title )
+		  .text((d) ->  scrapedIDs[d.title] )
 		  .attr("text-anchor", "middle")
 		  .style("opacity", "0.2")
 		  .attr("class","node-label")

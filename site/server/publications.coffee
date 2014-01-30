@@ -1,21 +1,32 @@
-Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
+Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
     console.log "just Updated"
     # console.log "updated " + updated
     # if updated 
     console.log "Beginning new"
-    beginEverything(historyValues, receivedHistoryTime)
+    console.log "About to Begin everything with userID " + userID
+    if historyValues
+	    console.log "historyValues be" + historyValues
+	    beginEverything(historyValues, receivedHistoryTime, userID)
+
     console.log "finished updated"
     return WikiData.find()
 
 
 
-@beginEverything = (historyValues, receivedHistoryTime) ->
+@beginEverything = (historyValues, receivedHistoryTime, userID) ->
 
 	visitHistory = []
 	visitedTitles = []
-	userID = 'travis'
+	# userID = 'travis'
 
-	haveEverything = 1
+	# if WikiData.findOne({accountID:userID})
+	# 	haveEverything = 1
+	# else
+	haveEverything = 0
+
+	# console.log userID
+	# console.log "wikidataaaaa " + WikiData.findOne({accountID:userID})
+	
 
 	if haveEverything
 		startTime = new Date().getTime()
@@ -24,6 +35,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 		# countyy = 0
 		pageHistory = {}
 		visitedIDs = []
+		scrapedIDs = {}
 		startTime = new Date().getTime()	
 		_.forEach historyValues, (e) ->
 			# console.log countyy
@@ -46,6 +58,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 
 					pageHistory[pageID] = {url:url, title:title, visitTime:visitTime, visitCount:visitCount}
 					visitedIDs.push(pageID)
+					scrapedIDs[pageID] = title
 
 				else
 					console.log "No Page: " + url
@@ -66,9 +79,11 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 		totalNewTime = (endTime-startTime)/1000
 		console.log "Finished Total Building" + " | " + totalNewTime
 
+		console.log "About to add to mongo with ID: " + userID
+
 		if _.isEmpty(pageHistory) == false
 			console.log "got a pagehistory"
-			console.log pageHistory
+			# console.log pageHistory
 			if WikiData.findOne({accountID:userID})
 				WikiData.update(
 					accountID: userID
@@ -77,22 +92,35 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime) ->
 						receivedHistoryTime: receivedHistoryTime
 						pageHistory: pageHistory
 						edges: myEdges
+						scrapedIDs: scrapedIDs
 				)
 			else
+				# Generate a random hash use that as ID
+				# make sure to send it back to extension and have it stored
+				# will have to pass it in here to this function above for future iterations
 				WikiData.insert(
 					accountID: userID
 					receivedHistoryTime: receivedHistoryTime
 					pageHistory: pageHistory
 					edges: myEdges
+					scrapedIDs: scrapedIDs
 				)
 	else 
-		dontHaveThings(historyValues, receivedHistoryTime)		
+		dontHaveThings(historyValues, receivedHistoryTime, userID)		
 
 
 
 
 
+@makeID = () ->
+  text = ""
+  possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  i = 0
 
+  while i < 8
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+    i++
+  return text
 
 
 
@@ -523,11 +551,13 @@ linkSet = []
 
 
 
-@dontHaveThings = (historyValues, receivedHistoryTime)	->
+@dontHaveThings = (historyValues, receivedHistoryTime, userID)	->
 	visitHistory = []
 	visitedTitles = []
-	userID = 'travis'
+	# userID = 'travis'
 	
+	scrapedIDs = {}
+
 	startTime = new Date().getTime()
 	console.log "Starting Title Building"
 	# For each history item in value
@@ -577,8 +607,8 @@ linkSet = []
 	    	$set:
 	    		url:e.url.split("://")[1].split("#")[0]
 	    ) 
-	    if e.title == 'Mother sauce'
-		    console.log PageIDs.findOne({pageID: pageID})
+	    # if e.title == 'Mother sauce'
+		   #  console.log PageIDs.findOne({pageID: pageID})
 
 		# PageIDs.update(
 		# 	accountID: userID
@@ -610,7 +640,9 @@ linkSet = []
 	console.log "Beginning Collect IDs"
 	visitedIDs = []
 	_.forEach visitedTitles, (title) ->
-		visitedIDs.push(getPageID(title))
+		pageID = getPageID(title)
+		visitedIDs.push(pageID)
+		scrapedIDs[pageID] = title
 	# console.log "Herehere2"
 	# console.log visitedIDs
 	
@@ -729,6 +761,7 @@ linkSet = []
 				receivedHistoryTime: receivedHistoryTime
 				pageHistory: pageHistory
 				edges: myEdges
+				scrapedIDs: scrapedIDs
 		)
 		# console.log "got it3"
 	else
@@ -744,6 +777,7 @@ linkSet = []
 			receivedHistoryTime: receivedHistoryTime
 			pageHistory: pageHistory
 			edges: myEdges
+			scrapedIDs: scrapedIDs
 		)
 		# console.log "got it2"
 

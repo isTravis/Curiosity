@@ -9,6 +9,7 @@ chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 function checkForValidUrl(tabId, changeInfo, tab) {
   if (tab.url == "http://localhost:3000/") {
+  // if (tab.url == "http://curiosity.meteor.com/") {
     chrome.pageAction.show(tabId); // show the page action
 
     if (tab.url !== undefined && changeInfo.status == "complete") {
@@ -20,8 +21,9 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 
 function checkAndSendHistory(){
   // Check for a locally stored history and if it exists, save it.
-  var hasLocal = false
-  var localHistory = {}
+  var hasLocal = false;
+  var localHistory = {};
+  var userID = '';
   chrome.storage.local.get(function(d) {
     if(d.localHistory){
       localHistory = d.localHistory;
@@ -31,10 +33,11 @@ function checkAndSendHistory(){
     if(hasLocal == true){
       var startTime = d.lastVisitTime; // XXX set to be the last value in the local history
       // console.log("last" + d.lastVisitTime);
-      sendNewHistory(startTime, localHistory);
+      userID = d.userID
+      sendNewHistory(startTime, localHistory, userID);
     }else{
       var startTime = 0;
-      sendNewHistory(startTime, []);
+      sendNewHistory(startTime, [], userID);
     }
     
   });
@@ -42,7 +45,7 @@ function checkAndSendHistory(){
 
 // Can add a line, so that if there is no new history, you don't ping hte server, just send the stored edges
 
-function sendNewHistory(startTime, localHistory){
+function sendNewHistory(startTime, localHistory, userID){
   var numRequestsOutstanding = 0;
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
@@ -59,16 +62,17 @@ function sendNewHistory(startTime, localHistory){
         console.log("SentHistory");
         // Send a message to the content_script with all of the history items
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {greeting: "wikihistory", payload: historyItems.concat(localHistory)}, function(response) {
+          chrome.tabs.sendMessage(tabs[0].id, {greeting: "wikihistory", payload: historyItems.concat(localHistory), userID:userID}, function(response) {
             console.log(response);
           });
         });
       }else{
         console.log("SentEdges");
-        chrome.storage.local.get('edges', function(d) {
+        chrome.storage.local.get(function(d) {
           if(d.edges){
+            // console.log("scrapedinext " + d.scrapedIDs);
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-              chrome.tabs.sendMessage(tabs[0].id, {greeting: "edges", payload: d.edges}, function(response) {
+              chrome.tabs.sendMessage(tabs[0].id, {greeting: "edges", payload: d.edges, userID: userID, scrapedIDs:d.scrapedIDs}, function(response) {
                 console.log(response);
               });
             });
@@ -104,6 +108,9 @@ chrome.runtime.onMessage.addListener(
         console.log("Got new from server");
         // console.log(request.payload);
         chrome.storage.local.set({'edges': request.payload});
+        console.log("Just set storage with ID: " + request.userID);
+        chrome.storage.local.set({'userID': request.userID});
+        chrome.storage.local.set({'scrapedIDs': request.scrapedIDs});
         console.log("Set new localHistory");
         sendResponse({farewell: "goodbye"});
       }
@@ -122,7 +129,7 @@ chrome.runtime.onMessage.addListener(
   //   console.log(d);
   // });
 
-  //   chrome.storage.local.get('value', function(d) {
+  //   chrome.storage.local.get(function(d) {
   //   // Notify that we saved.
   //   console.log("I got: ");
   //   console.log(d);

@@ -8,6 +8,13 @@ window.addEventListener "message", ((event) ->
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
     Session.set "historyValues", event.data.text
+    
+    userID = event.data.userID
+    if userID == ''
+    	console.log "Got Empy ID"
+    	userID = makeID()
+    	console.log "User ID is now: " + userID
+    Session.set "userID", userID
     # console.log "event.data.text " + event.data.text
     Session.set "receivedHistoryTime", new Date().getTime()
     # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
@@ -18,6 +25,9 @@ window.addEventListener "message", ((event) ->
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
     Session.set "edges", event.data.text
+    Session.set "scrapedIDs", event.data.scrapedIDs
+    console.log "inmessage ids" + event.data.scrapedIDs
+    # Session.set "userID", event.data.userID
     draw(250)
     # console.log event.data.text
     # console.log "event.data.text " + event.data.text
@@ -29,31 +39,36 @@ window.addEventListener "message", ((event) ->
 
 
 Template.settings.events = 
-    "mouseenter .fa-cog": (d) ->
-        srcE = if d.srcElement then d.srcElement else d.target
-        console.log srcE.parentNode
-        # srcE = srcE.parentNode
-        $(srcE.parentNode).children(".controls").removeClass("hidden")
+	"mouseenter .fa-cog": (d) ->
+		srcE = if d.srcElement then d.srcElement else d.target
+		console.log srcE.parentNode
+		# srcE = srcE.parentNode
+		$(srcE.parentNode).children(".controls").removeClass("hidden")
+
 
     
-    "mouseleave div.controls": (d) ->
-        srcE = if d.srcElement then d.srcElement else d.target
-        console.log srcE.parentNode
-        console.log srcE
-        # srcE = srcE.parentNode
-        $(".controls").addClass("hidden")
+	"mouseleave div.controls": (d) ->
+		srcE = if d.srcElement then d.srcElement else d.target
+		console.log srcE.parentNode
+		console.log srcE
+		# srcE = srcE.parentNode
+		$(".controls").addClass("hidden")
 
 
+	"click .install": (d) ->
+		chrome.webstore.install()
 
 
-    "click .submit": (d)->
-    	console.log "wat"
-    	srcE = if d.srcElement then d.srcElement else d.target
-    	nodeVal = $(".nodeRange").attr("value")
-    	strengthVal = $(".strengthRange").attr("value")
-    	console.log nodeVal
-    	draw(nodeVal)
+	"click .submit": (d)->
+		console.log "wat"
+		srcE = if d.srcElement then d.srcElement else d.target
+		nodeVal = $(".nodeRange").attr("value")
+		strengthVal = $(".strengthRange").attr("value")
+		console.log nodeVal
+		# userID = Session.get "userID"
+		draw(nodeVal)
 		# nodeVal = $(".nodeRange").attr("value") 
+
 
 
 Template.wikiData.created = ->
@@ -71,14 +86,20 @@ Template.wikiData.wikiData = ->
 	# console.log "inUpdatedWiki"
 	# if Session.get "updated"
 	# console.log "updated was true"
-	xx = WikiData.findOne({accountID:'travis'})
+	userID = Session.get "userID"
+	console.log "In Template, got user ID of " + userID
+	# if userID == ''
+	# 	userID = 
+	xx = WikiData.findOne({accountID:userID})
 	
 	if xx
 		# console.log "wikipub history rtime " + xx['receivedHistoryTime']
 		if xx['receivedHistoryTime'] == (Session.get "receivedHistoryTime")
 			if xx['edges']
 
-				Session.set "scrapedIDs", xx['scrapedIDs']
+				scrapedIDs = xx['scrapedIDs']
+				Session.set "scrapedIDs", scrapedIDs
+				# console.log scrapedIDs
 				Session.set "status", "okkk"
 				# console.log xx['edges']
 				# networkData = buildNetwork(xx['scrapedHistory'])
@@ -106,7 +127,7 @@ Template.wikiData.wikiData = ->
 				totalNewTime = (endTime-startTime)/1000
 				console.log "Client Side" + " | " + totalNewTime 
 
-				postToExt(xx['edges'])
+				postToExt(xx['edges'], userID, scrapedIDs)
 	
 	# localEdges = Session.get "edges"
 	# if localEdges
@@ -120,13 +141,26 @@ Template.wikiData.wikiData = ->
 			# postToExt(xx['titles'])
 		# postToExt(xx['networkData'])
 
-	return WikiData.findOne({accountID:'travis'})
+	return WikiData.findOne({accountID:userID})
 
 
-@postToExt = (xx) ->
+@makeID = () ->
+  text = ""
+  possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  i = 0
+
+  while i < 8
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+    i++
+  return text
+
+
+@postToExt = (xx, userID,scrapedIDs) ->
 	window.postMessage
 	  type: "FROM_Server"
 	  text: xx
+	  userID: userID
+	  scrapedIDs: scrapedIDs
 	, "*"
 
 		# How about no links, but a spectrum of colors, based on link connection. Not simply 6 colors, 
@@ -138,7 +172,13 @@ Template.wikiData.wikiData = ->
 
 @draw = (numNodes) ->
 	localEdges = Session.get "edges"
-	xx = WikiData.findOne({accountID:'travis'})
+	localIDs = Session.get "scrapedIDs"
+	userID = Session.get "userID"
+	# console.log ("thisuserID " + userID)
+	# xx = WikiData.findOne({accountID:userID})
+	# console.log ("thisxx " + xx)
+	# console.log xx
+	# console.log localHistory
 	yy = buildGraph(localEdges,numNodes)
 
 	# renderD3(yy,xx['pageHistory'])
@@ -146,7 +186,7 @@ Template.wikiData.wikiData = ->
 	clusters = communityDetection(yy)
 
 	# clusterData = generateClusters(yy)
-	renderD4(clusters,xx['pageHistory'])
+	renderD4(clusters,localIDs)
 
 
 
@@ -197,6 +237,7 @@ Template.wikiData.wikiData = ->
 
 	for page of numInTitles
 		Session.set "status", "Building Network Links: Page " + statuscount+1 + " of " + pageListLength
+		# console.log "OMG THIS IS AWESOME!!!!!"
 		pageID = page
 		pageTitle = getPageTitle(pageID) 
 		numIn = numInTitles[pageID]

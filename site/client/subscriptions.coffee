@@ -13,6 +13,7 @@ Deps.autorun ->
     # maxNumShown = Session.get "maxNumShown" # Get the session variable
     receivedHistoryTime = Session.get "receivedHistoryTime"
     historyValues = Session.get "historyValues"
-    wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime
+    userID = Session.get "userID"
+    wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime, userID
 
    
