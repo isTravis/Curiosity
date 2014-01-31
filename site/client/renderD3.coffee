@@ -373,13 +373,17 @@
 			# 	).attr( "y", (d) ->
 			# 		d.y
 			# 	)
-		
+		# $('.status').html("Rendering")
 		loading = svg.append("text")
 			.attr("x", width / 2)
 			.attr("y", height / 2)
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
+			.style("font-size", "50px")
+			.style("fill", "#ddd")
 			.text("Rendering. One moment please…");
+
+		# $('.status').html("Rendering")
 
 		setTimeout (->
 			

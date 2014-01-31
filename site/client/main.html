@@ -24,7 +24,8 @@
 
 	<section class="main">
 		<section class="welcome">
-			This is here until it's not.
+			<div id="hasExtension">Please Install Extension</div>
+			{{>status}}
 		</section>
 
 		<section class="data">
@@ -62,12 +63,16 @@
 	{{timeline}}
 </template>
 
+<template name = "status">
+	<div class="status ">{{status}}</div>
+</template>
+
 
 <template name="settings">
 	<div class="settings">
 		<i class="fa fa-cog" data-placement="right" data-toggle="tooltip" data-animation="true" title="Settings"></i>
 		<div class="controls hidden">
-			<div id="install">Install Extension</div>
+			<!-- <div id="install">Install Extension</div> -->
 
 			<div class="control node-slider">
 				Node Slider

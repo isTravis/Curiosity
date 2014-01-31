@@ -4,7 +4,9 @@ window.addEventListener "message", ((event) ->
   if (event.data.type and (event.data.type is "FROM_PAGE_WIKI"))
     console.log "gotWikimessage"
     # console.log "message gotten"
-    Session.set "status", "Parsing Wikipedia History"
+    console.log event.data.text
+    console.log "number of pages: " + event.data.text.length
+    Session.set "status", "Parsing Wikipedia History: " + event.data.text.length + " New Pages."
     # Meteor.call "inputHistory", event.data.text
     Session.set "updated", event.data.text
     Session.set "historyValues", event.data.text
@@ -81,6 +83,19 @@ Template.wikiData.created = ->
 
 # Template.status.status = ->
 # 	return Session.get "status"
+
+
+	# console.log document.getElementById("hasExtension").html()
+
+Template.status.status = ->
+	Session.get "status"
+	# if $("#hasExtension")
+	# 	console.log "itis" + $("#hasExtension").html()
+	# 	if $("#hasExtension").html() != ""
+	# 		$(".status").addClass("hidden")
+	# 	else
+	# 		$(".status").removeClass("hidden")
+
 
 Template.wikiData.wikiData = ->
 	# console.log "inUpdatedWiki"

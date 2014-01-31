@@ -1,5 +1,8 @@
 var wikihistory;
 
+document.getElementById("hasExtension").innerHTML = ""
+document.getElementsByClassName("status").className = "status"
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.greeting == "wikihistory"){
