@@ -181,11 +181,11 @@ Template.wikiData.wikiData = ->
 	# console.log localHistory
 	yy = buildGraph(localEdges,numNodes)
 
-	# renderD3(yy,xx['pageHistory'])
+	# renderD3(yy,localIDs)
 
 	clusters = communityDetection(yy)
 
-	# clusterData = generateClusters(yy)
+	# # clusterData = generateClusters(yy)
 	renderD4(clusters,localIDs)
 
 

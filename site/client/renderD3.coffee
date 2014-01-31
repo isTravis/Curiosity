@@ -1,5 +1,6 @@
-@renderD3 = (renderData,pageHistory) ->
+@renderD3 = (renderData,localIDs) ->
 	if renderData
+		$('.welcome').addClass('hidden')
 		w = $(document).width()
 		h = $(document).height()
 		h = h-100
@@ -52,7 +53,8 @@
 		nodeMap = []
 		renderData['nodes'].forEach (x) ->
 			# console.log "derg" + pageHistory[x.id]
-			title =  pageHistory[x.id].title
+			title =  localIDs[x.id]
+
 			nodeMap.push({id:x.id, value:x.attr, title:title})
 
 		# _.forEach renderData['links'], (link) ->
@@ -106,19 +108,20 @@
 				nodeSelection = d3.select(this)
 				nodeSelection.select("circle").style(opacity: "1.0")
 				nodeSelection.select("text").style(opacity: "1.0")
-				console.log nodeSelection.text()
+				# console.log nodeSelection.text()
 			)
 			.on("mouseout", (d) ->
 				nodeSelection = d3.select(this)
 				nodeSelection.select("circle").style(opacity: "1.0")
 				nodeSelection.select("text").style(opacity: "0.2")
-				console.log nodeSelection.text()
+				# console.log nodeSelection.text()
 			)
 
 		node = gnodes.append("circle")
 			.attr("class", "node")
 			.attr("class", "node").attr("r", (d) ->
-				d.value/100
+				# d.value/100
+				Math.pow(d.value,1/3)*2
 			)
 			.style("fill", (d) ->
 				color d.value
@@ -207,16 +210,36 @@
 
 @renderD4 = (clusterData,scrapedIDs) ->
 	if clusterData
-		console.log "scrapedid is " + scrapedIDs
+		# console.log clusterData
+		# console.log "scrapedid is " + scrapedIDs
+		
+		$('.welcome').addClass('hidden')
+
+		n = clusterData.length
+		m = 0
+		maxNodeRadius = 0
+		_.forEach clusterData, (node) ->
+			if node.cluster > m
+				m = node.cluster
+				# console.log m
+			thisRadius = Math.pow(node.radius,1/3)*2
+			if thisRadius > maxNodeRadius
+				maxNodeRadius = thisRadius
+				# console.log maxRadius
+		# maxRadius = Math.ceil(maxRadius)
+		# console.log maxRadius
+
+
 		docHeight = $(document).height()
 		docWidth = $(document).width()
 		width = docWidth
 		height = docHeight-110
-		padding = 1.5
-		clusterPadding = 6
-		maxRadius = 45
-		n = 25
-		m = 1
+		padding = 3
+		clusterPadding = 10
+		maxRadius = Math.ceil(height/Math.sqrt(n))/10
+		# maxRadius = 45
+		# n = 25
+		# m = 1
 		color = d3.scale.category20().domain(d3.range(m))
 		clusters = new Array(m)
 
@@ -227,17 +250,18 @@
 		nodes = d3.range(clusterData.length).map(->
 		  # console.log clusterData[counter]
 		  i = clusterData[counter]['cluster']
-		  r = Math.pow(clusterData[counter]['radius'],1/3)*2
-		  if r > 50
-		  	r = 50
+		  # r = (clusterData[counter]['radius']/maxNodeRadius)*maxRadius
+		  r = (Math.pow((clusterData[counter]['radius']),1/3)) / (Math.pow(maxNodeRadius,1/3)) * maxRadius
+		  # if r > 50
+		  # 	r = 50
 		  # console.log r
 		  d =
 		    cluster: i
 		    radius: r
 		    title: clusterData[counter]['title']
 		    id: 'id'
-		    x: Math.cos(i / m * 2 * Math.PI) * 200 + width / 2 + Math.random()
-		    y: Math.sin(i / m * 2 * Math.PI) * 200 + height / 2 + Math.random()
+		    x:  Math.cos(i / m * 2 * Math.PI) * 200 + width / 2 + Math.random()
+		    y:  Math.sin(i / m * 2 * Math.PI) * 200 + height / 2 + Math.random()
 
 		  # console.log d
 		  clusters[i] = d  if not clusters[i] or (r > clusters[i].radius)
@@ -257,92 +281,226 @@
 		# nodes = nodes2
 		# clusters = clusters2
 
-		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0.2).charge(0).start()
+		# d3.layout.pack().sort(null).size([width, height]).children((d) ->
+		#   d.values
+		# ).value((d) ->
+		#   d.radius * d.radius
+		# ).nodes values: d3.nest().key((d) ->
+		#   d.cluster
+		# ).entries(nodes)
+
+		force = d3.layout.force().nodes(nodes).size([width, height]).gravity(0.02).charge(0)
 
 		$(".wikimap").empty()
 		svg = d3.select(".wikimap").append("svg").attr("width", width).attr("height", height)
 		
-		gnodes = svg.selectAll('g.gnode')
-			.data(nodes)
-			.enter()
-			.append('g')
-			.classed('gnode', true)
-			.on("mouseover", (d) ->
-				nodeSelection = d3.select(this)
-				# nodeSelection.select("circle").style(opacity: "1.0")
-				nodeSelection.select("text").style(opacity: "1.0")
-				# console.log nodeSelection.text()
-			)
-			.on("mouseout", (d) ->
-				nodeSelection = d3.select(this)
-				# nodeSelection.select("circle").style(opacity: "1.0")
-				nodeSelection.select("text").style(opacity: "0.2")
-				# console.log nodeSelection.text()
-			)
-
-		gnodes.transition().duration(750).delay((d, i) ->
-		  i * 5
-		).attrTween "r", (d) ->
-		  i = d3.interpolate(0, d.radius)
-		  (t) ->
-		    d.radius = i(t)
 
 
-		circle = gnodes.append("circle").attr("r", (d) ->
-		  d.radius
-		).style("fill", (d) ->
-		  color d.cluster
-		)
+		# node = svg.selectAll("circle").data(nodes).enter().append("circle").style("fill", (d) ->
+		#   color d.cluster
+		# ).call(force.drag)
 
-		labels = gnodes.append("text")
-		  .text((d) ->  scrapedIDs[d.title] )
-		  .attr("text-anchor", "middle")
-		  .style("opacity", "0.2")
-		  .attr("class","node-label")
-		  .style("font-size","10px")
+		# node.transition().duration(750).delay((d, i) ->
+		#   i * 5
+		# ).attrTween "r", (d) ->
+		#   i = d3.interpolate(0, d.radius)
+		#   (t) ->
+		#     d.radius = i(t)
+
+
+
+		# gnodes = svg.selectAll('g.gnode')
+		# 	.data(nodes)
+		# 	.enter()
+		# 	.append('g')
+		# 	.classed('gnode', true)
+		# 	.on("mouseover", (d) ->
+		# 		nodeSelection = d3.select(this)
+		# 		# nodeSelection.select("circle").style(opacity: "1.0")
+		# 		nodeSelection.select("text").style(opacity: "1.0")
+		# 		# console.log nodeSelection.text()
+		# 	)
+		# 	.on("mouseout", (d) ->
+		# 		nodeSelection = d3.select(this)
+		# 		# nodeSelection.select("circle").style(opacity: "1.0")
+		# 		nodeSelection.select("text").style(opacity: "0.2")
+		# 		# console.log nodeSelection.text()
+		# 	)
+
+		# gnodes.transition().duration(750).delay((d, i) ->
+		#   i * 5
+		# ).attrTween "r", (d) ->
+		#   i = d3.interpolate(0, d.radius)
+		#   (t) ->
+		#     d.radius = i(t)
+
+
+		# circle = gnodes.append("circle").attr("r", (d) ->
+		#   d.radius
+		# ).style("fill", (d) ->
+		#   color d.cluster
+		# )
+
+		# labels = gnodes.append("text")
+		#   .text((d) ->  scrapedIDs[d.title] )
+		#   .attr("text-anchor", "middle")
+		#   .style("opacity", "0.2")
+		#   .attr("class","node-label")
+		#   .style("font-size","10px")
 
 		# separation between same-color circles
 		# separation between different-color circles
 		# total number of circles
 		# number of distinct clusters
+		
+		# force.stop()
 
+		# force.on "tick", -> 
+		# # @tick = (e) ->
 
-		force.on "tick", -> 
-			circle
-				.each(cluster(10 *.01))
-				.each(collide(.5))
-				.attr("cx", (d) ->
-					d.x
-				).attr( "cy", (d) ->
-					d.y
+		# 	# node
+		# 	circle
+		# 		.each(cluster(10 * force.alpha() * force.alpha()))
+		# 		.each(collide(.5))
+		# 		.attr("cx", (d) ->
+		# 			d.x
+		# 		).attr( "cy", (d) ->
+		# 			d.y
+		# 		)
+			# labels
+			# 	.attr("x", (d) ->
+			# 		d.x
+			# 	).attr( "y", (d) ->
+			# 		d.y
+			# 	)
+		
+		loading = svg.append("text")
+			.attr("x", width / 2)
+			.attr("y", height / 2)
+			.attr("dy", ".35em")
+			.style("text-anchor", "middle")
+			.text("Rendering. One moment please…");
+
+		setTimeout (->
+			
+			# Run the layout a fixed number of times.
+			# The ideal number of times scales with graph complexity.
+			# Of course, don't run too long—you'll hang the page!
+			force.start()
+
+			gnodes = svg.selectAll('g.gnode')
+				.data(nodes)
+				.enter()
+				.append('g')
+				.classed('gnode', true)
+				.on("mouseover", (d) ->
+					nodeSelection = d3.select(this)
+					#	 nodeSelection.select("circle").style(opacity: "1.0")
+					nodeSelection.select("text").style(opacity: "1.0")
+					nodeSelection.select("circle").style("stroke","#ddd")
+					# nodeSelection.select("circle").style("stroke-width","1px")
+					# console.log nodeSelection.text()
 				)
-			labels
-				.attr("x", (d) ->
-					d.x
-				).attr( "y", (d) ->
-					d.y
+				.on("mouseout", (d) ->
+					nodeSelection = d3.select(this)
+					# nodeSelection.select("circle").style(opacity: "1.0")
+					nodeSelection.select("text").style(opacity: "0.2")
+					nodeSelection.select("circle").style("stroke","#999")
+					# console.log nodeSelection.text()
 				)
 
+			# gnodes.transition().duration(750).delay((d, i) ->
+			#   i * 5
+			# ).attrTween "r", (d) ->
+			#   i = d3.interpolate(0, d.radius)
+			#   (t) ->
+			#     d.radius = i(t)
+
+
+			circle = gnodes.append("circle").attr("r", (d) ->
+			  d.radius
+			).style("fill", (d) ->
+			  color d.cluster
+			).style("stroke","#999")
+			.style("stroke-width","2px")
+
+			labels = gnodes.append("text")
+				.text((d) ->  scrapedIDs[d.title] )
+				.attr("text-anchor", "middle")
+				.style("opacity", "0.2")
+				.attr("class","node-label")
+				.style("font-size","10px")
+
+			force.on "tick", -> 
+				# console.log "hereintick"
+				# node
+				circle
+					.each(cluster(10 * force.alpha() * force.alpha()))
+					.each(collide(.5))
+					.attr("cx", (d) ->
+						# d.x
+						if d.x > width
+							return (width - maxRadius)
+						else if d.x < 0
+							return (0 + maxRadius)
+						else 
+							return d.x
+						# return d.x = Math.max(15, Math.min(width - 15, d.x))
+					).attr( "cy", (d) ->
+						# d.y
+						# return d.y = Math.max(15, Math.min(height - 15, d.y))
+						if d.y > height
+							return (height - maxRadius)
+						else if d.y < 0
+							return (0 + maxRadius)
+						else 
+							return d.y
+					)
+				labels
+					.attr("x", (d) ->
+						d.x
+					).attr( "y", (d) ->
+						d.y
+					)
+				# circle.attr("transform", (d) -> return "translate(" + d.x + "," + d.y + ")" )
+				# gnodes.attr "transform", (d) ->
+				#   "translate(" + [Math.max(r, Math.min(w - r, d.x)), d.y = Math.max(r, Math.min(h - r, d.y))] + ")"
+
+			i = n * n
+
+			while force.alpha() != 0
+			  force.tick()
+			  --i
+			  # console.log force.alpha()
+			force.stop()
+
+			
+
+
+			loading.remove()
+		), 50
+
+
+		# @fakeTick = () ->
+		# 	circle
+		# 		.each(cluster(10 * 0.01))
+		# 		.each(collide(.5))
+		# 		.attr("cx", (d) ->
+		# 			d.x
+		# 		).attr( "cy", (d) ->
+		# 			d.y
+		# 		)
 		# Move d to be adjacent to the cluster node.
 		@cluster = (alpha) ->
 		  (d) ->
 		    cluster = clusters[d.cluster]
-		    k = 1
-		    
-		    # For cluster nodes, apply custom gravity.
-		    if cluster is d
-		      cluster =
-		        x: width / 2
-		        y: height / 2
-		        radius: -d.radius
-
-		      k = .1 * Math.sqrt(d.radius)
+		    return  if cluster is d
 		    x = d.x - cluster.x
 		    y = d.y - cluster.y
 		    l = Math.sqrt(x * x + y * y)
 		    r = d.radius + cluster.radius
 		    unless l is r
-		      l = (l - r) / l * alpha * k
+		      l = (l - r) / l * alpha
 		      d.x -= x *= l
 		      d.y -= y *= l
 		      cluster.x += x
@@ -371,7 +529,13 @@
 		          quad.point.y += y
 		      x1 > nx2 or x2 < nx1 or y1 > ny2 or y2 < ny1
 
-		
+		# pp= 0
+		# while pp <500
+		# 	fakeTick()
+		# 	pp++
+		# 	console.log "here"
+		# 	# console.log force.alpha()
+		# force.start()
 # @renderTimeline = () ->
 # 	type = (d) ->
 # 		d.frequency = +d.frequency
@@ -451,6 +615,10 @@
 
 		links.push({source:nodes[srcIndex],target:nodes[destIndex],skip:false})
 
+	# _.forEach links, (link) ->
+	# 	console.log link
+	console.log "rebuilt node length is " + nodes.length
+	console.log "rebuilt link length is " + links.length
 	graph = {nodes: nodes, links: links}
 
 	
@@ -478,23 +646,30 @@
 @reduceEdges = (edges,numNodes) ->
 	# Ween down the full edges list 
 
-	# numNodes = 500
+	# numNodes = 200
 	nodes = []
+	topEdges = []
+	# console.log edges
 	# Sort edges by strength value
 	edges.sort (a, b) ->
 		b.strength - a.strength
 
 	edgecounter = 0
 	_.forEach edges, (e) ->
-		if nodes.length < numNodes
-			if nodes.indexOf(e.src) < 0
-				# console.log "here"
-				nodes.push(e.src)
-			if nodes.indexOf(e.dest) < 0
-				nodes.push(e.dest)
-			edgecounter += 1
+		if e.src != e.dest
+			# console.log e.src + " and " + e.dest
+			if nodes.length < numNodes
+
+				if nodes.indexOf(e.src) < 0
+					# console.log "here"
+					nodes.push(e.src)
+				if nodes.indexOf(e.dest) < 0
+					nodes.push(e.dest)
+				edgecounter += 1
+				topEdges.push(e)
 
 	console.log "nodeslength " + nodes.length
-	return edges.slice(0,edgecounter)
+	# return edges.slice(0,edgecounter)
+	return topEdges
 
 	
