@@ -30,7 +30,7 @@ window.addEventListener "message", ((event) ->
     Session.set "scrapedIDs", event.data.scrapedIDs
     console.log "inmessage ids" + event.data.scrapedIDs
     # Session.set "userID", event.data.userID
-    draw(250)
+    draw(200)
     # console.log event.data.text
     # console.log "event.data.text " + event.data.text
     Session.set "receivedHistoryTime", new Date().getTime()
@@ -61,8 +61,12 @@ Template.settings.events =
 		chrome.webstore.install()
 
 
+	"change .node-slider": (d) ->
+		nodeVal = $(".nodeRange").attr("value")
+		draw(nodeVal)
+
 	"click .submit": (d)->
-		console.log "wat"
+		# console.log "wat"
 		srcE = if d.srcElement then d.srcElement else d.target
 		nodeVal = $(".nodeRange").attr("value")
 		strengthVal = $(".strengthRange").attr("value")
@@ -136,7 +140,7 @@ Template.wikiData.wikiData = ->
 				# # console.log xx['pageHistory']
 
 				# renderD3(yy,xx['pageHistory'])
-				draw(250)
+				draw(200)
 
 				endTime = new Date().getTime()
 				totalNewTime = (endTime-startTime)/1000

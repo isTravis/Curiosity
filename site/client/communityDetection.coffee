@@ -38,7 +38,7 @@
       linksMap[a][b] = 1.0 / (2 * m) - (nodesMap[a].degree * nodesMap[b].degree) / (4.0 * m * m)
   # console.log linksMap
   iter = 0
-  while iter < 1000
+  while iter < 10000
     deltaQ = -1
     maxa = `undefined`
     maxb = `undefined`

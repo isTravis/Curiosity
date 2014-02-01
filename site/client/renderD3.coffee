@@ -236,7 +236,7 @@
 		height = docHeight-110
 		padding = 3
 		clusterPadding = 10
-		maxRadius = Math.ceil(height/Math.sqrt(n))/10
+		maxRadius = Math.ceil(height/Math.sqrt(n))/8
 		# maxRadius = 45
 		# n = 25
 		# m = 1
@@ -376,11 +376,11 @@
 		# $('.status').html("Rendering")
 		loading = svg.append("text")
 			.attr("x", width / 2)
-			.attr("y", height / 2)
+			.attr("y", (height / 2))
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
-			.style("font-size", "50px")
-			.style("fill", "#ddd")
+			.style("font-size", "20px")
+			.style("fill", "#434C52")
 			.text("Rendering. One moment please…");
 
 		# $('.status').html("Rendering")

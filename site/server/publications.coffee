@@ -324,8 +324,13 @@ linkSet = []
 			# console.log "wtf2"
 			# console.log pageID1
 			# console.log pageID2
-			linkList1 = Links.findOne({pageID: pageID1}).links
-			linkList2 = Links.findOne({pageID: pageID2}).links
+			try
+				linkList1 = Links.findOne({pageID: pageID1}).links
+				linkList2 = Links.findOne({pageID: pageID2}).links
+			catch
+				linkList1 = []
+				linkList2 = []
+			
 			strength = sharedLinkCount(linkList1, linkList2)
 			dummy = {}
 			dummy[pageID2] = strength
