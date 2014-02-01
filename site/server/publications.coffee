@@ -82,29 +82,30 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
 		console.log "About to add to mongo with ID: " + userID
 
 		if _.isEmpty(pageHistory) == false
-			console.log "got a pagehistory"
-			# console.log pageHistory
-			if WikiData.findOne({accountID:userID})
-				WikiData.update(
-					accountID: userID
-				,
-					$set:
+			if userID != null
+				console.log "got a pagehistory"
+				# console.log pageHistory
+				if WikiData.findOne({accountID:userID})
+					WikiData.update(
+						accountID: userID
+					,
+						$set:
+							receivedHistoryTime: receivedHistoryTime
+							pageHistory: pageHistory
+							edges: myEdges
+							scrapedIDs: scrapedIDs
+					)
+				else
+					# Generate a random hash use that as ID
+					# make sure to send it back to extension and have it stored
+					# will have to pass it in here to this function above for future iterations
+					WikiData.insert(
+						accountID: userID
 						receivedHistoryTime: receivedHistoryTime
 						pageHistory: pageHistory
 						edges: myEdges
 						scrapedIDs: scrapedIDs
-				)
-			else
-				# Generate a random hash use that as ID
-				# make sure to send it back to extension and have it stored
-				# will have to pass it in here to this function above for future iterations
-				WikiData.insert(
-					accountID: userID
-					receivedHistoryTime: receivedHistoryTime
-					pageHistory: pageHistory
-					edges: myEdges
-					scrapedIDs: scrapedIDs
-				)
+					)
 	else 
 		dontHaveThings(historyValues, receivedHistoryTime, userID)		
 
