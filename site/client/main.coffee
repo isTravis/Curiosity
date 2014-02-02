@@ -39,6 +39,11 @@ window.addEventListener "message", ((event) ->
 ), false
 
 
+Template.hasExtension.events =
+	"click #hasExtension": (d) ->
+		console.log "just clicked it"
+		chrome.webstore.install()
+		console.log "and after"
 
 Template.settings.events = 
 	"mouseenter .fa-cog": (d) ->

@@ -24,7 +24,8 @@
 
 	<section class="main">
 		<section class="welcome">
-			<div id="hasExtension">Please Install Extension</div>
+			{{>hasExtension}}
+			
 			{{>status}}
 		</section>
 
@@ -65,6 +66,10 @@
 
 <template name = "status">
 	<div class="status ">{{status}}</div>
+</template>
+
+<template name = "hasExtension">
+	<div id="hasExtension">Please Install Extension</div>
 </template>
 
 
