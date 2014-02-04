@@ -1,6 +1,6 @@
 {
-  "name": "WikiNet",
-  "version": "0.1",
+  "name": "Curiosity",
+  "version": "0.3",
   "description": "Reads your wiki History, build the network map",
   "permissions": [
     "history",
@@ -9,7 +9,7 @@
 
   ],
   "page_action": {
-    "default_icon": "net.png",
+    "default_icon": "curiosity.png",
     "default_title" : "WikiNet"
   },
   "background": {
@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://localhost:3000/"],
+      "matches": ["http://curiosity.meteor.com/"],
       "js": ["src/js/script.js"]
     }
   ],

@@ -82,29 +82,30 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
 		console.log "About to add to mongo with ID: " + userID
 
 		if _.isEmpty(pageHistory) == false
-			console.log "got a pagehistory"
-			# console.log pageHistory
-			if WikiData.findOne({accountID:userID})
-				WikiData.update(
-					accountID: userID
-				,
-					$set:
+			if userID != null
+				console.log "got a pagehistory"
+				# console.log pageHistory
+				if WikiData.findOne({accountID:userID})
+					WikiData.update(
+						accountID: userID
+					,
+						$set:
+							receivedHistoryTime: receivedHistoryTime
+							pageHistory: pageHistory
+							edges: myEdges
+							scrapedIDs: scrapedIDs
+					)
+				else
+					# Generate a random hash use that as ID
+					# make sure to send it back to extension and have it stored
+					# will have to pass it in here to this function above for future iterations
+					WikiData.insert(
+						accountID: userID
 						receivedHistoryTime: receivedHistoryTime
 						pageHistory: pageHistory
 						edges: myEdges
 						scrapedIDs: scrapedIDs
-				)
-			else
-				# Generate a random hash use that as ID
-				# make sure to send it back to extension and have it stored
-				# will have to pass it in here to this function above for future iterations
-				WikiData.insert(
-					accountID: userID
-					receivedHistoryTime: receivedHistoryTime
-					pageHistory: pageHistory
-					edges: myEdges
-					scrapedIDs: scrapedIDs
-				)
+					)
 	else 
 		dontHaveThings(historyValues, receivedHistoryTime, userID)		
 
@@ -128,7 +129,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
 @goGetTitle = (url) ->
 	# Use when the history search result returns a title of ''
 	urlTitle = url.split("wiki/")[1].split("#")[0]
-	apiURL = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urlTitle + '&redirects'
+	apiURL = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urlTitle + '&redirects&prop=revisions'
 	result = Meteor.http.get(apiURL)
 	# console.log result
 	for page of result.data['query']['pages']
@@ -324,8 +325,13 @@ linkSet = []
 			# console.log "wtf2"
 			# console.log pageID1
 			# console.log pageID2
-			linkList1 = Links.findOne({pageID: pageID1}).links
-			linkList2 = Links.findOne({pageID: pageID2}).links
+			try
+				linkList1 = Links.findOne({pageID: pageID1}).links
+				linkList2 = Links.findOne({pageID: pageID2}).links
+			catch
+				linkList1 = []
+				linkList2 = []
+			
 			strength = sharedLinkCount(linkList1, linkList2)
 			dummy = {}
 			dummy[pageID2] = strength
