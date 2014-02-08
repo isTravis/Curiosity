@@ -3,5 +3,6 @@
 @PageIDs = new Meteor.Collection "pageids"
 @Links = new Meteor.Collection "links"
 @Edges = new Meteor.Collection "edges"
+@ArticleData = new Meteor.Collection "articledata"
 # @isReady = new Meteor.Collection "links"
 

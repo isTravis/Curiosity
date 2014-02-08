@@ -11,5 +11,6 @@ less
 ejson
 d3
 http
-npm
 font-awesome
+npm
+iron-router

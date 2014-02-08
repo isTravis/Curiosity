@@ -8,7 +8,8 @@ import urllib
 
 # in_file = open("eng_cropped5", 'r')
 in_file = open("../datasets/wikiDataSets/eng_cropped5", 'r')
-outfile = open('../datasets/wikiDataSets/validPages2','w')
+outfile = open('../datasets/wikiDataSets/validPages4','w')
+badfile = open('../datasets/wikiDataSets/validPages4_bad','w')
 count = 0
 
 
@@ -186,20 +187,21 @@ for lineItem in in_file.readlines():
 			print type(e)
 			for title in titleList.split('|'):
 				try:
-					
-					urltitle = title
+					properOutput = title + "\n"
+					badfile.write(properOutput.encode('utf-8'))
+					# urltitle = title
 
-					apiURL = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urltitle + '&redirects'
-					r = requests.get(apiURL)
-					j = r.json()['query']['pages']
+					# apiURL = 'http://en.wikipedia.org/w/api.php?format=json&action=query&titles=' + urltitle + '&redirects'
+					# r = requests.get(apiURL)
+					# j = r.json()['query']['pages']
 
-					articleNumber = 0
-					for children in j:
-						articleNumber = children
-						if int(articleNumber) > 0:
-							mtitle = j[articleNumber]['title'].replace(' ', '_')
-							properOutput = articleNumber + " | " + mtitle + " | " + lineItem.split(' ')[0].strip() + " | " + lineItem.split(' ')[1].strip() + "\n"
-							outfile.write(properOutput.encode('utf-8'))
+					# articleNumber = 0
+					# for children in j:
+					# 	articleNumber = children
+					# 	if int(articleNumber) > 0:
+					# 		mtitle = j[articleNumber]['title'].replace(' ', '_')
+					# 		properOutput = articleNumber + " | " + mtitle + " | " + lineItem.split(' ')[0].strip() + " | " + lineItem.split(' ')[1].strip() + "\n"
+					# 		outfile.write(properOutput.encode('utf-8'))
 				except:
 					print "Found a bad site: " + title
 
