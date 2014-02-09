@@ -27,6 +27,11 @@ except:
 	print "Can't seem to find the meteor database"
 
 c_articleData = db.articledata
+c_tophundredthousand = db.tophundredthousand
+c_toptenthousand = db.toptenthousand
+c_topthousand = db.topthousand
+c_topmillion = db.topmillion
+c_toppages = db.toppages
 # c_gifs = db.gifs
 in_file = open("../datasets/wikiDataSets/validPages3", 'r')
 
@@ -98,13 +103,23 @@ for lineItem in in_file.readlines():
 sorted_articles = sorted(viewDict.iteritems(), key=operator.itemgetter(1), reverse=True)
 # print sorted_articles
 outputJSON = []
-outputArticles = 10000
+outputArticles = 100000
 outputCounter = 1
+
+tempx = -1
+tempy = -1
+counter = 0
 for item in sorted_articles:
+	if counter % 401 == 0:
+		tempx = -1
+		tempy += 1
+	tempx += 1
+	counter+=1
 	thisID = item[0]
 	thisViewCount = item[1]
 	thisTitle = articleDict[thisID]['articleTitle']
-	x = {'pageID':thisID, 'articleTitle' :thisTitle, 'viewCount' :thisViewCount}
+	print "x,y : " + str(tempx) + "," + str(tempy)
+	x = {'pageID':thisID, 'articleTitle' :thisTitle, 'viewCount' :thisViewCount, "x":tempx, "y":tempy, "rank": counter}
 	outputJSON.append(x)
 	# print item
 	# print x
@@ -113,8 +128,12 @@ for item in sorted_articles:
 		break
 
 
-with open('../datasets/wikiDataSets/topPages.json', 'w') as outfile:
-  json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
+# with open('../datasets/wikiDataSets/topPages.json', 'w') as outfile:
+  # json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
+# c_tophundred.insert(outputJSON)
+# c_topthousand.insert(outputJSON)
+c_tophundredthousand.insert(outputJSON)
+
 # count = 0
 # startTime = time.time()
 # for item in articleDict:

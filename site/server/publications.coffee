@@ -11,6 +11,72 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
     console.log "finished updated"
     return WikiData.find()
 
+Meteor.publish "topHundredThousandPub", ->
+    TopHundredThousand.find()
+
+Meteor.publish "topTenThousandPub", ->
+    TopTenThousand.find()
+
+Meteor.publish "topThousandPub", ->
+    TopThousand.find()
+
+# Meteor.TopMillion._ensureIndex(x: 1, y: 1)
+
+Meteor.publish "topMillionPub", (myx,myy) ->
+	# sub = this
+	# collectionName = 'selectmillion'
+	console.log myx
+	console.log myy
+	
+	results = TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  })
+	console.log "----"
+	# _.forEach results, (result) ->
+	# 	# console.log result
+	# 	sub.added collectionName, result._id, result
+	# sub.ready()
+	return results
+    # console.log myx
+    # # console.log TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  }).count()
+    # return TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  })
+    # console.log TopMillion.findOne({x:myx,y:myy})
+    # TopMillion.find({x:myx,y:myy})
+
+
+
+# Meteor.publish "mostRecentGifsPub", (numGifs) ->
+#     sub = this
+#     collectionName = "mostRecentGifs"
+
+#     gifCount = Gifs.find().count()
+#     if numGifs == "0"
+#         #return all
+#         for i in [gifCount-1..0]
+#             gif = Gifs.findOne({intID: i})
+#             sub.added collectionName, gif._id, gif
+#     else
+#         #return numGifs
+#         for i in [gifCount-1..gifCount-numGifs]
+#             gif = Gifs.findOne({intID: i})
+#             sub.added collectionName, gif._id, gif
+
+#     sub.ready()
+#     return
+
+Meteor.publish "topPagesPub", (zoom,myx,myy) ->
+	bufferLength = 8
+	switch (zoom)
+		when 9
+			return TopThousand.find()
+		when 1000
+			return TopPages.find({rank: {$lt:1001}})
+		when 10000
+			return TopPages.find({rank: {$lt:10001}})
+		when 100000
+
+			return TopPages.find({x: {$gt:myx-bufferLength, $lt:myx+bufferLength}, y: {$gt:myy-bufferLength, $lt:myy+bufferLength}  })
+		when 1000000
+			return TopMillion.find({x: {$gt:myx-bufferLength, $lt:myx+bufferLength}, y: {$gt:myy-bufferLength, $lt:myy+bufferLength}  })
+
 
 
 @beginEverything = (historyValues, receivedHistoryTime, userID) ->
