@@ -123,6 +123,18 @@ Template.userGridData.userGridData = ->
     scroller.zoomBy 1.5, true
     return
   ), false
+  # $('body').keypress ->
+  #   console.log 'wellyea'
+
+  document.addEventListener "keydown", (->
+    console.log event.keyCode
+    if event.keyCode == 65
+        scroller.zoomBy 1.5, true
+    if event.keyCode == 83
+        scroller.zoomBy 0.5, true
+    
+    return
+  ), false
   # while i < l
   #   checkboxes[i].addEventListener "change", (->
   #     scroller.options[@id] = @checked
