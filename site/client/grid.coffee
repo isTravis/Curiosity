@@ -1,5 +1,8 @@
 mything = {}
 mygridData = []
+globalpixelwidth = 1
+globalleft = 0
+globaltop = 0
 Template.mgrid.created = ->
   Session.set "myx", 0
   Session.set "myy", 0
@@ -7,8 +10,12 @@ Template.mgrid.created = ->
 
 Template.mgrid.rendered = ->
   drawit()
-  drawData(mygridData)
-  # testDraw()
+  # drawData(mygridData)
+  # content = document.getElementById("dataCanvas")
+
+  # initZoom()
+  testDraw()
+  render(975,600,5)
 
 
 Template.userGridData.userGridData = ->
@@ -34,16 +41,21 @@ Template.userGridData.userGridData = ->
   contentHeight = 800
   cellWidth = 1
   cellHeight = 1
-  content = document.getElementById("content")
+  content = document.getElementById("dataCanvas")
   console.log content
   context = content.getContext("2d")
   tiling = new Tiling
 
   # Canvas renderer
-  render = (left, top, zoom) ->
+  @render = (left, top, zoom) ->
     console.log "left " + left
+    globalpixelwidth = zoom
+    globalleft = left
+    globaltop = top
+    console.log globalpixelwidth
     console.log "top " + top
-    
+    console.log "herree"
+    content = document.getElementById("dataCanvas")
     # Sync current dimensions with canvas
     content.width = clientWidth
     content.height = clientHeight
@@ -59,15 +71,160 @@ Template.userGridData.userGridData = ->
 
   # Cell Paint Logic
   paint = (row, col, left, top, width, height, zoom) ->
-    if row % 10 is 0
-      r = Math.floor((row + col * 10) % 255)
-      g = Math.floor((row + col * 10) % 255)
-      b = Math.floor((row + col * 2) % 255)
+    if (row+col) % 10 is 0
+      r = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 20) % 255)
+      g = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 5) % 255)
+      b = Math.floor((row + Math.floor(Math.pow(row+Math.pow(col,2),3)) * 2) % 255)
       
       # context.fillStyle = row%2 + col%2 > 0 ? "#ddd" : "#fff";
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height
     return
+  # @initZoom = () ->
+  # Intialize layout
+  container = document.getElementById("container")
+  console.log container
+  content = document.getElementById("dataCanvas")
+  clientWidth = 0
+  clientHeight = 0
+
+  # Initialize Scroller
+  @scroller = new Scroller(render,
+    zooming: true
+  )
+  scrollLeftField = document.getElementById("scrollLeft")
+  scrollTopField = document.getElementById("scrollTop")
+  zoomLevelField = document.getElementById("zoomLevel")
+  # setInterval (->
+  #   values = scroller.getValues()
+  #   scrollLeftField.value = values.left.toFixed(2)
+  #   scrollTopField.value = values.top.toFixed(2)
+  #   zoomLevelField.value = values.zoom.toFixed(2)
+  #   return
+  # ), 500
+  rect = container.getBoundingClientRect()
+  scroller.setPosition rect.left + container.clientLeft, rect.top + container.clientTop
+
+  # Reflow handling
+  reflow = ->
+    clientWidth = container.clientWidth
+    console.log clientWidth
+    clientHeight = container.clientHeight
+    scroller.setDimensions clientWidth, clientHeight, clientWidth, clientHeight
+    # xxx need to fix the above line
+    return
+
+  window.addEventListener "resize", reflow, false
+  reflow()
+  # checkboxes = document.querySelectorAll("#settings input[type=checkbox]")
+  # i = 0
+  # l = checkboxes.length
+  document.querySelector("#container").addEventListener "click", (->
+    scroller.zoomBy 1.5, true
+    return
+  ), false
+  # while i < l
+  #   checkboxes[i].addEventListener "change", (->
+  #     scroller.options[@id] = @checked
+  #     return
+  #   ), false
+  #   i++
+  # document.querySelector("#settings #zoom").addEventListener "click", (->
+  #   scroller.zoomTo parseFloat(document.getElementById("zoomLevel").value)
+  #   return
+  # ), false
+  # document.querySelector("#settings #zoomIn").addEventListener "click", (->
+  #   scroller.zoomBy 1.2, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #zoomOut").addEventListener "click", (->
+  #   scroller.zoomBy 0.8, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollTo").addEventListener "click", (->
+  #   scroller.scrollTo parseFloat(document.getElementById("scrollLeft").value), parseFloat(document.getElementById("scrollTop").value), true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByUp").addEventListener "click", (->
+  #   scroller.scrollBy 0, -150, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByRight").addEventListener "click", (->
+  #   scroller.scrollBy 150, 0, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByDown").addEventListener "click", (->
+  #   scroller.scrollBy 0, 150, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByLeft").addEventListener "click", (->
+  #   scroller.scrollBy -150, 0, true
+  #   return
+  # ), false
+  if "ontouchstart" of window
+    container.addEventListener "touchstart", ((e) ->
+      
+      # Don't react if initial down happens on a form element
+      return  if e.touches[0] and e.touches[0].target and e.touches[0].target.tagName.match(/input|textarea|select/i)
+      scroller.doTouchStart e.touches, e.timeStamp
+      e.preventDefault()
+      return
+    ), false
+    document.addEventListener "touchmove", ((e) ->
+      scroller.doTouchMove e.touches, e.timeStamp, e.scale
+      return
+    ), false
+    document.addEventListener "touchend", ((e) ->
+      scroller.doTouchEnd e.timeStamp
+      return
+    ), false
+    document.addEventListener "touchcancel", ((e) ->
+      scroller.doTouchEnd e.timeStamp
+      return
+    ), false
+  else
+    mousedown = false
+    container.addEventListener "mousedown", ((e) ->
+      return  if e.target.tagName.match(/input|textarea|select/i)
+      scroller.doTouchStart [
+        pageX: e.pageX
+        pageY: e.pageY
+      ], e.timeStamp
+      mousedown = true
+      return
+    ), false
+    document.addEventListener "mousemove", ((e) ->
+      return  unless mousedown
+      scroller.doTouchMove [
+        pageX: e.pageX
+        pageY: e.pageY
+      ], e.timeStamp
+      mousedown = true
+      return
+    ), false
+    document.addEventListener "mouseup", ((e) ->
+      return  unless mousedown
+      scroller.doTouchEnd e.timeStamp
+      mousedown = false
+      return
+    ), false
+    container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
+      scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
+      return
+    ), false
+
+  
+  # // Test for background activity (slow down scrolling)
+  # setInterval(function() {
+  # var arr = [];
+  # for (var i=0, l=Math.random()*600; i<l; i++) {
+  #   arr.push.call(arr, document.querySelectorAll(".abc" + i));
+  # }
+  # }, 50);
+  
+
+
+
 
 @drawData = (data) ->
   #create canvas over position of background
@@ -79,6 +236,8 @@ Template.userGridData.userGridData = ->
     
     scaledX = Math.floor((CurX-1-leftOffset)/pixelWidth)
     scaledY = Math.floor((CurY)/pixelHeight-topOffset)
+    # scaledX = Math.floor((CurX-1-globalleft)/globalpixelwidth)
+    # scaledY = Math.floor((CurY-globaltop)/globalpixelwidth)
     # console.log scaledX
     xx = Session.get "myx"
     yy = Session.get "myy"
@@ -202,9 +361,12 @@ Template.userGridData.userGridData = ->
     CurX = (if (window.Event) then e.pageX else event.clientX + ((if document.documentElement.scrollLeft then document.documentElement.scrollLeft else document.body.scrollLeft)))
     CurY = (if (window.Event) then e.pageY else event.clientY + ((if document.documentElement.scrollTop then document.documentElement.scrollTop else document.body.scrollTop)))
     
-    scaledX = Math.floor((CurX-1-leftOffset)/pixelWidth)
-    scaledY = Math.floor((CurY)/pixelHeight-topOffset)
-    # console.log scaledX
+    # scaledX = Math.floor((CurX-1-leftOffset)/pixelWidth)
+    # scaledY = Math.floor((CurY)/pixelHeight-topOffset)
+    scaledX = Math.floor((CurX-1)/globalpixelwidth)
+    scaledY = Math.floor((CurY)/globalpixelwidth)
+    console.log scaledX
+    console.log scaledY
     xx = Session.get "myx"
     yy = Session.get "myy"
 
@@ -321,5 +483,3 @@ Template.userGridData.userGridData = ->
   document.onmousemove = throttledMouse
 
   
-
-

@@ -39,10 +39,10 @@ var Scroller;
 			animationDuration: 250,
 
 			/** Enable bouncing (content can be slowly moved outside and jumps back after releasing) */
-			bouncing: true,
+			bouncing: false,
 
 			/** Enable locking to the main axis if user moves only slightly on one of them at start */
-			locking: true,
+			locking: false,
 
 			/** Enable pagination mode (switching between full page content panes) */
 			paging: false,
@@ -54,10 +54,10 @@ var Scroller;
 			zooming: false,
 
 			/** Minimum zoom level */
-			minZoom: 0.5,
+			minZoom: 1.0,
 
 			/** Maximum zoom level */
-			maxZoom: 3,
+			maxZoom: 50,
 
 			/** Multiply or decrease scrolling speed **/
 			speedMultiplier: 1,
