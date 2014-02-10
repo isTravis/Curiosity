@@ -8,7 +8,7 @@
 @TopThousand = new Meteor.Collection "topthousand"
 @TopTenThousand = new Meteor.Collection "toptenthousand"
 @TopMillion = new Meteor.Collection "topmillion"
-@SelectMillion = new Meteor.Collection "selectmillion"
+@UserGridData = new Meteor.Collection "usergriddata"
 # @isReady = new Meteor.Collection "links"
 
-@TopPages = new Meteor.Collection "toppages"
+# @TopPages = new Meteor.Collection "toppages"

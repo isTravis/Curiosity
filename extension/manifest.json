@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://curiosity.meteor.com/"],
+      "matches": ["http://localhost:3000/grid"],
       "js": ["src/js/script.js"]
     }
   ],

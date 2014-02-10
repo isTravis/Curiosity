@@ -18,5 +18,15 @@
 	<div class="gridcanvas">
 		<canvas id="myCanvas" class="wtfcanvas" width="1000" height="1000"></canvas>
 	</div>
+
+	{{>userGridData}}
 	
+</template>
+
+
+<template name="userGridData">
+	{{userGridData}}
+	{{#constant}}
+		<div class="datacanvas"><canvas id="dataCanvas"  width="1000" height="1000"></canvas></div>
+	{{/constant}}
 </template>

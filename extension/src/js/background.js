@@ -8,7 +8,7 @@
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 function checkForValidUrl(tabId, changeInfo, tab) {
-  if (tab.url == "http://curiosity.meteor.com/") {
+  if (tab.url == "http://localhost:3000/grid") {
   // if (tab.url == "http://curiosity.meteor.com/") {
     chrome.pageAction.show(tabId); // show the page action
 
@@ -49,7 +49,7 @@ function sendNewHistory(startTime, localHistory, userID){
   var numRequestsOutstanding = 0;
   chrome.history.search({
       'text': 'http://en.wikipedia.org/wiki/*',              // Return every history item....
-      'maxResults': 500,
+      'maxResults': 50000,
       'startTime': (startTime+.1) // Give the .1 as a little buffer to avoid long float comparisons falling the wrong way
     },
     function(historyItems) {

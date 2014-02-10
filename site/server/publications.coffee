@@ -7,75 +7,153 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
     if historyValues
 	    console.log "historyValues be" + historyValues
 	    beginEverything(historyValues, receivedHistoryTime, userID)
+	    # beginEverythingGrid(historyValues, receivedHistoryTime, userID)
 
     console.log "finished updated"
     return WikiData.find()
 
-Meteor.publish "topHundredThousandPub", ->
-    TopHundredThousand.find()
 
-Meteor.publish "topTenThousandPub", ->
-    TopTenThousand.find()
+Meteor.publish "userGridDataPub", (historyValues, receivedHistoryTime, userID) ->
+    console.log "just Updated"
+    # console.log "updated " + updated
+    # if updated 
+    console.log "Beginning new"
+    console.log "About to Begin everything with userID " + userID
+    if historyValues
+	    console.log "historyValues be" + historyValues
+	    # beginEverything(historyValues, receivedHistoryTime, userID)
+	    beginEverythingGrid(historyValues, receivedHistoryTime, userID)
 
-Meteor.publish "topThousandPub", ->
-    TopThousand.find()
+    console.log "finished updated"
+    return UserGridData.find()
 
-# Meteor.TopMillion._ensureIndex(x: 1, y: 1)
 
-Meteor.publish "topMillionPub", (myx,myy) ->
-	# sub = this
-	# collectionName = 'selectmillion'
-	console.log myx
-	console.log myy
+Meteor.publish "topThousandPub", (zoom)->
+	if zoom == 1000
+		TopThousand.find()
+	else
+		this.stop()
+
+Meteor.publish "topTenThousandPub", (zoom) ->
+	if zoom == 10000
+		TopTenThousand.find()
+	else
+		this.stop()
+
+Meteor.publish "topHundredThousandPub", (zoom, myx,myy) ->
+	if zoom == 100000
+		radius = 10
+		results = TopHundredThousand.find({x: {$gt:myx-radius, $lt:myx+radius}, y: {$gt:myy-radius, $lt:myy+radius}  })
+		console.log "----"
+		return results
+	else
+		this.stop()
 	
-	results = TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  })
-	console.log "----"
-	# _.forEach results, (result) ->
-	# 	# console.log result
-	# 	sub.added collectionName, result._id, result
-	# sub.ready()
-	return results
-    # console.log myx
-    # # console.log TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  }).count()
-    # return TopMillion.find({x: {$gt:myx-10, $lt:myx+10}, y: {$gt:myy-10, $lt:myy+10}  })
-    # console.log TopMillion.findOne({x:myx,y:myy})
-    # TopMillion.find({x:myx,y:myy})
+
+Meteor.publish "topMillionPub", (zoom, myx,myy) ->
+	if zoom == 1000000
+		console.log myx
+		console.log myy
+		radius = 10
+		results = TopMillion.find({x: {$gt:myx-radius, $lt:myx+radius}, y: {$gt:myy-radius, $lt:myy+radius}  })
+		console.log "----"
+		return results
+	else
+		this.stop()
 
 
 
-# Meteor.publish "mostRecentGifsPub", (numGifs) ->
-#     sub = this
-#     collectionName = "mostRecentGifs"
 
-#     gifCount = Gifs.find().count()
-#     if numGifs == "0"
-#         #return all
-#         for i in [gifCount-1..0]
-#             gif = Gifs.findOne({intID: i})
-#             sub.added collectionName, gif._id, gif
-#     else
-#         #return numGifs
-#         for i in [gifCount-1..gifCount-numGifs]
-#             gif = Gifs.findOne({intID: i})
-#             sub.added collectionName, gif._id, gif
+@beginEverythingGrid = (historyValues, receivedHistoryTime, userID) ->
+	console.log "well son of a gun"
+	visitHistory = []
+	visitedTitles = []
 
-#     sub.ready()
-#     return
+	haveEverything = 1
 
-Meteor.publish "topPagesPub", (zoom,myx,myy) ->
-	bufferLength = 8
-	switch (zoom)
-		when 9
-			return TopThousand.find()
-		when 1000
-			return TopPages.find({rank: {$lt:1001}})
-		when 10000
-			return TopPages.find({rank: {$lt:10001}})
-		when 100000
+	# Want to iterate through all titles and check if they are in the zoom we're currently in.
+	# make array of those objects, return them, (by storing in usergriddata)
+	#client side add a new canvas over it and render the colours.
 
-			return TopPages.find({x: {$gt:myx-bufferLength, $lt:myx+bufferLength}, y: {$gt:myy-bufferLength, $lt:myy+bufferLength}  })
-		when 1000000
-			return TopMillion.find({x: {$gt:myx-bufferLength, $lt:myx+bufferLength}, y: {$gt:myy-bufferLength, $lt:myy+bufferLength}  })
+	if haveEverything
+		startTime = new Date().getTime()
+		console.log "Starting Title Building"
+		# For each history item in value
+		# countyy = 0
+		pageHistory = {}
+		visitedIDs = []
+		scrapedIDs = {}
+		startTime = new Date().getTime()	
+		_.forEach historyValues, (e) ->
+			# console.log countyy
+			# console.log e
+			# countyy++
+			title = e.title.split(" - Wiki")[0]
+			url = e.url.split("://")[1].split("#")[0]
+			visitCount = e.visitCount
+			visitTime = e.lastVisitTime
+			if testURL(e.url) #
+				# console.log 
+				pageObject = PageIDs.findOne({url:url})
+
+				if pageObject
+					# console.log pageObject
+					pageID = pageObject['pageID']
+					#great we have everything, no scraping or anything, just compile from the known and go
+					if title == ''
+						title = pageObject['title']
+
+					pageHistory[pageID] = {url:url, title:title, visitTime:visitTime, visitCount:visitCount}
+					visitedIDs.push(pageID)
+					scrapedIDs[pageID] = title
+
+				else
+					console.log "No Page: " + url
+					# Could just be a redirect, check by title instead, maybe? e.title
+					# add it to the queue of things we need to scrape - but don't do it now.
+
+		gridHistory = []
+
+		selectedIDs = []
+		# _.forEach visitedIDs, (id1) ->
+
+		gridObject = TopMillion.find({pageID: {$in: visitedIDs}})
+		gridHistory = gridObject.fetch()
+			# console.log gridObject
+			# if gridObject
+			# 	gridHistory.push(gridObject)
+
+		# console.log gridHistory
+
+		if gridHistory.length > 0
+			if userID != null
+				console.log "got a gridhistory"
+				# console.log pageHistory
+				if UserGridData.findOne({accountID:userID})
+					UserGridData.update(
+						accountID: userID
+					,
+						$set:
+							gridHistory: gridHistory
+							# receivedHistoryTime: receivedHistoryTime
+							pageHistory: pageHistory
+							# edges: myEdges
+							# scrapedIDs: scrapedIDs
+					)
+				else
+					# Generate a random hash use that as ID
+					# make sure to send it back to extension and have it stored
+					# will have to pass it in here to this function above for future iterations
+					UserGridData.insert(
+						accountID: userID
+						gridHistory: gridHistory
+						pageHistory: pageHistory
+						# edges: myEdges
+						# scrapedIDs: scrapedIDs
+					)
+
+	else 
+		dontHaveThings(historyValues, receivedHistoryTime, userID)
 
 
 
