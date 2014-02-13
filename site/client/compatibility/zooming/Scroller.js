@@ -54,7 +54,7 @@ var Scroller;
 			zooming: false,
 
 			/** Minimum zoom level */
-			minZoom: 1.0,
+			minZoom: 1.00,
 
 			/** Maximum zoom level */
 			maxZoom: 50,

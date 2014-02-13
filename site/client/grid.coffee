@@ -41,6 +41,15 @@ Template.userGridData.userGridData = ->
   contentHeight = 800
   cellWidth = 1
   cellHeight = 1
+  clientWidth = window.innerWidth 
+  clientWidth = clientWidth - 50
+  clientHeight = window.innerHeight - 200
+  availableWidthRatio = clientWidth/contentWidth
+  availableHeightRatio = clientHeight/contentHeight
+
+  console.log availableHeightRatio
+  console.log availableWidthRatio
+
   content = document.getElementById("dataCanvas")
   console.log content
   context = content.getContext("2d")
@@ -57,6 +66,7 @@ Template.userGridData.userGridData = ->
     console.log "herree"
     content = document.getElementById("dataCanvas")
     # Sync current dimensions with canvas
+    console.log "setting content width to " + clientWidth
     content.width = clientWidth
     content.height = clientHeight
     
@@ -71,11 +81,15 @@ Template.userGridData.userGridData = ->
 
   # Cell Paint Logic
   paint = (row, col, left, top, width, height, zoom) ->
-    if (row+col) % 10 is 0
+    if (col+row) % 100 is 0
       r = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 20) % 255)
       g = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 5) % 255)
       b = Math.floor((row + Math.floor(Math.pow(row+Math.pow(col,2),3)) * 2) % 255)
       
+      # r = row/1250*255
+      # g = 0
+      # b = 0
+
       # context.fillStyle = row%2 + col%2 > 0 ? "#ddd" : "#fff";
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height
@@ -83,10 +97,13 @@ Template.userGridData.userGridData = ->
   # @initZoom = () ->
   # Intialize layout
   container = document.getElementById("container")
+  container.setAttribute("style","height:"+ clientHeight+ "px; width:"+ clientWidth+ "px;")
+  # container.setAttribute("style","width:"+ clientWidth+ "px;")
+
   console.log container
   content = document.getElementById("dataCanvas")
-  clientWidth = 0
-  clientHeight = 0
+  # clientWidth = 0
+  # clientHeight = 0
 
   # Initialize Scroller
   @scroller = new Scroller(render,
@@ -95,6 +112,10 @@ Template.userGridData.userGridData = ->
   scrollLeftField = document.getElementById("scrollLeft")
   scrollTopField = document.getElementById("scrollTop")
   zoomLevelField = document.getElementById("zoomLevel")
+
+  scroller.options.minZoom = Math.min(1.0, availableWidthRatio, availableHeightRatio)
+  # scroller.options.minZoom =1.1
+
   # setInterval (->
   #   values = scroller.getValues()
   #   scrollLeftField.value = values.left.toFixed(2)
@@ -119,10 +140,10 @@ Template.userGridData.userGridData = ->
   # checkboxes = document.querySelectorAll("#settings input[type=checkbox]")
   # i = 0
   # l = checkboxes.length
-  document.querySelector("#container").addEventListener "click", (->
-    scroller.zoomBy 1.5, true
-    return
-  ), false
+  # document.querySelector("#container").addEventListener "click", (->
+  #   scroller.zoomBy 1.5, true
+  #   return
+  # ), false
   # $('body').keypress ->
   #   console.log 'wellyea'
 
@@ -220,10 +241,10 @@ Template.userGridData.userGridData = ->
       mousedown = false
       return
     ), false
-    container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
-      scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
-      return
-    ), false
+    # container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
+    #   scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
+    #   return
+    # ), false
 
   
   # // Test for background activity (slow down scrolling)
@@ -413,8 +434,11 @@ Template.userGridData.userGridData = ->
 
         console.log "hi"
         console.log zoomLevel
+        # console.log thisThing
         console.log thisThing.articleTitle
+
       thisThing = mything.findOne({x:scaledX, y:scaledY})
+      console.log thisThing
       document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
     return
 
