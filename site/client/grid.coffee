@@ -15,7 +15,7 @@ Template.mgrid.rendered = ->
 
   # initZoom()
   testDraw()
-  render(975,600,5)
+  # render(975,600,5)
 
 
 Template.userGridData.userGridData = ->
