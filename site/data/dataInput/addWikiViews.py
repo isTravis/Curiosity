@@ -103,7 +103,7 @@ for lineItem in in_file.readlines():
 sorted_articles = sorted(viewDict.iteritems(), key=operator.itemgetter(1), reverse=True)
 # print sorted_articles
 outputJSON = []
-outputArticles = 100000
+outputArticles = 1000000
 outputCounter = 1
 
 tempx = -1
@@ -132,7 +132,7 @@ for item in sorted_articles:
   # json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
 # c_tophundred.insert(outputJSON)
 # c_topthousand.insert(outputJSON)
-c_tophundredthousand.insert(outputJSON)
+c_topmillion.insert(outputJSON)
 
 # count = 0
 # startTime = time.time()

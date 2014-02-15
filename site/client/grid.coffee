@@ -42,8 +42,8 @@ Template.userGridData.userGridData = ->
   cellWidth = 1
   cellHeight = 1
   clientWidth = window.innerWidth 
-  clientWidth = clientWidth - 50
-  clientHeight = window.innerHeight - 200
+  clientWidth = Math.min(clientWidth - 50, 1250)
+  clientHeight = Math.min(window.innerHeight - 200, 800)
   availableWidthRatio = clientWidth/contentWidth
   availableHeightRatio = clientHeight/contentHeight
 
@@ -241,10 +241,11 @@ Template.userGridData.userGridData = ->
       mousedown = false
       return
     ), false
-    # container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
-    #   scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
-    #   return
-    # ), false
+    container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
+      scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
+      e.preventDefault()
+      return
+    ), false
 
   
   # // Test for background activity (slow down scrolling)
