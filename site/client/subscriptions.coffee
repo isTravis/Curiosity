@@ -22,9 +22,9 @@ Deps.autorun ->
 	zoom = Session.get "zoom"
 	myx = Session.get "myx"
 	myy = Session.get "myy"
-	topThousandSub = Meteor.subscribe "topThousandPub", zoom
-	topTenThousandSub = Meteor.subscribe "topTenThousandPub", zoom
-	topHundredThousandSub = Meteor.subscribe "topHundredThousandPub", zoom, myx, myy
+	# topThousandSub = Meteor.subscribe "topThousandPub", zoom
+	# topTenThousandSub = Meteor.subscribe "topTenThousandPub", zoom
+	# topHundredThousandSub = Meteor.subscribe "topHundredThousandPub", zoom, myx, myy
 	topMillionSub = Meteor.subscribe "topMillionPub", zoom, myx, myy
 
     # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy

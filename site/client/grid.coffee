@@ -81,7 +81,7 @@ Template.userGridData.userGridData = ->
 
   # Cell Paint Logic
   paint = (row, col, left, top, width, height, zoom) ->
-    if (col+row) % 100 is 0
+    if (col+row) % 1 is 0
       r = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 20) % 255)
       g = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 5) % 255)
       b = Math.floor((row + Math.floor(Math.pow(row+Math.pow(col,2),3)) * 2) % 255)
@@ -241,11 +241,11 @@ Template.userGridData.userGridData = ->
       mousedown = false
       return
     ), false
-    container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
-      scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
-      e.preventDefault()
-      return
-    ), false
+    # container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
+    #   scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
+    #   e.preventDefault()
+    #   return
+    # ), false
 
   
   # // Test for background activity (slow down scrolling)
@@ -516,7 +516,7 @@ Template.userGridData.userGridData = ->
 
   document.captureEvents Event.MOUSEMOVE  if window.captureEvents
   # document.onmousemove = getCursorXY
-  throttledMouse = _.throttle(getCursorXY, 50)
+  throttledMouse = _.throttle(getCursorXY, 100)
   document.onmousemove = throttledMouse
 
   
