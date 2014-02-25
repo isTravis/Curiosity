@@ -8,7 +8,7 @@
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 function checkForValidUrl(tabId, changeInfo, tab) {
-  if (tab.url == "http://localhost:3000/grid") {
+  if (tab.url == "http://localhost:3000/") {
   // if (tab.url == "http://curiosity.meteor.com/") {
     chrome.pageAction.show(tabId); // show the page action
 

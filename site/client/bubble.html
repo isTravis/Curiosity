@@ -1,0 +1,88 @@
+<template name="bubble">
+	<body>
+		<section class="header">
+			<div class="title">
+				<h1 class="main-title">CURIOSITY</h1>
+			</div>
+			
+			<div class="nav">
+				<h2>About </h2>
+				<h2>My Data</h2>
+				<h2>FAQ</h2>
+				<h2>Share</h2>
+
+
+			</div>
+			
+		</section>
+
+		<section class="main">
+			<section class="welcome">
+				
+				
+				{{>status}}
+			</section>
+
+			<section class="data">
+				{{>settings}}
+				
+				<section class="map">
+					{{#constant}}
+						<div class="wikimap"></div>
+					{{/constant}}
+				</section>
+				<section class="timeline">
+
+				</section>
+			</section>
+		</section>
+		
+
+		<section class="hidden">
+			{{>wikiData}}
+		</section>
+		<!-- <div id="here"></div> -->
+	</body>
+</template>
+
+<template name="wikiData">
+	{{wikiData}}
+</template>
+
+<template name="timeline">
+	{{timeline}}
+</template>
+
+<template name = "status">
+	<div class="status ">{{status}}</div>
+</template>
+
+
+
+
+<template name="settings">
+	<div class="settings">
+		<i class="fa fa-cog" data-placement="right" data-toggle="tooltip" data-animation="true" title="Settings"></i>
+		<div class="controls hidden">
+			<!-- <div id="install">Install Extension</div> -->
+
+			<div class="control node-slider">
+				<h3 class='slider-title'>Node Slider</h3>
+				<input type="range" min="50" max="550" value="200" step="50" class="nodeRange">
+			</div>
+
+			<div class="control strength-slider">
+				<h3 class='slider-title'>Strength slider</h3>
+				<input type="range" min="1" max="10" value="10" step="1" class="strengthRange">
+			</div>
+
+			<div class="control submit">
+				<h4 class="redraw">Re-Draw</h4>
+				
+			</div>
+			
+			
+
+		</div>
+	</div>
+</template>

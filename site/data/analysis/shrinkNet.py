@@ -121,5 +121,59 @@ def main():
 # 	print "Reduced to " + str(reducedEdgesCount) + " vertices."
 # 	return reducedEdgesCount
 
-main()
+# def properRemoveVertices():
+# 	strengths = g.edge_properties["strength"]
+# 	degreePropMap = g.degree_property_map("total", weight=strengths)
+# 	for v in g.vertices():
+# 		toDelete = []
+# 		totalWeightedDegree = degreePropMap[v]
+# 		for e in v.all_edges():
+# 			if strengths[e] < totalWeightedDegree/10:
+# 				toDelete.append(e)
+# 		for e in toDelete:
+# 			g.remove_edge(e)
+# 		deleted += 1
+
+def main2():
+	startTime = time.time()
+	print "Loading Graph..."
+	g = load_graph("../fullNet.xml.gz")
+	# g = load_graph("fullNet_small.xml.gz")
+	# g = load_graph("fullNet_noedgeslessthan20.xml.gz")
+	print "Done loading Graph"
+	finishTime = time.time()
+	print "Took " + str((finishTime-startTime)/60) + " minutes to load graph"
+  
+	strengths = g.edge_properties["strength"]
+	degreePropMap = g.degree_property_map("total", weight=strengths)
+	
+	startTime = time.time()
+	totalVertices = g.num_vertices()
+	verticeIndex = 0
+	deleted = 0
+	for v in g.vertices():
+		toDelete = []
+		totalWeightedDegree = degreePropMap[v]
+		for e in v.all_edges():
+			if strengths[e] < totalWeightedDegree/10:
+				toDelete.append(e)
+		for e in toDelete:
+			g.remove_edge(e)
+		deleted += 1
+		verticeIndex += 1
+		if verticeIndex % 10000 == 0:
+			lapTime = time.time()
+			print "Finished " + str(verticeIndex)
+			print "Remaining Time: " + str((lapTime-startTime)/verticeIndex*(totalVertices-verticeIndex)/60) + " minutes"
+			print "-------------------------"
+	print "Just Deleted " + str(deleted) + " edges!"
+	print "Remaining edges: " + str(g.num_edges())
+	finishTime = time.time()
+	print "Took " + str((finishTime-startTime)/60) + " minutes to remove edges"
+	g.save("fullNet_noedgeslessthan10percent.xml.gz")
+
+
+# main()
+main2()
+
 

@@ -17,7 +17,7 @@ Deps.autorun ->
 	# wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime, userID
 	# Since main.coffee runs in all situations, nneed a way to make sure only the single publication is run
 	
-	userGridDataSub = Meteor.subscribe "userGridDataPub", historyValues, receivedHistoryTime, userID
+	UserData = Meteor.subscribe "userDataPub", historyValues, receivedHistoryTime, userID
 
 	zoom = Session.get "zoom"
 	myx = Session.get "myx"

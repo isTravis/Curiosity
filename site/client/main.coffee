@@ -1,461 +1,524 @@
-window.addEventListener "message", ((event) ->
-  # We only accept messages from ourselves
-  return  unless event.source is window
-  if (event.data.type and (event.data.type is "FROM_PAGE_WIKI"))
-    console.log "gotWikimessage"
-    # console.log "message gotten"
-    console.log event.data.text
-    console.log "number of pages: " + event.data.text.length
-    Session.set "status", "Parsing Wikipedia History: " + event.data.text.length + " New Pages."
-    # Meteor.call "inputHistory", event.data.text
-    Session.set "updated", event.data.text
-    Session.set "historyValues", event.data.text
+
+
+mything = {}
+mygridData = []
+globalpixelwidth = 1
+globalleft = 0
+globaltop = 0
+Template.mgrid.created = ->
+  Session.set "myx", 0
+  Session.set "myy", 0
+  Session.set "zoom", 1000000
+
+Template.mgrid.rendered = ->
+  drawit()
+  # drawData(mygridData)
+  # content = document.getElementById("dataCanvas")
+
+  # initZoom()
+  testDraw()
+  # render(975,600,5)
+
+
+Template.userData.userData = ->
+  # console.log "inUpdatedWiki"
+  # if Session.get "updated"
+  # console.log "updated was true"
+  userID = Session.get "userID"
+  # drawData()
+  # if userID == ''
+  #   userID = 
+  console.log "in User Grid data tempalte"
+  xx = UserData.findOne({accountID:userID})
+
+  if xx
+    console.log xx['gridHistory']
+    drawData(xx['gridHistory'])
+
+
+
+@testDraw = () ->
+  console.log "here we are"
+  contentWidth = 1250
+  contentHeight = 800
+  cellWidth = 1
+  cellHeight = 1
+  clientWidth = window.innerWidth 
+  clientWidth = Math.min(clientWidth - 50, 1250)
+  clientHeight = Math.min(window.innerHeight - 200, 800)
+  availableWidthRatio = clientWidth/contentWidth
+  availableHeightRatio = clientHeight/contentHeight
+
+  console.log availableHeightRatio
+  console.log availableWidthRatio
+
+  content = document.getElementById("dataCanvas")
+  console.log content
+  context = content.getContext("2d")
+  tiling = new Tiling
+
+  # Canvas renderer
+  @render = (left, top, zoom) ->
+    console.log "left " + left
+    globalpixelwidth = zoom
+    globalleft = left
+    globaltop = top
+    console.log globalpixelwidth
+    console.log "top " + top
+    console.log "herree"
+    content = document.getElementById("dataCanvas")
+    # Sync current dimensions with canvas
+    console.log "setting content width to " + clientWidth
+    content.width = clientWidth
+    content.height = clientHeight
     
-    userID = event.data.userID
-    if userID == ''
-    	console.log "Got Empy ID"
-    	userID = makeID()
-    	console.log "User ID is now: " + userID
-    Session.set "userID", userID
-    # console.log "event.data.text " + event.data.text
-    Session.set "receivedHistoryTime", new Date().getTime()
-    # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
-  else if (event.data.type and (event.data.type is "FROM_PAGE_EDGES"))
-    # console.log "hereere"
-    console.log "Gotedgemessage"
-    Session.set "status", "Parsing Edges History"
-    # Meteor.call "inputHistory", event.data.text
-    Session.set "updated", event.data.text
-    Session.set "edges", event.data.text
-    Session.set "scrapedIDs", event.data.scrapedIDs
-    console.log "inmessage ids" + event.data.scrapedIDs
-    # Session.set "userID", event.data.userID
-    draw(200)
-    # console.log event.data.text
-    # console.log "event.data.text " + event.data.text
-    Session.set "receivedHistoryTime", new Date().getTime()
-    # console.log "MessageHistory time " + (Session.get "receivedHistoryTime")
+    # Full clearing
+    context.clearRect 0, 0, clientWidth, clientHeight
+    
+    # Use tiling
+    tiling.setup clientWidth, clientHeight, contentWidth, contentHeight, cellWidth, cellHeight
+    tiling.render left, top, zoom, paint
+    return
+
+
+  # Cell Paint Logic
+  paint = (row, col, left, top, width, height, zoom) ->
+    if (col+row) % 100 is 0
+      r = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 20) % 255)
+      g = Math.floor((Math.floor(Math.pow(row+Math.pow(col,2),3)) + col * 5) % 255)
+      b = Math.floor((row + Math.floor(Math.pow(row+Math.pow(col,2),3)) * 2) % 255)
+      
+      # r = row/1250*255
+      # g = 0
+      # b = 0
+
+      # context.fillStyle = row%2 + col%2 > 0 ? "#ddd" : "#fff";
+      context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
+      context.fillRect left, top, width, height
+    return
+  # @initZoom = () ->
+  # Intialize layout
+  container = document.getElementById("container")
+  container.setAttribute("style","height:"+ clientHeight+ "px; width:"+ clientWidth+ "px;")
+  # container.setAttribute("style","width:"+ clientWidth+ "px;")
+
+  console.log container
+  content = document.getElementById("dataCanvas")
+  # clientWidth = 0
+  # clientHeight = 0
+
+  # Initialize Scroller
+  @scroller = new Scroller(render,
+    zooming: true
+  )
+  scrollLeftField = document.getElementById("scrollLeft")
+  scrollTopField = document.getElementById("scrollTop")
+  zoomLevelField = document.getElementById("zoomLevel")
+
+  scroller.options.minZoom = Math.min(1.0, availableWidthRatio, availableHeightRatio)
+  # scroller.options.minZoom =1.1
+
+  # setInterval (->
+  #   values = scroller.getValues()
+  #   scrollLeftField.value = values.left.toFixed(2)
+  #   scrollTopField.value = values.top.toFixed(2)
+  #   zoomLevelField.value = values.zoom.toFixed(2)
+  #   return
+  # ), 500
+  rect = container.getBoundingClientRect()
+  scroller.setPosition rect.left + container.clientLeft, rect.top + container.clientTop
+
+  # Reflow handling
+  reflow = ->
+    clientWidth = container.clientWidth
+    console.log clientWidth
+    clientHeight = container.clientHeight
+    scroller.setDimensions clientWidth, clientHeight, clientWidth, clientHeight
+    # xxx need to fix the above line
+    return
+
+  window.addEventListener "resize", reflow, false
+  reflow()
+  # checkboxes = document.querySelectorAll("#settings input[type=checkbox]")
+  # i = 0
+  # l = checkboxes.length
+  # document.querySelector("#container").addEventListener "click", (->
+  #   scroller.zoomBy 1.5, true
+  #   return
+  # ), false
+  # $('body').keypress ->
+  #   console.log 'wellyea'
+
+  document.addEventListener "keydown", (->
+    console.log event.keyCode
+    if event.keyCode == 65
+        scroller.zoomBy 1.5, true
+    if event.keyCode == 83
+        scroller.zoomBy 0.5, true
+    
+    return
+  ), false
+  # while i < l
+  #   checkboxes[i].addEventListener "change", (->
+  #     scroller.options[@id] = @checked
+  #     return
+  #   ), false
+  #   i++
+  # document.querySelector("#settings #zoom").addEventListener "click", (->
+  #   scroller.zoomTo parseFloat(document.getElementById("zoomLevel").value)
+  #   return
+  # ), false
+  # document.querySelector("#settings #zoomIn").addEventListener "click", (->
+  #   scroller.zoomBy 1.2, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #zoomOut").addEventListener "click", (->
+  #   scroller.zoomBy 0.8, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollTo").addEventListener "click", (->
+  #   scroller.scrollTo parseFloat(document.getElementById("scrollLeft").value), parseFloat(document.getElementById("scrollTop").value), true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByUp").addEventListener "click", (->
+  #   scroller.scrollBy 0, -150, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByRight").addEventListener "click", (->
+  #   scroller.scrollBy 150, 0, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByDown").addEventListener "click", (->
+  #   scroller.scrollBy 0, 150, true
+  #   return
+  # ), false
+  # document.querySelector("#settings #scrollByLeft").addEventListener "click", (->
+  #   scroller.scrollBy -150, 0, true
+  #   return
+  # ), false
+  if "ontouchstart" of window
+    container.addEventListener "touchstart", ((e) ->
+      
+      # Don't react if initial down happens on a form element
+      return  if e.touches[0] and e.touches[0].target and e.touches[0].target.tagName.match(/input|textarea|select/i)
+      scroller.doTouchStart e.touches, e.timeStamp
+      e.preventDefault()
+      return
+    ), false
+    document.addEventListener "touchmove", ((e) ->
+      scroller.doTouchMove e.touches, e.timeStamp, e.scale
+      return
+    ), false
+    document.addEventListener "touchend", ((e) ->
+      scroller.doTouchEnd e.timeStamp
+      return
+    ), false
+    document.addEventListener "touchcancel", ((e) ->
+      scroller.doTouchEnd e.timeStamp
+      return
+    ), false
+  else
+    mousedown = false
+    container.addEventListener "mousedown", ((e) ->
+      return  if e.target.tagName.match(/input|textarea|select/i)
+      scroller.doTouchStart [
+        pageX: e.pageX
+        pageY: e.pageY
+      ], e.timeStamp
+      mousedown = true
+      return
+    ), false
+    document.addEventListener "mousemove", ((e) ->
+      return  unless mousedown
+      scroller.doTouchMove [
+        pageX: e.pageX
+        pageY: e.pageY
+      ], e.timeStamp
+      mousedown = true
+      return
+    ), false
+    document.addEventListener "mouseup", ((e) ->
+      return  unless mousedown
+      scroller.doTouchEnd e.timeStamp
+      mousedown = false
+      return
+    ), false
+    container.addEventListener (if navigator.userAgent.indexOf("Firefox") > -1 then "DOMMouseScroll" else "mousewheel"), ((e) ->
+      scroller.doMouseZoom (if e.detail then (e.detail * -120) else e.wheelDelta), e.timeStamp, e.pageX, e.pageY
+      e.preventDefault()
+      return
+    ), false
+
   
-), false
+  # // Test for background activity (slow down scrolling)
+  # setInterval(function() {
+  # var arr = [];
+  # for (var i=0, l=Math.random()*600; i<l; i++) {
+  #   arr.push.call(arr, document.querySelectorAll(".abc" + i));
+  # }
+  # }, 50);
+  
 
 
-Template.hasExtension.events =
-	"click #hasExtension": (d) ->
-		console.log "just clicked it"
-		chrome.webstore.install()
-		console.log "and after"
-
-Template.settings.events = 
-	"mouseenter .fa-cog": (d) ->
-		srcE = if d.srcElement then d.srcElement else d.target
-		console.log srcE.parentNode
-		# srcE = srcE.parentNode
-		$(srcE.parentNode).children(".controls").removeClass("hidden")
 
 
+@drawData = (data) ->
+  #create canvas over position of background
+  #iterate over array of data
+  # create blocks in each spot
+  getCursorXY = (e) ->
+    CurX = (if (window.Event) then e.pageX else event.clientX + ((if document.documentElement.scrollLeft then document.documentElement.scrollLeft else document.body.scrollLeft)))
+    CurY = (if (window.Event) then e.pageY else event.clientY + ((if document.documentElement.scrollTop then document.documentElement.scrollTop else document.body.scrollTop)))
     
-	"mouseleave div.controls": (d) ->
-		srcE = if d.srcElement then d.srcElement else d.target
-		console.log srcE.parentNode
-		console.log srcE
-		# srcE = srcE.parentNode
-		$(".controls").addClass("hidden")
+    scaledX = Math.floor((CurX-1-leftOffset)/pixelWidth)
+    scaledY = Math.floor((CurY)/pixelHeight-topOffset)
+    # scaledX = Math.floor((CurX-1-globalleft)/globalpixelwidth)
+    # scaledY = Math.floor((CurY-globaltop)/globalpixelwidth)
+    # console.log scaledX
+    xx = Session.get "myx"
+    yy = Session.get "myy"
 
+    if zoomLevel == 1000
+      thisThing = TopThousand.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    else if zoomLevel == 10000
+      thisThing = TopTenThousand.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    if zoomLevel == 100000
+      # thisThing = TopHundredThousand.findOne({x:scaledX, y:scaledY})
+      # document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+      if Math.abs(xx - scaledX) > 8 or Math.abs(yy - scaledY) > 8
+        Session.set "myx", scaledX
+        Session.set "myy", scaledY
+        # console.log "Just reset"
+        mything = TopHundredThousand
+        thisThing = mything.findOne({x:scaledX, y:scaledY})
 
-	"click .install": (d) ->
-		chrome.webstore.install()
+        console.log "hi"
+        console.log zoomLevel
+        console.log thisThing.articleTitle
+      thisThing = mything.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    else if zoomLevel == 1000000
+      if Math.abs(xx - scaledX) > 8 or Math.abs(yy - scaledY) > 8
+        Session.set "myx", scaledX
+        Session.set "myy", scaledY
+        # console.log "Just reset"
+        mything = TopMillion
+        thisThing = mything.findOne({x:scaledX, y:scaledY})
 
+        console.log "hi"
+        console.log zoomLevel
+        console.log thisThing.articleTitle
+      thisThing = mything.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    return
 
-	"change .node-slider": (d) ->
-		nodeVal = $(".nodeRange").attr("value")
-		draw(nodeVal)
-
-	"click .submit": (d)->
-		# console.log "wat"
-		srcE = if d.srcElement then d.srcElement else d.target
-		nodeVal = $(".nodeRange").attr("value")
-		strengthVal = $(".strengthRange").attr("value")
-		console.log nodeVal
-		# userID = Session.get "userID"
-		draw(nodeVal)
-		# nodeVal = $(".nodeRange").attr("value") 
-
-
-
-Template.wikiData.created = ->
-	Session.set "receivedHistoryTime", 0
-	Session.set "renderNetwork", {}
-	Session.set "status", "Reading Wikipedia History"
-
-	
-	# Session.set "status", "here" # page updates automatically!
-
-# Template.status.status = ->
-# 	return Session.get "status"
-
-
-	# console.log document.getElementById("hasExtension").html()
-
-Template.status.status = ->
-	Session.get "status"
-	# if $("#hasExtension")
-	# 	console.log "itis" + $("#hasExtension").html()
-	# 	if $("#hasExtension").html() != ""
-	# 		$(".status").addClass("hidden")
-	# 	else
-	# 		$(".status").removeClass("hidden")
-
-
-Template.wikiData.wikiData = ->
-	# console.log "inUpdatedWiki"
-	# if Session.get "updated"
-	# console.log "updated was true"
-	userID = Session.get "userID"
-	console.log "In Template, got user ID of " + userID
-	# if userID == ''
-	# 	userID = 
-	xx = WikiData.findOne({accountID:userID})
-	
-	if xx
-		# console.log "wikipub history rtime " + xx['receivedHistoryTime']
-		if xx['receivedHistoryTime'] == (Session.get "receivedHistoryTime")
-			if xx['edges']
-
-				scrapedIDs = xx['scrapedIDs']
-				Session.set "scrapedIDs", scrapedIDs
-				# console.log scrapedIDs
-				Session.set "status", "okkk"
-				# console.log xx['edges']
-				# networkData = buildNetwork(xx['scrapedHistory'])
-
-				# console.log Object.keys(networkData).length
-				# Session.set "networkData", networkData
-
-				# for n of networkData
-				# 	console.log n
-				# renderData = createJSON(networkData)
-				# clusterData = generateClusters(renderData)
-				# Session.set "clusterData", clusterData
-				# renderD4(clusterData) # Function is located in renderD3.coffee
-				# renderD4(clusterData)
-				startTime = new Date().getTime()
-				Session.set "edges", xx['edges']
-				# yy = buildGraph(xx['edges'])
-				# # console.log yy
-				# # console.log xx['pageHistory']
-
-				# renderD3(yy,xx['pageHistory'])
-				draw(200)
-
-				endTime = new Date().getTime()
-				totalNewTime = (endTime-startTime)/1000
-				console.log "Client Side" + " | " + totalNewTime 
-
-				postToExt(xx['edges'], userID, scrapedIDs)
-	
-	# localEdges = Session.get "edges"
-	# if localEdges
-	# 	xx = WikiData.findOne({accountID:'travis'})
-	# 	yy = buildGraph(localEdges)
-	# 	console.log "pagehistory"
-	# 	console.log xx
-	# 	renderD3(yy,xx['pageHistory'])
-		# postToExt([])
-		# Session.set "updated", false
-			# postToExt(xx['titles'])
-		# postToExt(xx['networkData'])
-
-	return WikiData.findOne({accountID:userID})
-
-
-@makeID = () ->
-  text = ""
-  possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-  i = 0
-
-  while i < 8
-    text += possible.charAt(Math.floor(Math.random() * possible.length))
-    i++
-  return text
-
-
-@postToExt = (xx, userID,scrapedIDs) ->
-	window.postMessage
-	  type: "FROM_Server"
-	  text: xx
-	  userID: userID
-	  scrapedIDs: scrapedIDs
-	, "*"
-
-		# How about no links, but a spectrum of colors, based on link connection. Not simply 6 colors, 
-		# but a wide spectrum that communicate connections. Too many links for them to actually show value.
-		# When you click, then you can draw all it's connections
-
-
-		# http://bl.ocks.org/mbostock/1748247
-
-@draw = (numNodes) ->
-	localEdges = Session.get "edges"
-	localIDs = Session.get "scrapedIDs"
-	userID = Session.get "userID"
-	# console.log ("thisuserID " + userID)
-	# xx = WikiData.findOne({accountID:userID})
-	# console.log ("thisxx " + xx)
-	# console.log xx
-	# console.log localHistory
-	yy = buildGraph(localEdges,numNodes)
-
-	# renderD3(yy,localIDs)
-
-	clusters = communityDetection(yy)
-
-	# # clusterData = generateClusters(yy)
-	renderD4(clusters,localIDs)
-
-
-
-
-# Build Network - and functions for building the network
-#################################################
-
-# @buildNetwork = (visitHistory, visitedTitles) ->
-@buildNetwork = (scrapedHistory) ->
-	console.log "Building Network..."
-	# Need to build out. This will be the renderable network
-	# will include links as well as time stamps and the such
-	# visitHistory.push({url:e.url.split("#")[0], title:thisTitle, visitTime:e.lastVisitTime, visitCount:e.visitCount})
-	numInMin = .02
-	sharedMin = 1
-
-	firstHopNetwork = {}
-	count = 0
-	statuscount = 0
-	pageListLength = Object.keys(scrapedHistory).length
-	# console.log "scrape length" + Object.keys(scrapedHistory).length
-	# console.log pageListLength
-	numInTitles = {}
-	totalOriginalTime=0;
-	totalNewTime = 0;
-	Session.set "status", "Building Network Nodes: Page "
-	# Get and built numIn counts
-	for visit of scrapedHistory
-		# console.log visit
-		# div = document.getElementById('here');
-		# div.innerHTML = div.innerHTML + statuscount;
-		console.log "Building Network Nodes: Page " + (statuscount+1) + " of " + pageListLength
-		Session.set "status", "Building Network Nodes: Page " + statuscount+1 + " of " + pageListLength
-		pageID = visit
-		if pageID != '-1'
-			numIn = numInLink(pageID, scrapedHistory)
-			numInNormal = numIn/scrapedHistory[pageID].length
-			# console.log getPageTitle(pageID)
-			# console.log numInNormal
-			if numInNormal > numInMin
-				numInTitles[pageID] = numIn
-		statuscount += 1
-
-	console.log "Done with numin"
-	# console.log "numintitles " + Object.keys(numInTitles).length
-	# Get and build connections		
-	statuscount = 0
-
-	for page of numInTitles
-		Session.set "status", "Building Network Links: Page " + statuscount+1 + " of " + pageListLength
-		# console.log "OMG THIS IS AWESOME!!!!!"
-		pageID = page
-		pageTitle = getPageTitle(pageID) 
-		numIn = numInTitles[pageID]
-		# console.log 'PageTitle ' + pageTitle + ' | pageID ' + pageID + ' | numIn ' + numIn
-
-		index = count
-		connections = {}
-
-		# startTime = new Date().getTime()
-		for destPage of numInTitles
-			if parseInt(destPage) != parseInt(pageID)
-				sharedLinks= sharedLinkCount(scrapedHistory[pageID], scrapedHistory[destPage])
-				if sharedLinks > sharedMin
-					connections[destPage] = sharedLinks
-		# endTime = new Date().getTime()
-		# totalNewTime += (endTime-startTime)/1000
-
-
-
-		if Object.keys(connections).length > 0
-			
-			# firstHopNetwork[pageID] = [index,pageTitle,numIn,connections]
-			firstHopNetwork[pageID] = [index,pageID,pageTitle,numIn,connections]
-			count += 1
-
-		statuscount += 1
-
-	console.log firstHopNetwork
-	for i of firstHopNetwork
-		# console.log firstHopNetwork[i]
-		console.log firstHopNetwork[i][2] + " | " + firstHopNetwork[i][3] + " | " + Object.keys(firstHopNetwork[i][4]).length
-
-
-	# console.log firstHopNetwork
-	# console.log "New: " + totalNewTime + " seconds"
-	console.log "Done With Network..."
-	# console.log Object.keys(firstHopNetwork).length
-	return firstHopNetwork
-
-
-
-@sharedLinkCount = (linkList1, linkList2) ->
-  linkList1.sort()
-  linkList2.sort()
-  ai = bi = 0
-  result = []
-  while ai < linkList1.length and bi < linkList2.length
-    # console.log a[ai]
-    # console.log b[bi]
-    if linkList1[ai] < linkList2[bi]
-      ai++
-    else if linkList1[ai] > linkList2[bi]
-      bi++
-    # they're equal 
+  if data.length > 0
+    mygridData = data
+  zoomLevel = Session.get "zoom"
+  switch (zoomLevel)
+    when 9
+      numBlocksHori = 3
+      numBlocksVert = 3
+    when 1000
+      numBlocksHori = 40
+      numBlocksVert = 25
+    when 10000
+      numBlocksHori = 125
+      numBlocksVert = 80
+    when 100000
+      numBlocksHori = 400
+      numBlocksVert = 250
+    when 1000000
+      numBlocksHori = 1250
+      numBlocksVert = 800
     else
-      result.push ai
-      ai++
-      bi++
-  return result.length
+      numBlocksHori = 1
+      numBlocksVert = 1
 
 
-	
+  width = document.getElementById("myCanvas").width
+  height = document.getElementById("myCanvas").height
+  # console.log height
+  pixelWidth = Math.max(Math.floor(width/numBlocksHori), 1)
+  pixelHeight = Math.max(Math.floor(height/numBlocksVert),1)
 
-@numInLink = (pageID,scrapedHistory) ->
-	# console.log "HereNumInLInk"
-	pageTitle = getPageTitle(pageID)
-	inLinks = 0
-	for i of scrapedHistory
-		histID = i
-		histLinks = scrapedHistory[i]
-		try
-			# console.log page
-			# console.log Links.findOne({pageID:getPageID(page)})
-			if histLinks.indexOf(pageTitle) > -1
-				inLinks += 1
-		catch err
-			console.log histID
-			# console.log Links.findOne({pageID:getPageID(page)})
-			# console.log err
-	return inLinks
+  leftOffset = parseInt($('#myCanvas').css('marginLeft'))
 
+  # $('.datacanvas').css('top', 0)
+  $('.datacanvas').css('left', leftOffset)
 
-@getPageTitle = (pageID) ->
-	# console.log "here"
-	# console.log "here" + Session.get "scrapedIDs"
-	IDs = Session.get "scrapedIDs"
-	thisTitle = IDs[pageID]
-	if thisTitle # If we have the pageID already, return that.
-		return thisTitle
-	else
-		return 'noPageFound'
+  canvas2 = document.getElementById("dataCanvas")
+  canvas2.width = Math.max(numBlocksHori*pixelWidth, numBlocksHori)
+  canvas2.height = Math.max(numBlocksVert*pixelHeight, numBlocksVert)
+  context2 = canvas2.getContext("2d")
+  leftOffset = parseInt($('#myCanvas').css('marginLeft'))
+  topOffset = parseInt($('#myCanvas').css('marginTop'))
 
+  mcount = 0
+  i = 0
+  
+  # data = [{'x':5, 'y':10},{'x':2, 'y':20},{'x':15, 'y':10}]
+  console.log "length" + data.length
+  _.forEach data, (block) ->
+    blockx = parseInt(block['x'])
+    blocky = parseInt(block['y'])
+    context2.fillStyle = "rgba(" + 255 + "," + 0 + "," + 0 + "," + (255 / 255) + ")"
+    console.log blockx + " | " + blocky  + " | " + pixelWidth  + " | " + pixelHeight
+    context2.fillRect blockx*pixelWidth, blocky*pixelHeight, pixelWidth, pixelHeight
+  # while i < pixelWidth*numBlocksHori
+  #   j = 0
+  #   while j < pixelHeight*numBlocksVert
+  #     mcount += 1
+  #     r = Math.floor(Math.random() * 255)
+  #     g = Math.floor(Math.random() * 255)
+  #     b = Math.floor(Math.random() * 255)
+  #     context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
+  #     context.fillRect i, j, pixelWidth, pixelHeight
+  #     j += pixelHeight
+  #   i += pixelWidth
+  # console.log "i is " + i
+  # console.log "j is " + j
+  # console.log "mcount is " + mcount
 
+  # CurX = undefined
+  # CurY = undefined
 
-
-@createJSON = (network) ->
-	nodes = []
-	links = []
-	# count = 0
-	# missedConnections = 0
-
-	networkLength = Object.keys(network).length
-	# wtfcounter = 0
-	Session.set "status", "Formatting Network"
-	if networkLength
-		for i in [0..networkLength-1]
-			# console.log i
-			page = {}
-			for thispage of network
-				if network[thispage][0] == i
-					page = thispage
-			# if wtfcounter > 5000
-			# 	break
-			# console.log "Formatting Data: Page " + count+1 + " of " + networkLength
-			# console.log page
-			# console.log "network[page] " + network[page]
-			index = network[page][0]
-			title = network[page][2]
-			inLinks = network[page][3]
-			nodes.push({"name":title,"inlinks":inLinks})
-			for connection of network[page][4]
-				connectionTitle = connection
-
-				# print "Connection title: " + connectionTitle
-				# try
-					# console.log "in the try"
-					# console.log connectionTitle
-					# console.log connection
-				connectionIndex = network[connectionTitle][0]
-				# console.log "index " +connectionIndex
-				# console.log "linkstrength" + network[page][4][connection]
-				if connectionIndex != index
-					connectionStrength = network[page][4][connection]
-					links.push({"source":index,"target":connectionIndex,"value":connectionStrength})
-				# catch err
-				# 	console.log "inthemissed"
-				# 	missedConnections +=1
-			# count += 1
-			# wtfcounter += 1
-			# console.log  "Missed Connections: " + missedConnections
-
-		outputJSON = {"nodes":nodes,"links":links}
-	# console.log outputJSON
-	return outputJSON
-
-
-# # def createJSON(network):
-# 	# nodes = []
-# 	# links = []
-# 	# count = 0
-# 	# missedConnections = 0
-# 	# networkLength = len(network)
-# 	# wtfcounter = 0
-# 	# for page in network:
-# 	for i in range(networkLength):
-# 		page = {}
-# 		for thispage in network:
-# 			if network[thispage][0] == i:
-# 				page = thispage
-# 		if wtfcounter > 5000:
-# 			break
-# 		print "Formatting Data: Page " + str(count+1) + " of " + str(networkLength)
-# 		index = network[page][0]
-# 		print "Compare: " +str(wtfcounter) + " " + str(index)
-# 		title = network[page][1]
-# 		inLinks = network[page][2]
-# 		# if inLinks > 0:
-# 		nodes.append({"name":title,"inlinks":inLinks})
-# 		# nodes.append({"name":title,"inlinks":1})
-# 		print "network[page][3]: " 
-# 		print network[page][3]
-# 		for connection in network[page][3]:
-# 			connectionTitle = connection
-# 			print "Connection title: " + connectionTitle
-# 			try:
-# 				connectionIndex = network[connectionTitle][0]
-# 				if connectionIndex != index:
-# 					connectionStrength = sharedLinkCount(title, connectionTitle)
-# 					links.append({"source":index,"target":connectionIndex,"value":connectionStrength})
-# 			except:
-# 				missedConnections +=1
-# 		count += 1
-# 		wtfcounter += 1
-# 	print "Missed Connections: " + str(missedConnections)
-# 	outputJSON = {"nodes":nodes,"links":links}
-# 	# Write .json file out
-# 	with open('../../public/netDataTest.json', 'w') as outfile:
-# 	  json.dump(outputJSON, outfile, sort_keys=True, indent=3, separators=(',', ': '))
+  # document.captureEvents Event.MOUSEMOVE  if window.captureEvents
+  # # document.onmousemove = getCursorXY
+  # throttledMouse = _.throttle(getCursorXY, 50)
+  # document.onmousemove = throttledMouse
 
 
 
+@drawit = () ->
+  getCursorXY = (e) ->
+    CurX = (if (window.Event) then e.pageX else event.clientX + ((if document.documentElement.scrollLeft then document.documentElement.scrollLeft else document.body.scrollLeft)))
+    CurY = (if (window.Event) then e.pageY else event.clientY + ((if document.documentElement.scrollTop then document.documentElement.scrollTop else document.body.scrollTop)))
+    
+    # scaledX = Math.floor((CurX-1-leftOffset)/pixelWidth)
+    # scaledY = Math.floor((CurY)/pixelHeight-topOffset)
+    scaledX = Math.floor((CurX-1)/globalpixelwidth)
+    scaledY = Math.floor((CurY)/globalpixelwidth)
+    console.log scaledX
+    console.log scaledY
+    xx = Session.get "myx"
+    yy = Session.get "myy"
+
+    if zoomLevel == 1000
+      thisThing = TopThousand.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    else if zoomLevel == 10000
+      thisThing = TopTenThousand.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    if zoomLevel == 100000
+      # thisThing = TopHundredThousand.findOne({x:scaledX, y:scaledY})
+      # document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+      if Math.abs(xx - scaledX) > 8 or Math.abs(yy - scaledY) > 8
+        Session.set "myx", scaledX
+        Session.set "myy", scaledY
+        # console.log "Just reset"
+        mything = TopHundredThousand
+        thisThing = mything.findOne({x:scaledX, y:scaledY})
+
+        console.log "hi"
+        console.log zoomLevel
+        console.log thisThing.articleTitle
+      thisThing = mything.findOne({x:scaledX, y:scaledY})
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    else if zoomLevel == 1000000
+      if Math.abs(xx - scaledX) > 8 or Math.abs(yy - scaledY) > 8
+        Session.set "myx", scaledX
+        Session.set "myy", scaledY
+        # console.log "Just reset"
+        mything = TopMillion
+        thisThing = mything.findOne({x:scaledX, y:scaledY})
+
+        console.log "hi"
+        console.log zoomLevel
+        # console.log thisThing
+        console.log thisThing.articleTitle
+
+      thisThing = mything.findOne({x:scaledX, y:scaledY})
+      console.log thisThing
+      document.getElementById("label").innerHTML = thisThing.articleTitle + "   |   " + thisThing.viewCount
+    return
 
 
+  zoomLevel = Session.get "zoom"
+  switch (zoomLevel)
+    when 9
+      numBlocksHori = 3
+      numBlocksVert = 3
+    when 1000
+      numBlocksHori = 40
+      numBlocksVert = 25
+    when 10000
+      numBlocksHori = 125
+      numBlocksVert = 80
+    when 100000
+      numBlocksHori = 400
+      numBlocksVert = 250
+    when 1000000
+      numBlocksHori = 1250
+      numBlocksVert = 800
+    else
+      numBlocksHori = 1
+      numBlocksVert = 1
 
 
+  width = window.innerWidth*0.95
+  height = window.innerHeight*0.95
+  # console.log height
+  pixelWidth = Math.max(Math.floor(width/numBlocksHori), 1)
+  pixelHeight = Math.max(Math.floor(height/numBlocksVert),1)
 
 
+  canvas = document.getElementById("myCanvas")
+  canvas.width = Math.max(numBlocksHori*pixelWidth, numBlocksHori)
+  canvas.height = Math.max(numBlocksVert*pixelHeight, numBlocksVert)
+  context = canvas.getContext("2d")
+  leftOffset = parseInt($('#myCanvas').css('marginLeft'))
+  topOffset = parseInt($('#myCanvas').css('marginTop'))
+
+  mcount = 0
+  i = 0
+  
+  while i < pixelWidth*numBlocksHori
+    j = 0
+    while j < pixelHeight*numBlocksVert
+      mcount += 1
+      # r = Math.floor(Math.random() * 255)
+      # g = Math.floor(Math.random() * 255)
+      # b = Math.floor(Math.random() * 255)
+      # r = Math.floor(128+(Math.random()*25));
+      # g = Math.floor(230+(Math.random()*25));
+      # b = Math.floor(50+(Math.random()*25));
+      # r = x[i][j];
+      # g = x[i][j];
+      # b = x[i][j];
+      r = 0;
+      g = 0;
+      b = 0;
+      # r = Math.floor((i+j)%255);
+      # g = Math.floor((i+j+130)%255);
+      # b = Math.floor((i+j+200)%255);
+      # console.log(b);
+      context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
+      context.fillRect i, j, pixelWidth, pixelHeight
+      j += pixelHeight
+    i += pixelWidth
+  console.log "i is " + i
+  console.log "j is " + j
+  console.log "mcount is " + mcount
+
+  CurX = undefined
+  CurY = undefined
+
+  document.captureEvents Event.MOUSEMOVE  if window.captureEvents
+  # document.onmousemove = getCursorXY
+  throttledMouse = _.throttle(getCursorXY, 250)
+  document.onmousemove = throttledMouse
+
+  

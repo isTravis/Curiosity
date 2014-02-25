@@ -2,8 +2,8 @@ Router.map ->
     @route "main",
     	path: "/"
 
-    @route "grid",
-    	path: "/grid/"
+    @route "bubble",
+    	path: "/bubble/"
 
     # @route "results"
 

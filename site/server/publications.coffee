@@ -13,7 +13,7 @@ Meteor.publish "wikiDataPub", (historyValues, receivedHistoryTime, userID) ->
     return WikiData.find()
 
 
-Meteor.publish "userGridDataPub", (historyValues, receivedHistoryTime, userID) ->
+Meteor.publish "userDataPub", (historyValues, receivedHistoryTime, userID) ->
     console.log "just Updated"
     # console.log "updated " + updated
     # if updated 
@@ -25,7 +25,7 @@ Meteor.publish "userGridDataPub", (historyValues, receivedHistoryTime, userID) -
 	    beginEverythingGrid(historyValues, receivedHistoryTime, userID)
 
     console.log "finished updated"
-    return UserGridData.find()
+    return UserData.find()
 
 
 Meteor.publish "topThousandPub", (zoom)->
@@ -51,7 +51,9 @@ Meteor.publish "topHundredThousandPub", (zoom, myx,myy) ->
 	
 
 Meteor.publish "topMillionPub", (zoom, myx,myy) ->
+	console.log "yea Im calling"
 	if zoom == 1000000
+
 		console.log myx
 		console.log myy
 		radius = 10
@@ -72,7 +74,7 @@ Meteor.publish "topMillionPub", (zoom, myx,myy) ->
 	haveEverything = 1
 
 	# Want to iterate through all titles and check if they are in the zoom we're currently in.
-	# make array of those objects, return them, (by storing in usergriddata)
+	# make array of those objects, return them, (by storing in UserData)
 	#client side add a new canvas over it and render the colours.
 
 	if haveEverything
@@ -129,8 +131,8 @@ Meteor.publish "topMillionPub", (zoom, myx,myy) ->
 			if userID != null
 				console.log "got a gridhistory"
 				# console.log pageHistory
-				if UserGridData.findOne({accountID:userID})
-					UserGridData.update(
+				if UserData.findOne({accountID:userID})
+					UserData.update(
 						accountID: userID
 					,
 						$set:
@@ -144,7 +146,7 @@ Meteor.publish "topMillionPub", (zoom, myx,myy) ->
 					# Generate a random hash use that as ID
 					# make sure to send it back to extension and have it stored
 					# will have to pass it in here to this function above for future iterations
-					UserGridData.insert(
+					UserData.insert(
 						accountID: userID
 						gridHistory: gridHistory
 						pageHistory: pageHistory
