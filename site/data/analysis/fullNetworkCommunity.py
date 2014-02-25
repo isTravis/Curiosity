@@ -40,7 +40,7 @@ def sfdp_layout():
 	finishTime = time.time()
 	print "Total Time: " + str((finishTime-startTime)/60) + " minutes"
 	
-	pickle.dump(pos, open( "testNetwork_pos_1iter.p", "wb" ) )
+	# pickle.dump(pos, open( "testNetwork_pos_1iter.p", "wb" ) )
 	graph_draw(g, pos=pos, output="graph-draw-sfdp_1iter.pdf")
 
 # minimize_blockmodel_dl()

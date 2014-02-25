@@ -37,8 +37,9 @@ import pickle
 def main():
 	startTime = time.time()
 	print "Loading Graph..."
-	g = load_graph("../fullNet.xml.gz")
+	# g = load_graph("../fullNet.xml.gz")
 	# g = load_graph("fullNet_small.xml.gz")
+	g = load_graph("fullNet_noedgeslessthan20.xml.gz")
 	print "Done loading Graph"
 	finishTime = time.time()
 	print "Took " + str((finishTime-startTime)/60) + " minutes to load graph"
@@ -52,7 +53,7 @@ def main():
 	for v in g.vertices():
 		toDelete = []
 		for e in v.all_edges():
-			if strengths[e] < 5:
+			if strengths[e] < 50:
 				toDelete.append(e)
 		for e in toDelete:
 			g.remove_edge(e)
@@ -67,7 +68,7 @@ def main():
 	print "Remaining edges: " + str(g.num_edges())
 	finishTime = time.time()
 	print "Took " + str((finishTime-startTime)/60) + " minutes to remove edges"
-	g.save("fullNet_noedgeslessthan5.xml.gz")
+	g.save("fullNet_noedgeslessthan50.xml.gz")
 	# inrange = find_edge_range(g,strengths,[0,5])
 
 
@@ -101,9 +102,7 @@ def main():
 # 				g.remove_vertex(v, fast=True)
 # 	except:
 # 		yy = 0
-# 	reducedVertexCount = 0
-# 	for v in g.vertices():
-# 		reducedVertexCount += 1
+# 	reducedVertexCount = g.num_vertices()
 # 	print "Reduced to " + str(reducedVertexCount) + " vertices."
 # 	return reducedVertexCount
  
