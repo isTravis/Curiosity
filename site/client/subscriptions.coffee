@@ -11,22 +11,25 @@
 # An overview of deps.autorun is documented here: http://docs.meteor.com/#reactivity
 Deps.autorun ->
 	# maxNumShown = Session.get "maxNumShown" # Get the session variable
-	receivedHistoryTime = Session.get "receivedHistoryTime"
-	historyValues = Session.get "historyValues"
-	userID = Session.get "userID"
-	# wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime, userID
-	# Since main.coffee runs in all situations, nneed a way to make sure only the single publication is run
+	# receivedHistoryTime = Session.get "receivedHistoryTime"
+	# historyValues = Session.get "historyValues"
+	# userID = Session.get "userID"
+	# # wikiDataSub = Meteor.subscribe "wikiDataPub", historyValues, receivedHistoryTime, userID
+	# # Since main.coffee runs in all situations, nneed a way to make sure only the single publication is run
 	
-	UserData = Meteor.subscribe "userDataPub", historyValues, receivedHistoryTime, userID
+	# UserData = Meteor.subscribe "userDataPub", historyValues, receivedHistoryTime, userID
 
-	zoom = Session.get "zoom"
-	myx = Session.get "myx"
-	myy = Session.get "myy"
-	# topThousandSub = Meteor.subscribe "topThousandPub", zoom
-	# topTenThousandSub = Meteor.subscribe "topTenThousandPub", zoom
-	# topHundredThousandSub = Meteor.subscribe "topHundredThousandPub", zoom, myx, myy
-	topMillionSub = Meteor.subscribe "topMillionPub", zoom, myx, myy
+	# zoom = Session.get "zoom"
+	# myx = Session.get "myx"
+	# myy = Session.get "myy"
+	# # topThousandSub = Meteor.subscribe "topThousandPub", zoom
+	# # topTenThousandSub = Meteor.subscribe "topTenThousandPub", zoom
+	# # topHundredThousandSub = Meteor.subscribe "topHundredThousandPub", zoom, myx, myy
+	# topMillionSub = Meteor.subscribe "topMillionPub", zoom, myx, myy
 
+	userTitles = Session.get "userTitles"
+	userGridDataSub = Meteor.subscribe "userGridDataPub", userTitles
+	userLinksSub = Meteor.subscribe "userLinksPub", userTitles
     # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy
 
    

@@ -25,20 +25,20 @@ function checkAndSendHistory(){
   var localHistory = {};
   var userID = '';
   chrome.storage.local.get(function(d) {
-    if(d.localHistory){
-      localHistory = d.localHistory;
-      hasLocal  = true;
-      console.log("Local History Available");
-    }
-    if(hasLocal == true){
-      var startTime = d.lastVisitTime; // XXX set to be the last value in the local history
-      // console.log("last" + d.lastVisitTime);
-      userID = d.userID
-      sendNewHistory(startTime, localHistory, userID);
-    }else{
+    // if(d.localHistory){
+    //   localHistory = d.localHistory;
+    //   hasLocal  = true;
+    //   console.log("Local History Available");
+    // }
+    // if(hasLocal == true){
+    //   var startTime = d.lastVisitTime; // XXX set to be the last value in the local history
+    //   // console.log("last" + d.lastVisitTime);
+    //   userID = d.userID
+    //   sendNewHistory(startTime, localHistory, userID);
+    // }else{
       var startTime = 0;
       sendNewHistory(startTime, [], userID);
-    }
+    // }
     
   });
 }

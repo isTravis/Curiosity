@@ -4,6 +4,8 @@
 @UserData = new Meteor.Collection "userdata"
 
 
+# @UserGridData = new Meteor.Collection "usergriddata"
+
 
 
 
