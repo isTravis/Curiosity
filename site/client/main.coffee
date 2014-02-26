@@ -169,6 +169,7 @@ Template.dataGrid.dataGrid = ->
     xPos = Math.floor((left+correctedX)/zoom)
     yPos = Math.floor((top+correctedY)/zoom)
 
+    # console.log xPos + " | " + yPos
     thisTitle = dataArray[yPos][xPos]
     if thisTitle != undefined
       document.getElementById("label").innerHTML = dataArray[yPos][xPos]
