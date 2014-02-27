@@ -46,18 +46,20 @@ Template.links.map = ->
   if myMap.length 
     myLinks = []
     notMyLinks = []
+    IDs = {}
     links = myMap[0]["titledLinks"]
     _.forEach links, (link) ->
       if link["pageID"] of myIDs
         # console.log myIDs[link]["title"]
-        console.log link["title"]
+        console.log link
         myLinks.push(link["title"])
       else
         notMyLinks.push(link["title"])
+        IDs[link["title"]]= link["pageID"]
     notMyLinks = notMyLinks.slice(0,(35-myLinks.length))
 
     myLinks = myLinks.concat(notMyLinks)
-    buildCentricNet(myMap[0]["articleTitle"], myLinks)
+    buildCentricNet(myMap[0]["articleTitle"], myLinks, IDs)
     console.log myLinks.length
 
 
@@ -98,7 +100,7 @@ Template.links.map = ->
     myTitles[title] = {title:title, pageID:pageID}
     myIDs[pageID] = {title:title, pageID:pageID}
 
-@buildCentricNet = (centerNode,links) ->
+@buildCentricNet = (centerNode,links,IDs) ->
   mnodes = []
   mlinks = []
   height = 800
@@ -111,6 +113,7 @@ Template.links.map = ->
   linkNum = 1
   _.forEach links, (link) ->
     twopi = 2*Math.PI
+    console.log link
     mx = center + 125 * Math.cos(twopi/numLinks*linkNum)
     my = center + 125 * Math.sin(twopi/numLinks*linkNum)
     if link of myTitles
@@ -169,6 +172,9 @@ Template.links.map = ->
       nodeSelection.select("text").style(opacity: "1.0")
       nodeSelection.select("circle").style("stroke","#444")
       
+    )
+    .on("click", (d) ->
+      Session.set "clickedItem", IDs[d.name]
     )
 
   node = gnodes.append("circle")
