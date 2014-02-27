@@ -19,10 +19,13 @@ Template.dataGrid.dataGrid = ->
     
   return 
 
+Template.main.events =
+  "click #hasExtension": (d) ->
+    chrome.webstore.install()
+
 Template.dataGrid.events =
   "click ": (d) ->
     console.log xPos + " clicked " + yPos
-    document.getElementById("titleText").innerHTML = dataArray[yPos][xPos]
     console.log myTitles[dataArray[yPos][xPos]]
     Session.set "clickedItem", myTitles[dataArray[yPos][xPos]]["pageID"]
     console.log Session.get "clickedItem"
@@ -30,6 +33,8 @@ Template.links.events =
   "click .backgroundBlur": ->
     $('svg').remove()
     $('.backgroundBlur').remove()
+  "click #viz": ->
+    console.log "gotit"
 
 Template.links.created = ->
   Session.set "clickedItem", 0
@@ -64,12 +69,17 @@ Template.links.map = ->
       array[i][j] = undefined
 
   _.forEach data, (item) ->
-    x = item['y'] # Yes, I realized I switch x and y in the db. Oops. 
-    y = item['x']
-    if x > 1250
-      x = x-2150
-      y = y+400
-    array[y][x] = item["articleTitle"]
+    x = item['x'] # Yes, I realized I switch x and y in the db. Oops. 
+    y = item['y']
+
+    rank = x + (y*400 )
+    xx = rank %1250
+    yy = Math.floor(rank/1250)
+    # console.log xx + " | " + yy
+    # if x > 1250
+    #   x = x-1250
+    #   y = y+400
+    array[yy][xx] = item["articleTitle"]
 
   return array
 
@@ -94,8 +104,8 @@ Template.links.map = ->
   height = 800
   width = 800
   center = height/2
-  mnodes.push({"name":centerNode,"group":1, r:50, color:"white", x: center, y: center, fixed:true})
-
+  mnodes.push({"name":centerNode,"group":1, r:50, color:"black", x: center, y: center, fixed:true})
+  document.getElementById("label").innerHTML = centerNode
 
   numLinks = links.length
   linkNum = 1
@@ -177,6 +187,7 @@ Template.links.map = ->
       d.name
     )
     .style("opacity", "1.0")
+    .style("fill", "#ccc")
 
 
 

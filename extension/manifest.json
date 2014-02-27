@@ -1,6 +1,6 @@
 {
   "name": "Curiosity",
-  "version": "0.3",
+  "version": "0.4",
   "description": "Reads your wiki History, build the network map",
   "permissions": [
     "history",
