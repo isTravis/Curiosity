@@ -13,17 +13,18 @@
 #     return WikiData.find()
 
 Meteor.publish "userGridDataPub", (userTitles) ->
-	# console.log "in the userGrid Pub"
-	console.log userTitles.length + " titles long"
 	# console.log userTitles
-	results = TopMillion.find( { articleTitle: { $in: userTitles } } )
-	console.log results.fetch().length + " titles found"
-	return results
+	if userTitles isnt null
+		console.log userTitles.length + " titles submitted"
 
-Meteor.publish "userLinksPub", (userTitles) ->
+		results = TopMillion.find( { articleTitle: { $in: userTitles } } )
+		console.log results.fetch().length + " titles found"
+		return results
+
+Meteor.publish "userLinksPub", (userTitles, clickedItem) ->
 	# MUST MUST add the userTitles value to the wikilinks db.
-	# return WikiLinks.find( { articleTitle: { $in: userTitles } } )
-	return 0
+	return WikiLinks.find( { pageID: clickedItem })
+	# return 0
 
 # Meteor.publish "userDataPub", (historyValues, receivedHistoryTime, userID) ->
 #     console.log "just Updated"

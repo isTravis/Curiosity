@@ -11,12 +11,13 @@
 	<body>
 		{{>hasExtension}}
 		<div class="title-bar">
-			<h1>Explore</h1>
+			<h1 id="titleText">Explore</h1>
 		</div>
 		{{>dataGrid}}
 		<div class="details">
 			<h1 id="label">Label</h1>
 		</div>
+		{{>links}}
 		
 	</body>
 </template>
@@ -32,6 +33,14 @@
 	
 </template>
 
+<template name = "links">
+
+	{{map}}
+	{{#constant}}
+	<div class="blur"></div>
+	<div id="viz">OK</div>
+	{{/constant}}
+</template>
 
 <template name="userData">
 	{{userData}}

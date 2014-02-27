@@ -189,3 +189,14 @@
 # 		outputJSON = {"nodes":nodes,"links":links}
 # 	# console.log outputJSON
 # 	return outputJSON
+
+
+# @makeID = () ->
+#   text = ""
+#   possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#   i = 0
+
+#   while i < 8
+#     text += possible.charAt(Math.floor(Math.random() * possible.length))
+#     i++
+#   return text

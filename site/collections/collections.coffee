@@ -5,10 +5,6 @@
 
 
 # @UserGridData = new Meteor.Collection "usergriddata"
-
-
-
-
 # @WikiData = new Meteor.Collection "wikidata" 
 # @isReady = new Meteor.Collection "links"
 # @TopPages = new Meteor.Collection "toppages"

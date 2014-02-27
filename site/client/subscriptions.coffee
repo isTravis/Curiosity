@@ -1,16 +1,13 @@
-# Deps.autorun ->
-#     gamesSub = Meteor.subscribe "gamesPub"
-
-#     result = Session.get "newGameResult"
-#     playersSub = Meteor.subscribe "playersPub", result
-
-#     gameNum = Session.get "plotGameNum"
-#     plotDataSub = Meteor.subscribe "plotDataPub", gameNum
-#   
-
-# An overview of deps.autorun is documented here: http://docs.meteor.com/#reactivity
 Deps.autorun ->
-	# maxNumShown = Session.get "maxNumShown" # Get the session variable
+	userTitles = Session.get "userTitles"
+	userGridDataSub = Meteor.subscribe "userGridDataPub", userTitles
+
+	clickedItem = Session.get "clickedItem"
+	userLinksSub = Meteor.subscribe "userLinksPub", userTitles, clickedItem
+    
+
+    # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy
+    # maxNumShown = Session.get "maxNumShown" # Get the session variable
 	# receivedHistoryTime = Session.get "receivedHistoryTime"
 	# historyValues = Session.get "historyValues"
 	# userID = Session.get "userID"
@@ -26,10 +23,5 @@ Deps.autorun ->
 	# # topTenThousandSub = Meteor.subscribe "topTenThousandPub", zoom
 	# # topHundredThousandSub = Meteor.subscribe "topHundredThousandPub", zoom, myx, myy
 	# topMillionSub = Meteor.subscribe "topMillionPub", zoom, myx, myy
-
-	userTitles = Session.get "userTitles"
-	userGridDataSub = Meteor.subscribe "userGridDataPub", userTitles
-	userLinksSub = Meteor.subscribe "userLinksPub", userTitles
-    # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy
 
    
