@@ -61,6 +61,11 @@ Template.links.events =
     $('.backgroundBlur').remove()
     $('.closeRing').addClass("hidden")
 
+  "click .backgroundBlur": ->
+    $('svg').remove()
+    $('.backgroundBlur').remove()
+    $('.closeRing').addClass("hidden")
+
   "click #viz": ->
     console.log "gotit"
 
