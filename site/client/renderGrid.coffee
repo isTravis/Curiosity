@@ -1,4 +1,4 @@
-@drawData = (dataArray) ->
+@drawData = (dataArray, firstHopArray) ->
   contentWidth = 1250
   contentHeight = 800
   cellWidth = 1
@@ -38,6 +38,12 @@
       r = Math.floor(255)
       g = Math.floor(0)
       b = Math.floor(0)
+      context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
+      context.fillRect left, top, width, height
+    else if firstHopArray[row][col] 
+      r = Math.floor(0)
+      g = Math.floor(0)
+      b = Math.floor(255)
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height
     return
@@ -115,7 +121,7 @@
   ), false
 
 
-@initiateCursor = (dataArray) ->
+@initiateCursor = (dataArray, firstHopArray) ->
   printpos = (e) ->
     # console.log scroller.getValues()
     CurX = (if (window.Event) then e.pageX else event.clientX + ((if document.documentElement.scrollLeft then document.documentElement.scrollLeft else document.body.scrollLeft)))
@@ -132,8 +138,12 @@
 
     # console.log xPos + " | " + yPos
     thisTitle = dataArray[yPos][xPos]
-    if thisTitle != undefined
-      document.getElementById("label").innerHTML = dataArray[yPos][xPos]
+    fistLinkTitle = firstHopArray[yPos][xPos]
+    console.log fistLinkTitle
+    if thisTitle != undefined and $('.backgroundBlur').length==0
+      document.getElementById("label").innerHTML = thisTitle.replace(/_/g, " ")
+    else if fistLinkTitle != undefined and $('.backgroundBlur').length==0
+      document.getElementById("label").innerHTML = fistLinkTitle.replace(/_/g, " ")
     else
       document.getElementById("label").innerHTML = ""
 

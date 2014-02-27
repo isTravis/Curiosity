@@ -2,21 +2,33 @@ xPos = 0
 yPos = 0
 
 dataArray = []
+firstHopArray = []
 myTitles = {}
+firstHopTitles = {}
 myIDs = {}
+firstHopIDs = {}
 linksObject = {}
 
 
 # Template.dataGrid.dataGrid() # Can be called like so to resize the whole thing - to 'refresh'
 Template.dataGrid.dataGrid = ->
   myHistory = TopMillion.find() # This will be limited to only the topmillion that are published based on userTitles
-  if myHistory.count() # If we have any history items yet.
+  myFirstHops = FirstHops.find()
+  if myHistory.count() and myFirstHops.count()# If we have any history items yet.
     allItems = myHistory.fetch()
+    allFirstHops = myFirstHops.fetch()
+
     dataArray = buildArray(allItems)
-    drawData(dataArray)
-    initiateCursor(dataArray)
-    buildLinksList(allItems)
-    
+    firstHopArray = buildArray(allFirstHops)
+    drawData(dataArray,firstHopArray)
+
+    initiateCursor(dataArray,firstHopArray)
+    buildLinksList(allItems,1)
+    buildLinksList(allFirstHops,0)
+  
+  
+  # if myFirstHops.count()
+  #   console.log "We got firsts! " + myFirstHops.count()
   return 
 
 Template.main.events =
@@ -26,13 +38,29 @@ Template.main.events =
 Template.dataGrid.events =
   "click ": (d) ->
     console.log xPos + " clicked " + yPos
-    console.log myTitles[dataArray[yPos][xPos]]
-    Session.set "clickedItem", myTitles[dataArray[yPos][xPos]]["pageID"]
+    myTitle = myTitles[dataArray[yPos][xPos]]
+    firstTitle = firstHopTitles[firstHopArray[yPos][xPos]]
+    # if myTitl
+
+
+
+    if myTitle != undefined and $('.backgroundBlur').length==0
+      Session.set "clickedItem", myTitle["pageID"]
+    else if firstTitle != undefined and $('.backgroundBlur').length==0
+      Session.set "clickedItem", firstTitle["pageID"]
+    else
+      # Session.set "clickedItem", firstTitle
+      console.log "clicked Nothing"
+
+    # Session.set "clickedItem", myTitles[dataArray[yPos][xPos]]["pageID"]
     console.log Session.get "clickedItem"
+
 Template.links.events =
-  "click .backgroundBlur": ->
+  "click .closeRing": ->
     $('svg').remove()
     $('.backgroundBlur').remove()
+    $('.closeRing').addClass("hidden")
+
   "click #viz": ->
     console.log "gotit"
 
@@ -58,7 +86,7 @@ Template.links.map = ->
         IDs[link["title"]]= link["pageID"]
     notMyLinks = notMyLinks.slice(0,(35-myLinks.length))
 
-    myLinks = myLinks.concat(notMyLinks)
+    myLinks = myLinks.concat(notMyLinks).slice(0,35)
     buildCentricNet(myMap[0]["articleTitle"], myLinks, IDs)
     console.log myLinks.length
 
@@ -82,6 +110,7 @@ Template.links.map = ->
     #   x = x-1250
     #   y = y+400
     array[yy][xx] = item["articleTitle"]
+    # console.log array[yy][xx]
 
   return array
 
@@ -91,14 +120,23 @@ Template.links.map = ->
   xPos = x
   yPos = y
   
-@buildLinksList = (history) ->
-  _.forEach history, (item) ->
-    # console.log item
-    title = item["articleTitle"]
-    pageID = item["pageID"]
+@buildLinksList = (history,type) ->
+  if type == 1
+    _.forEach history, (item) ->
+      # console.log item
+      title = item["articleTitle"]
+      pageID = item["pageID"]
 
-    myTitles[title] = {title:title, pageID:pageID}
-    myIDs[pageID] = {title:title, pageID:pageID}
+      myTitles[title] = {title:title, pageID:pageID}
+      myIDs[pageID] = {title:title, pageID:pageID}
+  else
+    _.forEach history, (item) ->
+      # console.log item
+      title = item["articleTitle"]
+      pageID = item["pageID"]
+      
+      firstHopTitles[title] = {title:title, pageID:pageID}
+      firstHopIDs[pageID] = {title:title, pageID:pageID}
 
 @buildCentricNet = (centerNode,links,IDs) ->
   mnodes = []
@@ -139,6 +177,7 @@ Template.links.map = ->
 
   svg = d3.select("#viz").append("svg").attr("width", width).attr("height", height)
 
+  $('.closeRing').removeClass("hidden")
   
 
   # mnodes = network["nodes"]
@@ -165,16 +204,24 @@ Template.links.map = ->
       nodeSelection.select("circle").style(opacity: "1.0")
       nodeSelection.select("text").style(opacity: "1.0")
       nodeSelection.select("circle").style("stroke","#ccc")
+      if d.x == 400 and d.y == 400
+        nodeSelection.select("circle").style("cursor","pointer")
     )
     .on("mouseout", (d) ->
       nodeSelection = d3.select(this)
       nodeSelection.select("circle").style(opacity: "1.0")
       nodeSelection.select("text").style(opacity: "1.0")
       nodeSelection.select("circle").style("stroke","#444")
+
       
     )
     .on("click", (d) ->
       Session.set "clickedItem", IDs[d.name]
+      if d.x == 400 and d.y == 400
+        console.log "middle!"
+        url = "http://en.wikipedia.org/wiki/"+d.name
+        win = window.open(url, "_blank")
+        # win.focus()
     )
 
   node = gnodes.append("circle")
@@ -190,10 +237,11 @@ Template.links.map = ->
     
   labels = gnodes.append("text")
     .text((d) ->
-      d.name
+      d.name.replace(/_/g, " ")
     )
     .style("opacity", "1.0")
     .style("fill", "#ccc")
+    .style("pointer-events","none")
 
 
 

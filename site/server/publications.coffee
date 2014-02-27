@@ -21,10 +21,47 @@ Meteor.publish "userGridDataPub", (userTitles) ->
 		console.log results.fetch().length + " titles found"
 		return results
 
-Meteor.publish "userLinksPub", (userTitles, clickedItem) ->
+Meteor.publish "userLinksPub", (clickedItem) ->
 	# MUST MUST add the userTitles value to the wikilinks db.
 	return WikiLinks.find( { pageID: clickedItem })
 	# return 0
+
+Meteor.publish "firstHopPub", (userTitles) ->
+	if userTitles isnt null
+		allLinksObjects = WikiLinks.find({ articleTitle: { $in: userTitles } } ).fetch()
+		allFirstHops = []
+		# console.log allLinksObjects.count()
+		for object of allLinksObjects
+			# console.log 
+			allFirstHops = allFirstHops.concat(allLinksObjects[object]["links"])
+		
+		getDistinctArray = (arr) ->
+		  dups = {}
+		  arr.filter (el) ->
+		    hash = el.valueOf()
+		    isDup = dups[hash]
+		    dups[hash] = true
+		    not isDup
+
+		console.log allFirstHops.length
+		console.log getDistinctArray(allFirstHops).length
+		allResults = TopMillion.find( { pageID: { $in: getDistinctArray(allFirstHops) } } ).fetch()
+
+		sub = this
+		collectionName = "firsthops"
+		_.forEach allResults, (e) ->
+			sub.added collectionName, e._id, e 
+		sub.ready()
+		return
+		# var temp = {};
+		# for (var i = 0; i < array.length; i++)
+		# temp[array[i]] = true;
+		# var r = [];
+		# for (var k in temp)
+		# r.push(k);
+		# return r;
+
+	return 0
 
 # Meteor.publish "userDataPub", (historyValues, receivedHistoryTime, userID) ->
 #     console.log "just Updated"

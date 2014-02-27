@@ -3,6 +3,7 @@
 @TopMillion = new Meteor.Collection "topmillion" #Stores all the data about a specific article
 @UserData = new Meteor.Collection "userdata"
 
+@FirstHops = new Meteor.Collection "firsthops"
 
 # @UserGridData = new Meteor.Collection "usergriddata"
 # @WikiData = new Meteor.Collection "wikidata" 

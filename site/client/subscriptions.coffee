@@ -3,7 +3,10 @@ Deps.autorun ->
 	userGridDataSub = Meteor.subscribe "userGridDataPub", userTitles
 
 	clickedItem = Session.get "clickedItem"
-	userLinksSub = Meteor.subscribe "userLinksPub", userTitles, clickedItem
+	userLinksSub = Meteor.subscribe "userLinksPub", clickedItem
+
+	firstHopSub = Meteor.subscribe "firstHopPub", userTitles
+	
     
 
     # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy
