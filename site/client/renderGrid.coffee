@@ -139,7 +139,7 @@
     # console.log xPos + " | " + yPos
     thisTitle = dataArray[yPos][xPos]
     fistLinkTitle = firstHopArray[yPos][xPos]
-    console.log fistLinkTitle
+    # console.log fistLinkTitle
     if thisTitle != undefined and $('.backgroundBlur').length==0
       document.getElementById("label").innerHTML = thisTitle.replace(/_/g, " ")
     else if fistLinkTitle != undefined and $('.backgroundBlur').length==0
@@ -154,3 +154,43 @@
   # document.onmousemove = getCursorXY
   throttledMouse = _.throttle(printpos, 250)
   document.onmousemove = throttledMouse
+
+
+
+
+@scrollMap = (x,y)->
+  values = scroller.getValues()
+  zoom = scroller.getValues()['zoom']
+  scrollerx = scroller.getValues()['left']
+  scrollery = scroller.getValues()['top']
+  console.log values
+  console.log "I got "+x+" and "+y
+  console.log "Gunna scroll to "+x*zoom+" and "+y*zoom
+  
+  if zoom == 75
+    scroller.scrollTo(x*zoom-625+37.5,y*zoom-400+37.5,true)
+  else
+    doSomething = ->
+      zoom = scroller.getValues()['zoom']
+      scroller.scrollTo(x*zoom-625+37.5,y*zoom-400+37.5,true)
+      
+      return
+    setTimeout(doSomething, 500);
+    scroller.zoomTo 75, true
+  console.log "I'm at "+scroller.getValues()["left"]+" and "+scroller.getValues()["top"]
+  return
+
+  # i = 0
+  # while i < 5
+  #   setTimeout (->
+
+  #     console.log i
+  #     scrollerx +=1
+  #     scrollery +=1
+  #     i += 1
+      
+    #   return
+    # ), 1000
+    
+
+

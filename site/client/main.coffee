@@ -8,7 +8,7 @@ firstHopTitles = {}
 myIDs = {}
 firstHopIDs = {}
 linksObject = {}
-
+positions = {}
 
 # Template.dataGrid.dataGrid() # Can be called like so to resize the whole thing - to 'refresh'
 Template.dataGrid.dataGrid = ->
@@ -20,11 +20,14 @@ Template.dataGrid.dataGrid = ->
 
     dataArray = buildArray(allItems)
     firstHopArray = buildArray(allFirstHops)
+    buildPositions(allItems)
+    buildPositions(allFirstHops)
     drawData(dataArray,firstHopArray)
 
     initiateCursor(dataArray,firstHopArray)
     buildLinksList(allItems,1)
     buildLinksList(allFirstHops,0)
+
   
   
   # if myFirstHops.count()
@@ -53,7 +56,10 @@ Template.dataGrid.events =
       console.log "clicked Nothing"
 
     # Session.set "clickedItem", myTitles[dataArray[yPos][xPos]]["pageID"]
-    console.log Session.get "clickedItem"
+    # console.log Session.get "clickedItem"
+    # values = scroller.getValues()
+    # console.log values
+    # console.log positions[myTitle]["pageID"]
 
 Template.links.events =
   "click .closeRing": ->
@@ -94,6 +100,20 @@ Template.links.map = ->
     myLinks = myLinks.concat(notMyLinks).slice(0,35)
     buildCentricNet(myMap[0]["articleTitle"], myLinks, IDs)
     console.log myLinks.length
+
+
+@buildPositions = (data) ->
+  _.forEach data, (item) ->
+    x = item['x']
+    # console.log x
+    y = item['y']
+    id = item['pageID']
+
+    rank = x + (y*400 )
+    xx = rank %1250
+    yy = Math.floor(rank/1250)
+
+    positions[id] = {'x':xx, 'y':yy}
 
 
 @buildArray = (data) ->
@@ -143,20 +163,22 @@ Template.links.map = ->
       firstHopTitles[title] = {title:title, pageID:pageID}
       firstHopIDs[pageID] = {title:title, pageID:pageID}
 
+
+
 @buildCentricNet = (centerNode,links,IDs) ->
   mnodes = []
   mlinks = []
   height = 800
   width = 800
   center = height/2
-  mnodes.push({"name":centerNode,"group":1, r:50, color:"black", x: center, y: center, fixed:true})
+  mnodes.push({"name":centerNode,"group":1, r:50, color:"rgba(124,240,10,0.0)", x: center, y: center, fixed:true})
   document.getElementById("label").innerHTML = centerNode
 
   numLinks = links.length
   linkNum = 1
   _.forEach links, (link) ->
     twopi = 2*Math.PI
-    console.log link
+    # console.log link
     mx = center + 125 * Math.cos(twopi/numLinks*linkNum)
     my = center + 125 * Math.sin(twopi/numLinks*linkNum)
     if link of myTitles
@@ -221,12 +243,24 @@ Template.links.map = ->
       
     )
     .on("click", (d) ->
-      Session.set "clickedItem", IDs[d.name]
+      # console.log "-sdaf"
+      # console.log myTitles[d.name]
+      # console.log IDs[d.name]
+      id = 0
+      if myTitles[d.name]!=undefined
+        id = myTitles[d.name]["pageID"]
+        Session.set "clickedItem", myTitles[d.name]["pageID"]
+      else
+        id = IDs[d.name]
+        Session.set "clickedItem", IDs[d.name]
       if d.x == 400 and d.y == 400
         console.log "middle!"
         url = "http://en.wikipedia.org/wiki/"+d.name
         win = window.open(url, "_blank")
         # win.focus()
+      console.log "Got positions :" 
+      console.log positions[id]
+      scrollMap(positions[id]['x'],positions[id]['y'])
     )
 
   node = gnodes.append("circle")
@@ -261,10 +295,23 @@ Template.links.map = ->
   $('.backgroundBlur').offset({left:leftOffset, top:topOffset})
 
   force.on "tick", ->
+    
     link.attr("x1", (d) ->
-      d.source.x
+      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x)  )
+      offsetx = Math.abs(50*(Math.cos(angle)))
+      if d.target.x > 400
+        d.source.x+offsetx
+      else
+        d.source.x-offsetx
     ).attr("y1", (d) ->
-      d.source.y
+      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x))
+      offsety = Math.abs(50*(Math.sin(angle)))
+      if d.target.y > 400
+        d.source.y+offsety
+      else
+        d.source.y-offsety
+      
+      # d.source.y-offsety
     ).attr("x2", (d) ->
       d.target.x
     ).attr "y2", (d) ->

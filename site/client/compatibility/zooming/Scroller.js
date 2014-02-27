@@ -36,7 +36,7 @@ var Scroller;
 			animating: true,
 
 			/** duration for animations triggered by scrollTo/zoomTo */
-			animationDuration: 250,
+			animationDuration: 500,
 
 			/** Enable bouncing (content can be slowly moved outside and jumps back after releasing) */
 			bouncing: false,
@@ -57,7 +57,7 @@ var Scroller;
 			minZoom: 1.00,
 
 			/** Maximum zoom level */
-			maxZoom: 50,
+			maxZoom: 75,
 
 			/** Multiply or decrease scrolling speed **/
 			speedMultiplier: 1,
