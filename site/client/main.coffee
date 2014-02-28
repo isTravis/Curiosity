@@ -49,8 +49,10 @@ Template.dataGrid.events =
 
     if myTitle != undefined and $('.backgroundBlur').length==0
       Session.set "clickedItem", myTitle["pageID"]
+      scrollMap(positions[myTitle["pageID"]]['x'],positions[myTitle["pageID"]]['y'])
     else if firstTitle != undefined and $('.backgroundBlur').length==0
       Session.set "clickedItem", firstTitle["pageID"]
+      scrollMap(positions[firstTitle["pageID"]]['x'],positions[firstTitle["pageID"]]['y'])
     else
       # Session.set "clickedItem", firstTitle
       console.log "clicked Nothing"

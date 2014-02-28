@@ -176,7 +176,7 @@
       
       return
     setTimeout(doSomething, 500);
-    scroller.zoomTo 75, true
+    scroller.zoomTo 75, true 
   console.log "I'm at "+scroller.getValues()["left"]+" and "+scroller.getValues()["top"]
   return
 
