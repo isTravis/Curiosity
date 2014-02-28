@@ -40,7 +40,7 @@ Template.main.events =
 
 Template.dataGrid.events =
   "click ": (d) ->
-    console.log xPos + " clicked " + yPos
+    # console.log xPos + " clicked " + yPos
     myTitle = myTitles[dataArray[yPos][xPos]]
     firstTitle = firstHopTitles[firstHopArray[yPos][xPos]]
     # if myTitl
@@ -55,7 +55,7 @@ Template.dataGrid.events =
       scrollMap(positions[firstTitle["pageID"]]['x'],positions[firstTitle["pageID"]]['y'])
     else
       # Session.set "clickedItem", firstTitle
-      console.log "clicked Nothing"
+      # console.log "clicked Nothing"
 
     # Session.set "clickedItem", myTitles[dataArray[yPos][xPos]]["pageID"]
     # console.log Session.get "clickedItem"
@@ -75,33 +75,41 @@ Template.links.events =
     $('.closeRing').addClass("hidden")
 
   "click #viz": ->
-    console.log "gotit"
+    # console.log "gotit"
 
 Template.links.created = ->
   Session.set "clickedItem", 0
 
 Template.links.map = ->
   myMap = WikiLinks.find().fetch()
-  console.log "myMap:"
-  console.log myMap
+  # console.log "myMap:"
+  # console.log myMap
   if myMap.length 
     myLinks = []
+    firstHopLinks = []
     notMyLinks = []
     IDs = {}
     links = myMap[0]["titledLinks"]
     _.forEach links, (link) ->
       if link["pageID"] of myIDs
         # console.log myIDs[link]["title"]
-        console.log link
+        # console.log link
         myLinks.push(link["title"])
+      else if link["pageID"] of firstHopIDs
+        firstHopLinks.push(link["title"])
+        IDs[link["title"]]= link["pageID"]
       else
         notMyLinks.push(link["title"])
         IDs[link["title"]]= link["pageID"]
-    notMyLinks = notMyLinks.slice(0,(35-myLinks.length))
 
-    myLinks = myLinks.concat(notMyLinks).slice(0,35)
+    firstHopLinks = firstHopLinks.slice(0,(35-myLinks.length))
+    notMyLinks = notMyLinks.slice(0,(35-myLinks.length-firstHopLinks.length))
+
+    myLinks = myLinks.concat(firstHopLinks).concat(notMyLinks).slice(0,35)
+
+
     buildCentricNet(myMap[0]["articleTitle"], myLinks, IDs)
-    console.log myLinks.length
+    # console.log myLinks.length
 
 
 @buildPositions = (data) ->
@@ -170,10 +178,11 @@ Template.links.map = ->
 @buildCentricNet = (centerNode,links,IDs) ->
   mnodes = []
   mlinks = []
-  height = 800
-  width = 800
-  center = height/2
-  mnodes.push({"name":centerNode,"group":1, r:50, color:"rgba(124,240,10,0.0)", x: center, y: center, fixed:true})
+  height = $('#dataCanvas').height()
+  width = $('#dataCanvas').width()
+  centerx = width/2
+  centery = height/2
+  mnodes.push({"name":centerNode,"group":1, r:50, color:"rgba(124,240,10,0.0)", x: centerx, y: centery, fixed:true})
   document.getElementById("label").innerHTML = centerNode
 
   numLinks = links.length
@@ -181,13 +190,14 @@ Template.links.map = ->
   _.forEach links, (link) ->
     twopi = 2*Math.PI
     # console.log link
-    mx = center + 125 * Math.cos(twopi/numLinks*linkNum)
-    my = center + 125 * Math.sin(twopi/numLinks*linkNum)
+    mx = centerx + 125 * Math.cos(twopi/numLinks*linkNum)
+    my = centery + 125 * Math.sin(twopi/numLinks*linkNum)
     if link of myTitles
       mnodes.push({"name":link,"group":1, r:10, color:"red", x: mx, y: my, fixed:true})
-    else
+    else if link of firstHopTitles
       mnodes.push({"name":link,"group":1, r:10, color:"blue", x: mx, y: my, fixed:true})
-
+    else
+      mnodes.push({"name":link,"group":1, r:10, color:"#333", x: mx, y: my, fixed:true})
     mlinks.push({"source":0,"target":linkNum,"value":1})
     linkNum += 1
 
@@ -222,6 +232,7 @@ Template.links.map = ->
       5
     )
     
+  clickANode = false
 
   gnodes = svg.selectAll("g.gnode")
     .data(mnodes)
@@ -233,7 +244,7 @@ Template.links.map = ->
       nodeSelection.select("circle").style(opacity: "1.0")
       nodeSelection.select("text").style(opacity: "1.0")
       nodeSelection.select("circle").style("stroke","#ccc")
-      if d.x == 400 and d.y == 400
+      if d.x == centerx and d.y == centery
         nodeSelection.select("circle").style("cursor","pointer")
     )
     .on("mouseout", (d) ->
@@ -249,21 +260,38 @@ Template.links.map = ->
       # console.log myTitles[d.name]
       # console.log IDs[d.name]
       id = 0
-      if myTitles[d.name]!=undefined
-        id = myTitles[d.name]["pageID"]
-        Session.set "clickedItem", myTitles[d.name]["pageID"]
-      else
-        id = IDs[d.name]
-        Session.set "clickedItem", IDs[d.name]
-      if d.x == 400 and d.y == 400
-        console.log "middle!"
-        url = "http://en.wikipedia.org/wiki/"+d.name
-        win = window.open(url, "_blank")
-        # win.focus()
-      console.log "Got positions :" 
-      console.log positions[id]
-      scrollMap(positions[id]['x'],positions[id]['y'])
+
+      clickANode = true
+      console.log d.color
+      if d.color != "#333"
+        if myTitles[d.name]!=undefined
+          id = myTitles[d.name]["pageID"]
+          Session.set "clickedItem", myTitles[d.name]["pageID"]
+        else
+          id = IDs[d.name]
+          Session.set "clickedItem", IDs[d.name]
+        if d.x == centerx and d.y == centery
+          # console.log "middle!"
+          # url = "http://en.wikipedia.org/wiki/"+d.name
+          # win = window.open(url, "_blank")
+          $('svg').remove()
+          $('.backgroundBlur').remove()
+          $('.closeRing').addClass("hidden")
+          # win.focus()
+        # console.log "Got positions :" 
+        # console.log positions[id]
+        scrollMap(positions[id]['x'],positions[id]['y'])
     )
+
+  svg.on("click", (d) ->
+    # console.log "okayyy"
+    # console.log d
+    # console.log clickANode
+    if not clickANode
+      $('svg').remove()
+      $('.backgroundBlur').remove()
+      $('.closeRing').addClass("hidden")
+  ).style("background","rgba(44,44,44,0.5")
 
   node = gnodes.append("circle")
     .attr("class", "node")
@@ -293,7 +321,7 @@ Template.links.map = ->
   mheight = $('#dataCanvas').height()
 
   # console.log leftOffset + " | " + topOffset + " | " + mwidth + " | " + mheight
-  $('#viz').offset({left:mwidth/2-center+leftOffset, top:topOffset+mheight/2-center})
+  $('#viz').offset({left:leftOffset, top:topOffset })
   $('.backgroundBlur').offset({left:leftOffset, top:topOffset})
 
   force.on "tick", ->
@@ -301,14 +329,14 @@ Template.links.map = ->
     link.attr("x1", (d) ->
       angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x)  )
       offsetx = Math.abs(50*(Math.cos(angle)))
-      if d.target.x > 400
+      if d.target.x > centerx
         d.source.x+offsetx
       else
         d.source.x-offsetx
     ).attr("y1", (d) ->
       angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x))
       offsety = Math.abs(50*(Math.sin(angle)))
-      if d.target.y > 400
+      if d.target.y > centery
         d.source.y+offsety
       else
         d.source.y-offsety
@@ -324,15 +352,15 @@ Template.links.map = ->
 
 
     labels.attr "transform", (d) ->
-      if d.x == 400 and d.y == 400
+      if d.x == centerx and d.y == centery
         mag = -this.getBBox().width/2
         return "translate("+mag+","+0+")"
 
-      slope = (center-d.y)/(center-d.x)
+      slope = (centery-d.y)/(centerx-d.x)
       degangle = 360/(Math.PI*2)*Math.atan(slope)
       radangle = Math.atan(slope)
 
-      if d.x <= center
+      if d.x <= centerx
         mag = this.getBBox().width + 15
         xTrans = -mag*Math.cos(radangle)
         yTrans = -mag*Math.sin(radangle)
@@ -358,20 +386,20 @@ Template.links.map = ->
         # "rotate(" + 360/(Math.PI*2)*Math.atan(Math.abs(250-d.y)/Math.abs(250-d.x)) + ")"
 
 
-network = {
-  "nodes":[
-    {"name":"Myriel","group":1, x: 250, y: 250, fixed:true},
-    {"name":"Napoleon","group":1, x: 300, y:150, fixed:true},
-    {"name":"Mlle.Baptistine","group":1, x: 300, y: 50, fixed:true},
-    {"name":"Mme.Magloire","group":1, x: 0, y: 500, fixed:true},
-    {"name":"CountessdeLo","group":1, x: 500, y: 0, fixed:true},
-    {"name":"Geborand","group":1, x: 500, y: 500, fixed:true}],
-  "links":[
-    {"source":0,"target":1,"value":1},
-    {"source":0,"target":2,"value":8},
-    {"source":0,"target":3,"value":10},
-    {"source":0,"target":4,"value":6},
-    {"source":0,"target":5,"value":6}
-  ]
+# network = {
+#   "nodes":[
+#     {"name":"Myriel","group":1, x: 250, y: 250, fixed:true},
+#     {"name":"Napoleon","group":1, x: 300, y:150, fixed:true},
+#     {"name":"Mlle.Baptistine","group":1, x: 300, y: 50, fixed:true},
+#     {"name":"Mme.Magloire","group":1, x: 0, y: 500, fixed:true},
+#     {"name":"CountessdeLo","group":1, x: 500, y: 0, fixed:true},
+#     {"name":"Geborand","group":1, x: 500, y: 500, fixed:true}],
+#   "links":[
+#     {"source":0,"target":1,"value":1},
+#     {"source":0,"target":2,"value":8},
+#     {"source":0,"target":3,"value":10},
+#     {"source":0,"target":4,"value":6},
+#     {"source":0,"target":5,"value":6}
+#   ]
 
-}
+# }

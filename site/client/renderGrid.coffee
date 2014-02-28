@@ -46,6 +46,12 @@
       b = Math.floor(255)
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height
+    # else
+    #   r = Math.floor(0)
+    #   g = Math.floor(255)
+    #   b = Math.floor(255)
+    #   context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
+    #   context.fillRect left, top, width, height
     return
 
 
@@ -163,16 +169,20 @@
   zoom = scroller.getValues()['zoom']
   scrollerx = scroller.getValues()['left']
   scrollery = scroller.getValues()['top']
-  console.log values
+  # console.log values
   console.log "I got "+x+" and "+y
   console.log "Gunna scroll to "+x*zoom+" and "+y*zoom
-  
+  height = $('#dataCanvas').height()
+  width = $('#dataCanvas').width()
+  centerx = width/2
+  centery = height/2
+  console.log height + " | " + width + " | " + centerx + " | " + centery
   if zoom == 75
-    scroller.scrollTo(x*zoom-625+37.5,y*zoom-400+37.5,true)
+    scroller.scrollTo(x*zoom-centerx+37.5,y*zoom-centery+37.5,true)
   else
     doSomething = ->
       zoom = scroller.getValues()['zoom']
-      scroller.scrollTo(x*zoom-625+37.5,y*zoom-400+37.5,true)
+      scroller.scrollTo(x*zoom-centerx+37.5,y*zoom-centery+37.5,true)
       
       return
     setTimeout(doSomething, 500);
