@@ -35,14 +35,14 @@
     # if (col+row) % 100 is 0
 
     if dataArray[row][col] 
-      r = Math.floor(255)
-      g = Math.floor(0)
-      b = Math.floor(0)
+      r = Math.floor(250)
+      g = Math.floor(18)
+      b = Math.floor(66)
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height
     else if firstHopArray[row][col] 
       r = Math.floor(0)
-      g = Math.floor(0)
+      g = Math.floor(94)
       b = Math.floor(255)
       context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (255 / 255) + ")"
       context.fillRect left, top, width, height

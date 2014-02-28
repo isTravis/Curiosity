@@ -48,9 +48,12 @@ Template.dataGrid.events =
 
 
     if myTitle != undefined and $('.backgroundBlur').length==0
+      $('#label').addClass("hidden")
       Session.set "clickedItem", myTitle["pageID"]
       scrollMap(positions[myTitle["pageID"]]['x'],positions[myTitle["pageID"]]['y'])
+
     else if firstTitle != undefined and $('.backgroundBlur').length==0
+      $('#label').addClass("hidden")
       Session.set "clickedItem", firstTitle["pageID"]
       scrollMap(positions[firstTitle["pageID"]]['x'],positions[firstTitle["pageID"]]['y'])
     else
@@ -68,17 +71,23 @@ Template.links.events =
     $('svg').remove()
     $('.backgroundBlur').remove()
     $('.closeRing').addClass("hidden")
+    $('#label').removeClass("hidden")
 
   "click .backgroundBlur": ->
     $('svg').remove()
     $('.backgroundBlur').remove()
     $('.closeRing').addClass("hidden")
+    $('#label').removeClass("hidden")
+
 
   "click #viz": ->
     # console.log "gotit"
 
 Template.links.created = ->
-  Session.set "clickedItem", 0
+  Session.set "clickedItem", ""
+
+Template.bottomInfo.rendered = ->
+  $('.bottomInfo').width($('#dataCanvas').width())
 
 Template.links.map = ->
   myMap = WikiLinks.find().fetch()
@@ -90,17 +99,20 @@ Template.links.map = ->
     notMyLinks = []
     IDs = {}
     links = myMap[0]["titledLinks"]
+
+    centerTitle = myMap[0]["articleTitle"]
     _.forEach links, (link) ->
-      if link["pageID"] of myIDs
-        # console.log myIDs[link]["title"]
-        # console.log link
-        myLinks.push(link["title"])
-      else if link["pageID"] of firstHopIDs
-        firstHopLinks.push(link["title"])
-        IDs[link["title"]]= link["pageID"]
-      else
-        notMyLinks.push(link["title"])
-        IDs[link["title"]]= link["pageID"]
+      if centerTitle != link["title"]
+        if link["pageID"] of myIDs
+          # console.log myIDs[link]["title"]
+          # console.log link
+          myLinks.push(link["title"])
+        else if link["pageID"] of firstHopIDs
+          firstHopLinks.push(link["title"])
+          IDs[link["title"]]= link["pageID"]
+        else
+          notMyLinks.push(link["title"])
+          IDs[link["title"]]= link["pageID"]
 
     firstHopLinks = firstHopLinks.slice(0,(35-myLinks.length))
     notMyLinks = notMyLinks.slice(0,(35-myLinks.length-firstHopLinks.length))
@@ -108,9 +120,19 @@ Template.links.map = ->
     myLinks = myLinks.concat(firstHopLinks).concat(notMyLinks).slice(0,35)
 
 
-    buildCentricNet(myMap[0]["articleTitle"], myLinks, IDs)
-    # console.log myLinks.length
+    buildCentricNet(centerTitle, myLinks, IDs)
 
+    # console.log myLinks.length
+  return ""
+
+Template.bottomInfo.bottomInfo = ->
+  console.log "Printed bottomInfo"
+  xx = Session.get "clickedItem"
+  if xx != ""
+    console.log ClickedItem.findOne()
+    return ClickedItem.find()
+  else
+    return ""
 
 @buildPositions = (data) ->
   _.forEach data, (item) ->
@@ -180,6 +202,7 @@ Template.links.map = ->
   mlinks = []
   height = $('#dataCanvas').height()
   width = $('#dataCanvas').width()
+
   centerx = width/2
   centery = height/2
   mnodes.push({"name":centerNode,"group":1, r:50, color:"rgba(124,240,10,0.0)", x: centerx, y: centery, fixed:true})
@@ -193,9 +216,9 @@ Template.links.map = ->
     mx = centerx + 125 * Math.cos(twopi/numLinks*linkNum)
     my = centery + 125 * Math.sin(twopi/numLinks*linkNum)
     if link of myTitles
-      mnodes.push({"name":link,"group":1, r:10, color:"red", x: mx, y: my, fixed:true})
+      mnodes.push({"name":link,"group":1, r:10, color:"rgb(250,18,66)", x: mx, y: my, fixed:true})
     else if link of firstHopTitles
-      mnodes.push({"name":link,"group":1, r:10, color:"blue", x: mx, y: my, fixed:true})
+      mnodes.push({"name":link,"group":1, r:10, color:"rgb(0,94,255)", x: mx, y: my, fixed:true})
     else
       mnodes.push({"name":link,"group":1, r:10, color:"#333", x: mx, y: my, fixed:true})
     mlinks.push({"source":0,"target":linkNum,"value":1})
@@ -205,6 +228,7 @@ Template.links.map = ->
 
   $('svg').remove()
   $('.backgroundBlur').remove()
+
   # width = 800
   # height = 800
   color = d3.scale.category20()
@@ -233,7 +257,7 @@ Template.links.map = ->
     )
     
   clickANode = false
-
+  clickedABlankNode = false
   gnodes = svg.selectAll("g.gnode")
     .data(mnodes)
     .enter()
@@ -244,8 +268,8 @@ Template.links.map = ->
       nodeSelection.select("circle").style(opacity: "1.0")
       nodeSelection.select("text").style(opacity: "1.0")
       nodeSelection.select("circle").style("stroke","#ccc")
-      if d.x == centerx and d.y == centery
-        nodeSelection.select("circle").style("cursor","pointer")
+      # if d.x == centerx and d.y == centery
+      #   nodeSelection.select("circle").style("cursor","pointer")
     )
     .on("mouseout", (d) ->
       nodeSelection = d3.select(this)
@@ -262,13 +286,17 @@ Template.links.map = ->
       id = 0
 
       clickANode = true
+      # clickedABlankNode = false
       console.log d.color
       if d.color != "#333"
         if myTitles[d.name]!=undefined
           id = myTitles[d.name]["pageID"]
+          document.getElementById("label").innerHTML =""
           Session.set "clickedItem", myTitles[d.name]["pageID"]
+
         else
           id = IDs[d.name]
+          document.getElementById("label").innerHTML =""
           Session.set "clickedItem", IDs[d.name]
         if d.x == centerx and d.y == centery
           # console.log "middle!"
@@ -277,9 +305,17 @@ Template.links.map = ->
           $('svg').remove()
           $('.backgroundBlur').remove()
           $('.closeRing').addClass("hidden")
+          Session.set "clickedItem", ""
+          $('#label').removeClass("hidden")
           # win.focus()
         # console.log "Got positions :" 
         # console.log positions[id]
+        scrollMap(positions[id]['x'],positions[id]['y'])
+      else
+        document.getElementById("label").innerHTML =""
+        Session.set "clickedItem", (Session.get "clickedItem")
+        clickedABlankNode = true
+        id =  Session.get "clickedItem"
         scrollMap(positions[id]['x'],positions[id]['y'])
     )
 
@@ -291,7 +327,15 @@ Template.links.map = ->
       $('svg').remove()
       $('.backgroundBlur').remove()
       $('.closeRing').addClass("hidden")
+      Session.set "clickedItem", ""
+      $('#label').removeClass("hidden")
+    if clickedABlankNode
+      clickANode = false
+      clickedABlankNode = false
   ).style("background","rgba(44,44,44,0.5")
+
+  console.log clickANode
+  console.log clickedABlankNode
 
   node = gnodes.append("circle")
     .attr("class", "node")

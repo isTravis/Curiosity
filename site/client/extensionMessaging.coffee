@@ -6,6 +6,7 @@ window.addEventListener "message", ((event) ->
         history = event.data.text
         userTitles = collectTitles(history)
         Session.set "userTitles", userTitles
+        $('#hasExtension').addClass("hidden")
 ), false
 
 

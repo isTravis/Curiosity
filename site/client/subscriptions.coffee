@@ -7,6 +7,7 @@ Deps.autorun ->
 
 	firstHopSub = Meteor.subscribe "firstHopPub", userTitles
 	
+	clickedItemSub = Meteor.subscribe "clickedItemPub", clickedItem
     
 
     # topPagesSub = Meteor.subscribe "topPagesPub", zoom, myx, myy

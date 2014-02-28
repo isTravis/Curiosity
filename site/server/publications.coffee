@@ -63,6 +63,19 @@ Meteor.publish "firstHopPub", (userTitles) ->
 
 	return 0
 
+Meteor.publish "clickedItemPub", (clickedItem) ->
+	if clickedItem != ""
+		sub = this
+		collectionName = "clickeditem"
+		xx = TopMillion.find({pageID:clickedItem}).fetch()[0]
+		console.log xx
+		sub.added collectionName, xx._id, xx
+		sub.ready()
+		return
+	
+	
+
+
 # Meteor.publish "userDataPub", (historyValues, receivedHistoryTime, userID) ->
 #     console.log "just Updated"
 #     # console.log "updated " + updated

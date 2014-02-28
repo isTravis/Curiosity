@@ -5,6 +5,7 @@
 
 @FirstHops = new Meteor.Collection "firsthops"
 
+@ClickedItem = new Meteor.Collection "clickeditem"
 # @UserGridData = new Meteor.Collection "usergriddata"
 # @WikiData = new Meteor.Collection "wikidata" 
 # @isReady = new Meteor.Collection "links"

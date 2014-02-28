@@ -6,11 +6,6 @@
 </head>
 
 <template name="main">
-	
-
-
-
-
 	<body>
 		{{>hasExtension}}
 		<div class="title-bar">
@@ -19,11 +14,9 @@
 			<!-- <h2 id = "right">Heatmap | FAQ</h2> -->
 		</div>
 		{{>dataGrid}}
-		<div class="details">
-			<h1 id="label">Label</h1>
-		</div>
-		{{>links}}
 		
+		{{>links}}
+		{{>bottomInfo}}
 	</body>
 </template>
 
@@ -35,15 +28,16 @@
 	</div>
 	{{dataGrid}}
 	{{>userData}}
-	
+	<div class="details">
+			<h1 id="label"></h1>
+		</div>
 </template>
 
 <template name = "links">
-
 	{{map}}
 	{{#constant}}
 	<div class="blur"></div>
-	<div id="viz"><h2 class="closeRing hidden">CLOSE</h2></div>
+	<div id="viz"></div>
 	{{/constant}}
 </template>
 
@@ -51,11 +45,19 @@
 	{{userData}}
 	{{#constant}}
 		<div id="container"><canvas id="dataCanvas"  width="1000" height="1000"></canvas></div>
-
-
 	{{/constant}}
 </template>
 
 <template name = "hasExtension">
 	<div id="hasExtension">Please Install Extension</div>
+</template>
+
+<template name = "bottomInfo">
+	<div class="bottomInfo">
+		{{#each bottomInfo}}
+			<h2 class="bottom-title">{{articleTitle}}</h2>
+			<a class = "wikiLink" href="http://en.wikipedia.org/en/wiki/{{articleTitle}}"><h3 class="bottom-url">Go To Wiki</h3></a>
+		{{/each}}
+	</div>
+	
 </template>
