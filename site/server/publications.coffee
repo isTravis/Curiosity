@@ -64,11 +64,11 @@ Meteor.publish "firstHopPub", (userTitles) ->
 	return 0
 
 Meteor.publish "clickedItemPub", (clickedItem) ->
-	if clickedItem != ""
+	if clickedItem != "" and clickedItem != null
 		sub = this
 		collectionName = "clickeditem"
 		xx = TopMillion.find({pageID:clickedItem}).fetch()[0]
-		console.log xx
+		# console.log xx
 		sub.added collectionName, xx._id, xx
 		sub.ready()
 		return

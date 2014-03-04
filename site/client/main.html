@@ -23,9 +23,6 @@
 
 
 <template name = "dataGrid">
-	<div class="gridcanvas hidden">
-		<canvas id="myCanvas" class="  wtfcanvas" width="1000" height="1000"></canvas>
-	</div>
 	{{dataGrid}}
 	{{>userData}}
 	<div class="details">
@@ -56,7 +53,7 @@
 	<div class="bottomInfo">
 		{{#each bottomInfo}}
 			<h2 class="bottom-title">{{articleTitle}}</h2>
-			<a class = "wikiLink" href="http://en.wikipedia.org/en/wiki/{{articleTitle}}"><h3 class="bottom-url">Go To Wiki</h3></a>
+			<a class = "wikiLink" target="_blank" href="http://en.wikipedia.org/wiki/{{articleTitle}}"><h3 class="bottom-url">Go To Wiki</h3></a>
 		{{/each}}
 	</div>
 	

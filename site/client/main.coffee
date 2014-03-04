@@ -88,6 +88,9 @@ Template.links.created = ->
 
 Template.bottomInfo.rendered = ->
   $('.bottomInfo').width($('#dataCanvas').width())
+  if $('.bottom-title').html()
+    properText = $('.bottom-title').html().replace(/_/g, " ")
+    $('.bottom-title').html( properText)
 
 Template.links.map = ->
   myMap = WikiLinks.find().fetch()
