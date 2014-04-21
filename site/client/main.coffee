@@ -127,7 +127,8 @@ Template.links.map = ->
     myLinks = myLinks.concat(firstHopLinks).concat(notMyLinks).slice(0,35)
 
 
-    buildCentricNet(centerTitle, myLinks, IDs)
+    # buildCentricNet(centerTitle, myLinks, IDs)
+    buildLinearNet(centerTitle, IDs)
 
     # console.log myLinks.length
   return ""
@@ -163,6 +164,7 @@ Template.bottomInfo.bottomInfo = ->
       array[i][j] = undefined
 
   _.forEach data, (item) ->
+    # console.log item
     x = item['x'] # Yes, I realized I switch x and y in the db. Oops. 
     y = item['y']
 
@@ -173,8 +175,12 @@ Template.bottomInfo.bottomInfo = ->
     # if x > 1250
     #   x = x-1250
     #   y = y+400
-    array[y][x] = item["articleTitle"]
-    # console.log array[yy][xx]
+    try
+      array[y][x] = item["articleTitle"]
+    catch
+      dumbvariable = 0
+    # array[y][x] = item["articleTitle"]
+    
 
   return array
 
@@ -274,7 +280,7 @@ Template.bottomInfo.bottomInfo = ->
       nodeSelection = d3.select(this)
       nodeSelection.select("circle").style(opacity: "1.0")
       nodeSelection.select("text").style(opacity: "1.0")
-      nodeSelection.select("circle").style("stroke","#ccc")
+      nodeSelection.select("circle").style("stroke","#E2D64F")
       # if d.x == centerx and d.y == centery
       #   nodeSelection.select("circle").style("cursor","pointer")
     )
@@ -314,7 +320,7 @@ Template.bottomInfo.bottomInfo = ->
           id = myTitles[d.name]["pageID"]
           document.getElementById("label").innerHTML =""
           Session.set "clickedItem", myTitles[d.name]["pageID"]
-          # scrollMap(positions[id]['x'],positions[id]['y'])
+          scrollMap(positions[id]['x'],positions[id]['y'])
 
         else
           id = IDs[d.name]
@@ -474,3 +480,346 @@ Template.bottomInfo.bottomInfo = ->
 #   ]
 
 # }
+@buildLinearNet = (centerNode,IDs) ->
+  mnodes = []
+  mlinks = []
+  height = $('#dataCanvas').height()
+  width = $('#dataCanvas').width()
+
+  centerx = width/2
+  centery = height/2
+  # mnodes.push({"name":centerNode,"group":1, r:50, color:"rgba(124,240,10,0.0)", x: centerx, y: centery, fixed:true})
+  document.getElementById("label").innerHTML = centerNode
+
+  currentID = Session.get "clickedItem"
+  visitTimes = Session.get "visitTimes"
+  userTitles = Session.get "userTitles"
+
+  # console.log currentID
+  currentTitle = myIDs[currentID]['title']
+  # console.log currentTitle
+  index = userTitles.indexOf(currentTitle)
+  # console.log visitTimes[index]
+  baseTime = visitTimes[index]
+  console.log "index is " + index
+  console.log myIDs[currentID]
+  console.log centerNode
+
+  trailDistance = 4
+  trailNodes = []
+  goodPast = 0
+  goodFuture = 0
+  pastIndex = 1
+  futureIndex = 1
+
+  tempPastNodes = []
+  while goodPast < trailDistance
+    thisPast = userTitles[index-pastIndex]
+    if isGoodSite(thisPast)
+      tempPastNodes.push(index-pastIndex)
+      goodPast += 1
+    pastIndex += 1
+
+  tempPastNodes.reverse()
+
+  for jj in [0..trailDistance-1]
+    trailNodes.push(tempPastNodes[jj])
+
+  trailNodes.push(index)
+
+  while goodFuture < trailDistance
+    thisFuture = userTitles[index+futureIndex]
+    if isGoodSite(thisFuture)
+      trailNodes.push(index+futureIndex)
+      goodFuture += 1
+    futureIndex += 1
+
+  console.log trailNodes
+
+  iteratorIndex = 0
+  totalNodes = trailDistance*2+1
+  nodeoffset = 100
+  availableWidth = $('#dataCanvas').width()-nodeoffset
+  widthPer = availableWidth/(totalNodes-1)
+  nodeYPos = $('#dataCanvas').height()/2
+
+  _.forEach trailNodes, (node) ->
+    if node is index
+      mnodes.push({"name":userTitles[node],"group":1, r:50, color:"rgba(124,240,10,0.0)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
+    else
+      mnodes.push({"name":userTitles[node],"group":2, r:10, color:"rgba(240,240,10,0.0)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
+    iteratorIndex += 1
+
+  for i in [0..totalNodes-2]
+    console.log i + " " + (i+1)
+    time0 = parseFloat(visitTimes[trailNodes[i]])/1000
+    time1 = parseFloat(visitTimes[trailNodes[i+1]])/1000
+    console.log "time0: " + time0 + "    |    " + "time1: " + time1
+    if time1-time0 < 0
+      mlinks.push({"source":i,"target":i+1,"value":time1-time0})
+    else
+      mlinks.push({"source":i,"target":i+1,"value":45})
+    
+  console.log mnodes
+  console.log mlinks
+  # console.log userTitles[index-3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-3])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index-2] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-2])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index-1] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-1])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index] + " | " +   String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index  ])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index+1] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+1])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index+2] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+2])/1000/60)).toFixed(3))+"minutes difference"
+  # console.log userTitles[index+3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+3])/1000/60)).toFixed(3))+"minutes difference"
+  
+  $('svg').remove()
+  $('.backgroundBlur').remove()
+
+  color = d3.scale.category20()
+  force = d3.layout.force()
+
+  $('.blur').append("<div class='backgroundBlur'></div>")
+  $(".backgroundBlur").width( $('#dataCanvas').width())
+  $(".backgroundBlur").height( $('#dataCanvas').height())
+
+  svg = d3.select("#viz").append("svg").attr("width", width).attr("height", height-2)
+
+  # $('.closeRing').removeClass("hidden")
+  
+
+  # mnodes = network["nodes"]
+  # mlinks = network["links"]
+  force.nodes(mnodes).links(mlinks).start()
+
+  link = svg.selectAll(".link")
+    .data(mlinks)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .style("stroke-width", (d) ->
+      5
+    )
+    
+  clickANode = false
+  clickedABlankNode = false
+  gnodes = svg.selectAll("g.gnode")
+    .data(mnodes)
+    .enter()
+    .append("g")
+    .classed("gnode", true)
+    .on("mouseover", (d) ->
+      nodeSelection = d3.select(this)
+      nodeSelection.select("circle").style(opacity: "1.0")
+      nodeSelection.select("text").style(opacity: "1.0")
+      nodeSelection.select("circle").style("stroke","#E2D64F")
+      # if d.x == centerx and d.y == centery
+      #   nodeSelection.select("circle").style("cursor","pointer")
+    )
+    .on("mouseout", (d) ->
+      nodeSelection = d3.select(this)
+      nodeSelection.select("circle").style(opacity: "1.0")
+      nodeSelection.select("text").style(opacity: "1.0")
+      nodeSelection.select("circle").style("stroke","#444")
+
+      
+    )
+    .on("click", (d) ->
+      # console.log "-sdaf"
+      # console.log myTitles[d.name]
+      # console.log IDs[d.name]
+      id = 0
+
+      clickANode = true
+      # clickedABlankNode = false
+      console.log d.color
+      if d.color != "#333"
+        if d.x == centerx and d.y == centery
+          # console.log "middle!"
+          # url = "http://en.wikipedia.org/wiki/"+d.name
+          # win = window.open(url, "_blank")
+          # clickANode = false
+          $('#viz').append("<iframe class='wikiFrame' src='http://en.wikipedia.org/wiki/"+d.name+"'></iframe>")
+          
+          $('.close-iframe').removeClass('hidden')
+          $('.wikiFrame').css({ top: (0.05*$('#viz').height())+'px' })
+          $('.wikiFrame').css({ left: (0.025*$('#viz').width())+'px' })
+          $('.wikiFrame').height(0.9*$('#viz').height())
+          $('.wikiFrame').width(0.95*$('#viz').width())
+          clickedABlankNode = true
+
+        else if myTitles[d.name]!=undefined
+          id = myTitles[d.name]["pageID"]
+          document.getElementById("label").innerHTML =""
+          Session.set "clickedItem", myTitles[d.name]["pageID"]
+          scrollMap(positions[id]['x'],positions[id]['y'])
+
+        else
+          id = IDs[d.name]
+          document.getElementById("label").innerHTML =""
+          Session.set "clickedItem", IDs[d.name]
+          scrollMap(positions[id]['x'],positions[id]['y'])
+        
+
+
+          # id = IDs[d.name]
+          # console.log id
+          # console.log positions[id]
+
+          # clickANode = false
+          # clickedABlankNode = false
+          # $('svg').remove()
+          # $('.backgroundBlur').remove()
+          # $('.closeRing').addClass("hidden")
+          # Session.set "clickedItem", ""
+          # $('#label').removeClass("hidden")
+
+
+        # scrollMap(positions[id]['x'],positions[id]['y'])
+      else
+        document.getElementById("label").innerHTML =""
+        Session.set "clickedItem", (Session.get "clickedItem")
+        clickedABlankNode = true
+        id =  Session.get "clickedItem"
+        scrollMap(positions[id]['x'],positions[id]['y'])
+    )
+
+  svg.on("click", (d) ->
+    # console.log "okayyy"
+    # console.log d
+    # console.log clickANode
+    if not clickANode
+      $('svg').remove()
+      $('.backgroundBlur').remove()
+      $('.closeRing').addClass("hidden")
+      Session.set "clickedItem", ""
+      $('#label').removeClass("hidden")
+    if clickedABlankNode
+      clickANode = false
+      clickedABlankNode = false
+  ).style("background","rgba(44,44,44,0.5")
+
+  console.log clickANode
+  console.log clickedABlankNode
+
+  node = gnodes.append("circle")
+    .attr("class", "node")
+    .attr("class", "node").attr("r", (d) ->
+      d.r
+    )
+    .style("opacity", "1.0")
+    .style("fill", (d) ->
+      d.color
+    )
+    .style("stroke","#444")
+    
+  labels = gnodes.append("text")
+    .text((d) ->
+      d.name.replace(/_/g, " ")
+    )
+    .style("opacity", "1.0")
+    .style("fill", "#ccc")
+    .style("pointer-events","none")
+
+
+
+
+  leftOffset = $('#dataCanvas').position()["left"]
+  topOffset = $('#dataCanvas').position()["top"]
+  mwidth = $('#dataCanvas').width()
+  mheight = $('#dataCanvas').height()
+
+  # console.log leftOffset + " | " + topOffset + " | " + mwidth + " | " + mheight
+  $('#viz').offset({left:leftOffset, top:topOffset })
+  $('.backgroundBlur').offset({left:leftOffset, top:topOffset})
+
+  force.on "tick", ->
+    
+    link.attr("x1", (d) ->
+      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x)  )
+      offsetx = Math.abs(50*(Math.cos(angle)))
+      if d.target.x > centerx
+        d.source.x+offsetx
+      else
+        d.source.x-offsetx
+    ).attr("y1", (d) ->
+      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x))
+      offsety = Math.abs(50*(Math.sin(angle)))
+      if d.target.y > centery
+        d.source.y+offsety
+      else
+        d.source.y-offsety
+      
+      # d.source.y-offsety
+    ).attr("x2", (d) ->
+      d.target.x
+    ).attr "y2", (d) ->
+      d.target.y
+
+    gnodes.attr "transform", (d) ->
+      "translate(" + [d.x, d.y ] + ")"
+
+
+    labels.attr "transform", (d) ->
+      if d.x == centerx and d.y == centery
+        mag = -this.getBBox().width/2
+        return "translate("+mag+","+0+")"
+
+      slope = (centery-d.y)/(centerx-d.x)
+      degangle = 360/(Math.PI*2)*Math.atan(slope)
+      radangle = Math.atan(slope)
+
+      if d.x <= centerx
+        mag = this.getBBox().width + 15
+        xTrans = -mag*Math.cos(radangle)
+        yTrans = -mag*Math.sin(radangle)
+        "translate("+xTrans+","+yTrans+")rotate("+degangle+")"
+      else
+        mag = 15
+        xTrans = mag*Math.cos(radangle)
+        yTrans = mag*Math.sin(radangle)
+        "translate("+xTrans+","+yTrans+")rotate("+degangle+")"
+
+
+
+
+
+
+@getNearbyEvents = () ->
+  currentID = Session.get "clickedItem"
+  visitTimes = Session.get "visitTimes"
+  userTitles = Session.get "userTitles"
+
+  # console.log currentID
+  currentTitle = myIDs[currentID]['title']
+  # console.log currentTitle
+  index = userTitles.indexOf(currentTitle)
+  # console.log visitTimes[index]
+  baseTime = visitTimes[index]
+
+  console.log userTitles[index-3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-3])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index-2] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-2])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index-1] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-1])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index] + " | " +   String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index  ])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index+1] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+1])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index+2] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+2])/1000/60)).toFixed(3))+"minutes difference"
+  console.log userTitles[index+3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+3])/1000/60)).toFixed(3))+"minutes difference"
+  
+@isGoodSite = (pageTitle) ->
+  console.log pageTitle
+  isFile = /File:/g
+  isCategory = /Category:/g
+  isTemplate = /Template:/g
+  isTemplateTalk = /Template talk:/g
+  isHelp = /Help:/g
+  isWikipedia = /Wikipedia:/g
+  isPortal = /Portal:/g
+  isUser = /User:/g
+  isAPI = /api.php/g
+  isTalk = /Talk:/g
+  isSpecial = /Special:/g
+  # console.log myTitles
+  if(isSpecial.test(pageTitle) or isTalk.test(pageTitle) or isAPI.test(pageTitle) or isFile.test(pageTitle) or isCategory.test(pageTitle) or isTemplate.test(pageTitle) or isHelp.test(pageTitle) or isWikipedia.test(pageTitle) or isPortal.test(pageTitle) or isTemplateTalk.test(pageTitle) or isUser.test(pageTitle))
+    return false
+  if myTitles[pageTitle] is undefined
+    console.log pageTitle
+    return false
+  return true
+  
