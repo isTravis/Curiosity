@@ -3,9 +3,16 @@
   contentHeight = 800
   cellWidth = 1
   cellHeight = 1
-  clientWidth = window.innerWidth 
-  clientWidth = Math.min(clientWidth - 50, 1250)
-  clientHeight = Math.min(window.innerHeight - 200, 800)
+  clientWidth = window.innerWidth-5
+  clientHeight = window.innerHeight-105
+  # clientWidth = Math.min(clientWidth - 50, 1250)
+  # clientHeight = Math.min(window.innerHeight - 200, 800)
+
+  minzoom = Math.max(clientWidth/contentWidth, clientHeight/contentHeight)
+  console.log minzoom + "minzoom"
+  console.log clientWidth
+  console.log clientHeight
+
   availableWidthRatio = clientWidth/contentWidth
   availableHeightRatio = clientHeight/contentHeight
 
@@ -69,10 +76,14 @@
   scrollTopField = document.getElementById("scrollTop")
   zoomLevelField = document.getElementById("zoomLevel")
 
-  scroller.options.minZoom = Math.min(1.0, availableWidthRatio, availableHeightRatio)
+  # scroller.options.minZoom = Math.min(1.0, availableWidthRatio, availableHeightRatio)
+  scroller.options.minZoom = minzoom
+
 
   rect = container.getBoundingClientRect()
-  scroller.setPosition rect.left + container.clientLeft, rect.top + container.clientTop
+  
+  scroller.zoomTo minzoom
+  scroller.setPosition (rect.left + container.clientLeft)*minzoom, (rect.top + container.clientTop)*minzoom
 
   # Reflow handling
   reflow = ->

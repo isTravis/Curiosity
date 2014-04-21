@@ -8,15 +8,23 @@
 <template name="main">
 	<body>
 		{{>hasExtension}}
-		<div class="title-bar">
-			<h1 id="titleText">Curiosity</h1>
+		<div class="topBar">
+			<div class="title-bar">
+				<h1 id="titleText">Curiosity</h1>
+			</div>
+
+			<div class="details">
+				<h1 id="label"></h1>
+			</div>
+			{{>bottomInfo}}
+		</div>
 			<!-- <h2 id = "left">Timeline | Group</h2> -->
 			<!-- <h2 id = "right">Heatmap | FAQ</h2> -->
-		</div>
+		
 		{{>dataGrid}}
 		
 		{{>links}}
-		{{>bottomInfo}}
+		
 	</body>
 </template>
 
@@ -25,16 +33,16 @@
 <template name = "dataGrid">
 	{{dataGrid}}
 	{{>userData}}
-	<div class="details">
-			<h1 id="label"></h1>
-		</div>
+	
 </template>
 
 <template name = "links">
 	{{map}}
 	{{#constant}}
 	<div class="blur"></div>
-	<div id="viz"></div>
+	<div id="viz">
+		<div class="close-iframe hidden">CLOSE</div>
+	</div>
 	{{/constant}}
 </template>
 
@@ -53,7 +61,7 @@
 	<div class="bottomInfo">
 		{{#each bottomInfo}}
 			<h2 class="bottom-title">{{articleTitle}}</h2>
-			<a class = "wikiLink" target="_blank" href="http://en.wikipedia.org/wiki/{{articleTitle}}"><h3 class="bottom-url">Go To Wiki</h3></a>
+			<!-- <a class = "wikiLink" target="_blank" href="http://en.wikipedia.org/wiki/{{articleTitle}}"><h3 class="bottom-url">Go To Wiki</h3></a> -->
 		{{/each}}
 	</div>
 	

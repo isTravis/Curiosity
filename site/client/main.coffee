@@ -83,6 +83,10 @@ Template.links.events =
   "click #viz": ->
     # console.log "gotit"
 
+  "click .close-iframe": ->
+    $(".wikiFrame").remove()
+    $('.close-iframe').addClass('hidden')
+
 Template.links.created = ->
   Session.set "clickedItem", ""
 
@@ -148,7 +152,7 @@ Template.bottomInfo.bottomInfo = ->
     xx = rank %1250
     yy = Math.floor(rank/1250)
 
-    positions[id] = {'x':xx, 'y':yy}
+    positions[id] = {'x':x, 'y':y}
 
 
 @buildArray = (data) ->
@@ -169,7 +173,7 @@ Template.bottomInfo.bottomInfo = ->
     # if x > 1250
     #   x = x-1250
     #   y = y+400
-    array[yy][xx] = item["articleTitle"]
+    array[y][x] = item["articleTitle"]
     # console.log array[yy][xx]
 
   return array
@@ -241,7 +245,7 @@ Template.bottomInfo.bottomInfo = ->
   $(".backgroundBlur").width( $('#dataCanvas').width())
   $(".backgroundBlur").height( $('#dataCanvas').height())
 
-  svg = d3.select("#viz").append("svg").attr("width", width).attr("height", height)
+  svg = d3.select("#viz").append("svg").attr("width", width).attr("height", height-2)
 
   $('.closeRing').removeClass("hidden")
   
@@ -292,28 +296,48 @@ Template.bottomInfo.bottomInfo = ->
       # clickedABlankNode = false
       console.log d.color
       if d.color != "#333"
-        if myTitles[d.name]!=undefined
+        if d.x == centerx and d.y == centery
+          # console.log "middle!"
+          # url = "http://en.wikipedia.org/wiki/"+d.name
+          # win = window.open(url, "_blank")
+          # clickANode = false
+          $('#viz').append("<iframe class='wikiFrame' src='http://en.wikipedia.org/wiki/"+d.name+"'></iframe>")
+          
+          $('.close-iframe').removeClass('hidden')
+          $('.wikiFrame').css({ top: (0.05*$('#viz').height())+'px' })
+          $('.wikiFrame').css({ left: (0.025*$('#viz').width())+'px' })
+          $('.wikiFrame').height(0.9*$('#viz').height())
+          $('.wikiFrame').width(0.95*$('#viz').width())
+          clickedABlankNode = true
+
+        else if myTitles[d.name]!=undefined
           id = myTitles[d.name]["pageID"]
           document.getElementById("label").innerHTML =""
           Session.set "clickedItem", myTitles[d.name]["pageID"]
+          # scrollMap(positions[id]['x'],positions[id]['y'])
 
         else
           id = IDs[d.name]
           document.getElementById("label").innerHTML =""
           Session.set "clickedItem", IDs[d.name]
-        if d.x == centerx and d.y == centery
-          # console.log "middle!"
-          # url = "http://en.wikipedia.org/wiki/"+d.name
-          # win = window.open(url, "_blank")
-          $('svg').remove()
-          $('.backgroundBlur').remove()
-          $('.closeRing').addClass("hidden")
-          Session.set "clickedItem", ""
-          $('#label').removeClass("hidden")
-          # win.focus()
-        # console.log "Got positions :" 
-        # console.log positions[id]
-        scrollMap(positions[id]['x'],positions[id]['y'])
+          scrollMap(positions[id]['x'],positions[id]['y'])
+        
+
+
+          # id = IDs[d.name]
+          # console.log id
+          # console.log positions[id]
+
+          # clickANode = false
+          # clickedABlankNode = false
+          # $('svg').remove()
+          # $('.backgroundBlur').remove()
+          # $('.closeRing').addClass("hidden")
+          # Session.set "clickedItem", ""
+          # $('#label').removeClass("hidden")
+
+
+        # scrollMap(positions[id]['x'],positions[id]['y'])
       else
         document.getElementById("label").innerHTML =""
         Session.set "clickedItem", (Session.get "clickedItem")
