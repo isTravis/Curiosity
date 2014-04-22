@@ -70,12 +70,14 @@ Template.links.events =
   "click .closeRing": ->
     $('svg').remove()
     $('.backgroundBlur').remove()
+    $('.switch-viz').addClass("hidden")
     $('.closeRing').addClass("hidden")
     $('#label').removeClass("hidden")
 
   "click .backgroundBlur": ->
     $('svg').remove()
     $('.backgroundBlur').remove()
+    $('.switch-viz').addClass("hidden")
     $('.closeRing').addClass("hidden")
     $('#label').removeClass("hidden")
 
@@ -87,8 +89,23 @@ Template.links.events =
     $(".wikiFrame").remove()
     $('.close-iframe').addClass('hidden')
 
+  "click .switch-viz": ->
+    vizMode = Session.get "vizMode"
+    if vizMode == 'timeline'
+      Session.set "vizMode", "related"
+      $('.switch-viz').html("Switch to Timeline")
+    else 
+      Session.set "vizMode", "timeline"
+      $('.switch-viz').html("Switch to Related")
+
+    # Check which mode
+    # switch to the other, 
+    # make text proper
+
+
 Template.links.created = ->
   Session.set "clickedItem", ""
+  Session.set "vizMode", "related"
 
 Template.bottomInfo.rendered = ->
   $('.bottomInfo').width($('#dataCanvas').width())
@@ -126,9 +143,23 @@ Template.links.map = ->
 
     myLinks = myLinks.concat(firstHopLinks).concat(notMyLinks).slice(0,35)
 
+    if myTitles[centerTitle]
+      vizMode = Session.get "vizMode"
+    else
+      Session.set "vizMode", "related"
+      $('.switch-viz').html("Switch to Timeline")
+      vizMode = Session.get "vizMode"
 
-    # buildCentricNet(centerTitle, myLinks, IDs)
-    buildLinearNet(centerTitle, IDs)
+    console.log "centerTitle " + centerTitle
+
+    if vizMode == "timeline"
+      console.log Session.get "clickedItem"
+      if (Session.get "clickedItem").length
+        console.log " but I'm here"
+        buildLinearNet(centerTitle, IDs)
+    else
+      buildCentricNet(centerTitle, myLinks, IDs)
+    
 
     # console.log myLinks.length
   return ""
@@ -211,6 +242,14 @@ Template.bottomInfo.bottomInfo = ->
 
 
 @buildCentricNet = (centerNode,links,IDs) ->
+
+  if myTitles[centerNode]
+    $('.switch-viz').removeClass("hidden")
+  else
+    $('.switch-viz').addClass("hidden")
+    
+
+
   mnodes = []
   mlinks = []
   height = $('#dataCanvas').height()
@@ -254,6 +293,7 @@ Template.bottomInfo.bottomInfo = ->
   svg = d3.select("#viz").append("svg").attr("width", width).attr("height", height-2)
 
   $('.closeRing').removeClass("hidden")
+  
   
 
   # mnodes = network["nodes"]
@@ -300,7 +340,7 @@ Template.bottomInfo.bottomInfo = ->
 
       clickANode = true
       # clickedABlankNode = false
-      console.log d.color
+      # console.log d.color
       if d.color != "#333"
         if d.x == centerx and d.y == centery
           # console.log "middle!"
@@ -359,6 +399,7 @@ Template.bottomInfo.bottomInfo = ->
     if not clickANode
       $('svg').remove()
       $('.backgroundBlur').remove()
+      $('.switch-viz').addClass("hidden")
       $('.closeRing').addClass("hidden")
       Session.set "clickedItem", ""
       $('#label').removeClass("hidden")
@@ -367,8 +408,8 @@ Template.bottomInfo.bottomInfo = ->
       clickedABlankNode = false
   ).style("background","rgba(44,44,44,0.5")
 
-  console.log clickANode
-  console.log clickedABlankNode
+  # console.log clickANode
+  # console.log clickedABlankNode
 
   node = gnodes.append("circle")
     .attr("class", "node")
@@ -481,6 +522,13 @@ Template.bottomInfo.bottomInfo = ->
 
 # }
 @buildLinearNet = (centerNode,IDs) ->
+  console.log "woahwoahwoah what"
+  if myTitles[centerNode]
+    $('.switch-viz').removeClass("hidden")
+  else
+    $('.switch-viz').addClass("hidden")
+
+
   mnodes = []
   mlinks = []
   height = $('#dataCanvas').height()
@@ -496,14 +544,18 @@ Template.bottomInfo.bottomInfo = ->
   userTitles = Session.get "userTitles"
 
   # console.log currentID
-  currentTitle = myIDs[currentID]['title']
+  console.log "ok4"
+  currentTitle = myIDs[currentID]['title']  
+  
+  
   # console.log currentTitle
+  console.log "ok5"
   index = userTitles.indexOf(currentTitle)
   # console.log visitTimes[index]
   baseTime = visitTimes[index]
-  console.log "index is " + index
-  console.log myIDs[currentID]
-  console.log centerNode
+  # console.log "index is " + index
+  # console.log myIDs[currentID]
+  # console.log centerNode
 
   trailDistance = 4
   trailNodes = []
@@ -534,7 +586,8 @@ Template.bottomInfo.bottomInfo = ->
       goodFuture += 1
     futureIndex += 1
 
-  console.log trailNodes
+  # console.log trailNodes
+  trailNodes.reverse()
 
   iteratorIndex = 0
   totalNodes = trailDistance*2+1
@@ -545,23 +598,23 @@ Template.bottomInfo.bottomInfo = ->
 
   _.forEach trailNodes, (node) ->
     if node is index
-      mnodes.push({"name":userTitles[node],"group":1, r:50, color:"rgba(124,240,10,0.0)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
+      mnodes.push({"name":userTitles[node],"group":1, r:50, color:"rgba(250,18,66,0.0)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
     else
-      mnodes.push({"name":userTitles[node],"group":2, r:10, color:"rgba(240,240,10,0.0)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
+      mnodes.push({"name":userTitles[node],"group":2, r:10, color:"rgb(250,18,66)", x: nodeoffset/2+widthPer*iteratorIndex, y: nodeYPos, fixed:true})
     iteratorIndex += 1
 
   for i in [0..totalNodes-2]
-    console.log i + " " + (i+1)
+    # console.log i + " " + (i+1)
     time0 = parseFloat(visitTimes[trailNodes[i]])/1000
     time1 = parseFloat(visitTimes[trailNodes[i+1]])/1000
-    console.log "time0: " + time0 + "    |    " + "time1: " + time1
-    if time1-time0 < 0
+    # console.log "time0: " + time0 + "    |    " + "time1: " + time1
+    if time1-time0 > 0
       mlinks.push({"source":i,"target":i+1,"value":time1-time0})
     else
       mlinks.push({"source":i,"target":i+1,"value":45})
     
-  console.log mnodes
-  console.log mlinks
+  # console.log mnodes
+  # console.log mlinks
   # console.log userTitles[index-3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-3])/1000/60)).toFixed(3))+"minutes difference"
   # console.log userTitles[index-2] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-2])/1000/60)).toFixed(3))+"minutes difference"
   # console.log userTitles[index-1] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index-1])/1000/60)).toFixed(3))+"minutes difference"
@@ -584,6 +637,7 @@ Template.bottomInfo.bottomInfo = ->
 
   # $('.closeRing').removeClass("hidden")
   
+  
 
   # mnodes = network["nodes"]
   # mlinks = network["links"]
@@ -595,8 +649,9 @@ Template.bottomInfo.bottomInfo = ->
     .append("line")
     .attr("class", "link")
     .style("stroke-width", (d) ->
-      5
+      2
     )
+
     
   clickANode = false
   clickedABlankNode = false
@@ -688,16 +743,24 @@ Template.bottomInfo.bottomInfo = ->
     if not clickANode
       $('svg').remove()
       $('.backgroundBlur').remove()
+      
       $('.closeRing').addClass("hidden")
-      Session.set "clickedItem", ""
+      
       $('#label').removeClass("hidden")
+      console.log "ok0"
+      $('.switch-viz').addClass("hidden")
+      console.log "ok1"
+      Session.set "clickedItem", ""
+      console.log "ok2"
+
+
     if clickedABlankNode
       clickANode = false
       clickedABlankNode = false
   ).style("background","rgba(44,44,44,0.5")
 
-  console.log clickANode
-  console.log clickedABlankNode
+  # console.log clickANode
+  # console.log clickedABlankNode
 
   node = gnodes.append("circle")
     .attr("class", "node")
@@ -706,7 +769,8 @@ Template.bottomInfo.bottomInfo = ->
     )
     .style("opacity", "1.0")
     .style("fill", (d) ->
-      d.color
+      return d.color
+
     )
     .style("stroke","#444")
     
@@ -717,6 +781,18 @@ Template.bottomInfo.bottomInfo = ->
     .style("opacity", "1.0")
     .style("fill", "#ccc")
     .style("pointer-events","none")
+
+  timelabels = gnodes.append("text")
+    .text((d) ->
+      try
+        secondsToWords(mlinks[d.index]['value'])
+      catch
+        ""
+    )
+    .style("opacity", "1.0")
+    .style("fill", "#ccc")
+    .style("pointer-events","none")
+
 
 
 
@@ -733,23 +809,25 @@ Template.bottomInfo.bottomInfo = ->
   force.on "tick", ->
     
     link.attr("x1", (d) ->
-      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x)  )
-      offsetx = Math.abs(50*(Math.cos(angle)))
-      if d.target.x > centerx
-        d.source.x+offsetx
-      else
-        d.source.x-offsetx
+      # angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x)  )
+      # offsetx = Math.abs(50*(Math.cos(angle)))
+      # if d.target.x > centerx
+      #   d.source.x+offsetx
+      # else
+      #   d.source.x-offsetx
+      return d.source.x+(d.source.r)
     ).attr("y1", (d) ->
-      angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x))
-      offsety = Math.abs(50*(Math.sin(angle)))
-      if d.target.y > centery
-        d.source.y+offsety
-      else
-        d.source.y-offsety
+      # angle = Math.atan(Math.abs(d.source.y-d.target.y)/Math.abs(d.source.x-d.target.x))
+      # offsety = Math.abs(50*(Math.sin(angle)))
+      # if d.target.y > centery
+      #   d.source.y+offsety
+      # else
+      #   d.source.y-offsety
+      return d.source.y
       
       # d.source.y-offsety
     ).attr("x2", (d) ->
-      d.target.x
+      d.target.x-(d.target.r)
     ).attr "y2", (d) ->
       d.target.y
 
@@ -766,18 +844,27 @@ Template.bottomInfo.bottomInfo = ->
       degangle = 360/(Math.PI*2)*Math.atan(slope)
       radangle = Math.atan(slope)
 
-      if d.x <= centerx
-        mag = this.getBBox().width + 15
-        xTrans = -mag*Math.cos(radangle)
-        yTrans = -mag*Math.sin(radangle)
-        "translate("+xTrans+","+yTrans+")rotate("+degangle+")"
+      # if d.x <= centerx
+      #   mag = this.getBBox().width + 15
+      #   xTrans = -mag*Math.cos(radangle)
+      #   yTrans = -mag*Math.sin(radangle)
+      #   "translate("+xTrans+","+yTrans+")rotate("+degangle+")"
+      # else
+        # mag = 15
+        # xTrans = mag*Math.cos(radangle)
+        # yTrans = mag*Math.sin(radangle)
+      mag = -this.getBBox().width/2
+
+      return "translate("+mag+","+(-20)+")rotate("+0+")"
+
+    timelabels.attr "transform", (d) ->
+      yTrans = 20
+      xTrans = widthPer/4
+      if d.x == centerx and d.y == centery
+        return "translate("+widthPer/2+","+yTrans+")"
       else
-        mag = 15
-        xTrans = mag*Math.cos(radangle)
-        yTrans = mag*Math.sin(radangle)
-        "translate("+xTrans+","+yTrans+")rotate("+degangle+")"
-
-
+        
+        return "translate("+xTrans+","+yTrans+")"
 
 
 
@@ -803,7 +890,7 @@ Template.bottomInfo.bottomInfo = ->
   console.log userTitles[index+3] + " | " + String(((parseFloat(visitTimes[index])/1000/60)-(parseFloat(visitTimes[index+3])/1000/60)).toFixed(3))+"minutes difference"
   
 @isGoodSite = (pageTitle) ->
-  console.log pageTitle
+  # console.log pageTitle
   isFile = /File:/g
   isCategory = /Category:/g
   isTemplate = /Template:/g
@@ -819,7 +906,28 @@ Template.bottomInfo.bottomInfo = ->
   if(isSpecial.test(pageTitle) or isTalk.test(pageTitle) or isAPI.test(pageTitle) or isFile.test(pageTitle) or isCategory.test(pageTitle) or isTemplate.test(pageTitle) or isHelp.test(pageTitle) or isWikipedia.test(pageTitle) or isPortal.test(pageTitle) or isTemplateTalk.test(pageTitle) or isUser.test(pageTitle))
     return false
   if myTitles[pageTitle] is undefined
-    console.log pageTitle
+    # console.log pageTitle
     return false
   return true
+
+@secondsToWords = (seconds) ->
+  if seconds < 60
+    return seconds.toFixed(1) + " seconds"
+  else if seconds < 3600
+    return (seconds/60).toFixed(1) + " minutes"
+
+  else if seconds < 86400
+    return (seconds/3600).toFixed(1) + " hours"
+
+  else if seconds < 604800
+    return (seconds/86400).toFixed(1) + " days"
+
+  else if seconds < 2419200
+    return (seconds/604800).toFixed(1) + " weeks"
+
+  else if seconds < 29030400
+    return (seconds/2419200).toFixed(1) + " months"
+
+  else 
+    return (seconds/29030400).toFixed(1) + " years"
   

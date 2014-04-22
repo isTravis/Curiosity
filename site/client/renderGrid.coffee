@@ -9,9 +9,9 @@
   # clientHeight = Math.min(window.innerHeight - 200, 800)
 
   minzoom = Math.max(clientWidth/contentWidth, clientHeight/contentHeight)
-  console.log minzoom + "minzoom"
-  console.log clientWidth
-  console.log clientHeight
+  # console.log minzoom + "minzoom"
+  # console.log clientWidth
+  # console.log clientHeight
 
   availableWidthRatio = clientWidth/contentWidth
   availableHeightRatio = clientHeight/contentHeight
