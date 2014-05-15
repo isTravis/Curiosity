@@ -1,0 +1,40 @@
+body {
+	height: 100%;
+	width: 100%;
+	background-color: gray;
+}
+
+
+#fullMap {
+	border: 2px black solid;
+	width: 1250px;
+	height: 800px;
+	position: relative;
+	background-color: black;
+}
+
+
+#slider {
+	border:1px gray solid;
+	width:62.5px;
+	height:40px;
+	border-radius:1px;
+	position: absolute;
+	/*background-color:#6769BF; */
+	background-color: rgba(103, 105, 191, .5); 
+	left: 0px;
+	top: 0px;
+}
+
+#minimap {
+	border:2px solid white;
+	background-color:black;
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	border-radius:1px;
+	width:250px;
+	height:160px;
+	float:right;
+
+}
